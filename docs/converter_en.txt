@@ -1,0 +1,148 @@
+[Introduction]
+converter is designed to handle S.T.A.L.K.E.R. game and tools (LE/AE)
+assets. It implements the following functions:
+ - .ogf to .object conversion
+ - .ogf to .bones skeleton extraction
+ - .ogf/.omf to .skls/.skl extraction
+ - .dm to .object conversion
+ - game level to LE scene conversion
+ - game archive packing/unpacking
+ - .dds to .tga multi-conversion
+
+converter is a console application (Start -> Run -> cmd.exe). Tested on
+Windows XP SP2/SP3 only.
+
+
+[Installation]
+Specify $sdk_root$ in fsconverter.ltx and copy that file into converter
+folder. Do the same with paths in converter.ini (this file can also be
+placed in $sdk_root$). These steps are only needed for -level and
+-dds2tga options, otherwise no configuration is required.
+
+It is strongly recommended to use -ro option (operation without any
+writing on disk) after any configuration changes.
+
+
+[.ogf to .object conversion]
+Command line:
+ converter [-ogf] [-object] <input> [-out <output>]
+
+The name of output file is generated automatically if -out <output>
+option is not specified.
+
+Notes/problems:
+ - tool does not recover skeleton bind pose for OGF v3 (builds 1098,
+   1114, 1154) but it is often possible to restore it manually in
+   Maya/3ds Max using idle animation.
+ - tool does not yet recover motion marks introduced in Clear Sky
+   (including build 3120). Also, MOD SDK 0.4 ignores third and fourth
+   bone that influence vertices.
+ - it is not guaranteed that the "main" side of the two-sided surfaces
+   will be detected correctly.
+
+
+[.ogf to .bones skeleton extraction]
+Command line:
+ converter [-ogf] -bones <input> [-out <output>]
+
+The name of output file is generated automatically if -out <output>
+option is not specified.
+
+
+[.ogf/.omf to .skls extraction]
+Command line:
+ converter [-ogf|-omf] -skls <input> [-out <output>]
+
+The name of output file is generated automatically if -out <output>
+option is not specified.
+
+Notes:
+ - motions are saved as step-form curves.
+
+
+[.ogf/.omf to .skl extraction]
+Command line:
+ converter [-ogf|-omf] -skl <motion_name> <input> [-out <output>]
+
+The name of output file is generated automatically if -out <output>
+option is not specified.
+
+Notes/problems:
+ - incorrect handling of names with whitespaces.
+ - see the note about step-formed curves.
+
+
+[.dm to .object conversion]
+Command line:
+ converter [-dm] [-object] <input> [-out <output>]
+
+The name of output file is generated automatically if -out <output>
+option is not specified.
+
+Notes:
+ - the min/max scale is not saved in output .object, but it is possible
+   to view this information using -info option.
+
+
+[game level to LE scene conversion]
+Command line:
+ converter -level <level_name> [-out <scene_name>] [-mode maya|le|le2]
+
+-mode option specifies operation mode:
+ maya	- decompile level geometry only.
+ le	- decompile whole level into LE scene.
+ le2	- decompile whole level into LE scene (for l12_stancia_2).
+ raw	- decompile whole level into LE scene (debug mode).
+
+The handling of -with_lods option depends on the -mode value. When
+-mode maya is specified, converter will output MU-models in addition
+to the main level geometry. When -mode specifies another mode,
+converter will output LOD-textures for MU-models.
+
+Additional debug parameters: -dbgcfrm, -dbgmrg.
+
+Notes/problems:
+ - visual geometry in levels from builds 1098, 1114, 1154 often
+   are not compatible with contemporary xrLC (i.e. contains errors).
+   At least some of them are detected during conversion and saved
+   in $log$\converter_<scene_name>.err
+ - it is impossible to use trees from early builds (1098-1154) with
+   current engine shaders. Replace them with normal MU-models.
+ - visual geometry in levels from builds 2215-3312 (ShoC) does not
+   contain errors such as zero-area faces however they can appear
+   during xrLC optimization stage. This happens for l11_pripyat.
+ - on the contrary, geometry from builds 3456 and above (CS) does
+   contain errors as interpreted by xrLC from MOD SDK 0.4.
+ - draft levels are decompiled with incorrect compiler shader.
+ - light protectors/reflectors and caches are fixed level geometry, so
+   any changes in their visual appearance require full level rebuild.
+ - Wallmarks (wallmark.part) are recovered only if there is redundant
+   level.wallmarks file.
+ - converter does not handle case when level.snd_env contains
+   intersecting sound volumes. There are no real examples in
+   original game (ShoC) or addon (CS).
+ - detail models are always two-sided to render correctly in LE.
+ - AI map (level.ai/ai_map.part) sometimes is placed below the visual
+   geometry (e.g. l08_yantar). The reason is unknown.
+
+
+[Game archive packing/unpacking]
+Command line to unpack:
+ converter -unpack <archive> [-1114|-2215|-2945|-2947ru|-2947|-xdb]
+
+Command line to pack:
+ converter -pack <folder> [-2947ru|-2947ww|-xdb]
+
+Notes:
+ - Use -xdb to unpack Clear Sky archives.
+
+
+[.dds to .tga multi-conversion]
+Command line:
+ converter -dds2tga [-with_solid] [-with_bump]
+
+The tool scans all .thm files in $textures$ and converts .dds from
+$game_textures$ into .tga. Existing .tga files are not overwritten.
+
+Specify -with_solid option to handle the non-transparent textures
+as well as required for xrLC -gi.
