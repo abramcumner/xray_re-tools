@@ -45,7 +45,7 @@ void xr_level_sectors::load_v13(xr_reader& r)
 void xr_level_sectors::load(uint32_t xrlc_version, xr_reader& r)
 {
 	xr_reader* s = 0;
-	if (xrlc_version <= XRLC_VERSION_9) {
+	if (xrlc_version <= XRLC_VERSION_8) {
 		if (xrlc_version == XRLC_VERSION_5)
 			s = r.open_chunk(FSL5_SECTORS);
 		else

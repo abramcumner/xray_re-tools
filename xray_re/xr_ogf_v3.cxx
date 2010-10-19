@@ -54,6 +54,7 @@ bool xr_ogf_v3::hierarchical() const
 	switch (m_model_type) {
 	case MT3_HIERRARHY:
 	case MT3_SKELETON_ANIM:
+	case MT3_LOD:
 		return true;
 	default:
 		return false;
@@ -96,6 +97,14 @@ void xr_ogf_v3::set_ext_geom(const xr_vbuf_vec& ext_vbufs)
 		m_vb.proxy(ext_vbufs.at(m_ext_vb_index), m_ext_vb_offset, m_ext_vb_size);
 }
 
+void xr_ogf_v3::set_ext_geom(const xr_vbuf_vec& ext_vbufs, const xr_ibuf_vec& ext_ibufs)
+{
+	if (is_chunk_loaded(OGF3_VCONTAINER))
+		m_vb.proxy(ext_vbufs.at(m_ext_vb_index), m_ext_vb_offset, m_ext_vb_size);
+	if (is_chunk_loaded(OGF3_ICONTAINER))
+		m_ib.proxy(ext_ibufs.at(m_ext_ib_index), m_ext_ib_offset, m_ext_ib_size);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void xr_ogf_v3::load_header(xr_reader& r)
@@ -103,7 +112,8 @@ void xr_ogf_v3::load_header(xr_reader& r)
 	m_version = static_cast<ogf_version>(r.r_u8());
 	m_model_type = static_cast<ogf_model_type>(r.r_u8());
 	uint16_t unused = r.r_u16();
-	xr_assert(unused == 0);
+	m_texture_l = unused;
+	m_shader_l = unused;
 	set_chunk_loaded(OGF_HEADER);
 }
 
@@ -196,6 +206,14 @@ inline void xr_ogf_v3::load_vcontainer(xr_reader& r)
 	m_ext_vb_offset = r.r_u32();
 	m_ext_vb_size = r.r_u32();
 	set_chunk_loaded(OGF3_VCONTAINER);
+}
+
+inline void xr_ogf_v3::load_icontainer(xr_reader& r)
+{
+	m_ext_ib_index = r.r_u32();
+	m_ext_ib_offset = r.r_u32();
+	m_ext_ib_size = r.r_u32();
+	set_chunk_loaded(OGF3_ICONTAINER);
 }
 
 inline void xr_ogf_v3::load_bsphere(xr_reader& r)
@@ -490,6 +508,20 @@ void xr_ogf_v3::load_s_bone_names(xr_reader& r)
 	set_chunk_loaded(OGF3_S_BONE_NAMES);
 }
 
+inline void xr_ogf_v3::load_loddef2(xr_reader& r)
+{
+	r.r_cseq<ogf4_lod_face>(8, m_lod_faces);
+	set_chunk_loaded(OGF3_LODDEF2);
+}
+
+inline void xr_ogf_v3::load_treedef2(xr_reader& r)
+{
+	r.r(m_tree_xform);
+	r.r(m_c_scale);
+	r.r(m_c_bias);
+	set_chunk_loaded(OGF3_TREEDEF2);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void xr_ogf_v3::load_render_visual(xr_reader& r)
@@ -527,10 +559,15 @@ void xr_ogf_v3::load_visual(xr_reader& r)
 		load_vertices(r);
 		r.debug_find_chunk();
 	}
-	if (!r.find_chunk(OGF3_INDICES))
-		xr_not_expected();
-	load_indices(r);
-	r.debug_find_chunk();
+	if (r.find_chunk(OGF3_ICONTAINER)) {
+		load_icontainer(r);
+		r.debug_find_chunk();
+	} else {
+		if (!r.find_chunk(OGF3_INDICES))
+			xr_not_expected();
+		load_indices(r);
+		r.debug_find_chunk();
+	}
 }
 
 void xr_ogf_v3::load_hierrarhy_visual(xr_reader& r)
@@ -643,6 +680,35 @@ void xr_ogf_v3::load_progressive(xr_reader& r)
 	r.close_chunk(s);
 }
 
+void xr_ogf_v3::load_lod(xr_reader& r)
+{
+	load_hierrarhy_visual(r);
+	if (!r.find_chunk(OGF3_LODDEF2))
+		xr_not_expected();
+	load_loddef2(r);
+	r.debug_find_chunk();
+}
+
+void xr_ogf_v3::load_tree_visual(xr_reader& r)
+{
+	load_render_visual(r);
+
+	if (!r.find_chunk(OGF3_VCONTAINER))
+		xr_not_expected();
+	load_vcontainer(r);
+	r.debug_find_chunk();
+
+	if (!r.find_chunk(OGF3_ICONTAINER))
+		xr_not_expected();
+	load_icontainer(r);
+	r.debug_find_chunk();
+
+	if (!r.find_chunk(OGF3_TREEDEF2))
+		xr_not_expected();
+	load_treedef2(r);
+	r.debug_find_chunk();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void xr_ogf_v3::load_ogf(xr_reader& r)
@@ -686,6 +752,14 @@ void xr_ogf_v3::load_ogf(xr_reader& r)
 	case MT3_PROGRESSIVE2:
 		load_progressive(r);
 		m_flags = EOF_PROGRESSIVE;
+		break;
+	case MT3_LOD:
+		load_lod(r);
+		m_flags = EOF_MULTIPLE_USAGE;
+		break;
+	case MT3_TREE:
+		load_tree_visual(r);
+		m_flags = EOF_STATIC;
 		break;
 	default:
 		xr_not_expected();

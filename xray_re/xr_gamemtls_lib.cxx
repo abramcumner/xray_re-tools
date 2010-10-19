@@ -49,8 +49,9 @@ void xr_gamemtl::load(xr_reader& r)
 	if (!r.r_chunk<float>(GAMEMTL_CHUNK_FLOTATION, flotation_factor))
 		xr_not_expected();
 
+	//in build 1865 not present
 	if (!r.r_chunk<float>(GAMEMTL_CHUNK_INJURY, injurious_speed))
-		xr_not_expected();
+		injurious_speed = 0.0f;
 }
 
 void xr_gamemtlpair::load(xr_reader& r)

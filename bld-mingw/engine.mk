@@ -1,10 +1,6 @@
-ROOT_DIR ?= D:/stk1/xraytools
-
 include $(ROOT_DIR)/bld-mingw/xray_re_sources.inc
 include $(ROOT_DIR)/bld-mingw/nvtt_sources.inc
 SOURCES += $(XRAY_RE_SOURCES) $(NVTT_SOURCES)
-
-
 
 ###############################################################################
 # Defaults

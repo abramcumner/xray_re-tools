@@ -28,7 +28,7 @@ enum ogf_chunk_id {
 	OGF3_TEXTURE		= 0x2,
 	OGF3_TEXTURE_L		= 0x3,
 	OGF3_CHILD_REFS		= 0x5,
-	OGF3_BBOX		= 0x6,
+	OGF3_BBOX			= 0x6,
 	OGF3_VERTICES		= 0x7,
 	OGF3_INDICES		= 0x8,
 	OGF3_LODDATA		= 0x9,	// not sure
@@ -37,10 +37,13 @@ enum ogf_chunk_id {
 	OGF3_CHILDREN_L		= 0xc,
 	OGF3_S_BONE_NAMES	= 0xd,
 	OGF3_S_MOTIONS		= 0xe,
-	OGF3_DPATCH		= 0xf,	// guessed name
-	OGF3_LODS		= 0x10,	// guessed name
+	OGF3_DPATCH			= 0xf,	// guessed name
+	OGF3_LODS			= 0x10,	// guessed name
 	OGF3_CHILDREN		= 0x11,
 	OGF3_S_SMPARAMS		= 0x12,
+	OGF3_ICONTAINER		= 0x13,// build 1865
+	OGF3_LODDEF2		= 0x15,// build 1865
+	OGF3_TREEDEF2		= 0x16,// build 1865
 
 	OGF4_TEXTURE		= 0x2,
 	OGF4_VERTICES		= 0x3,
@@ -88,6 +91,8 @@ enum ogf_model_type {
 	MT3_CACHED		= 0x8,	// FCached
 	MT3_PARTICLE		= 0x9,	// CPSVisual
 	MT3_PROGRESSIVE2	= 0xa,	// FProgressive
+	MT3_LOD			= 0xb,	// FLOD build 1865
+	MT3_TREE		= 0xc,	// FTreeVisual build 1865
 
 	MT4_NORMAL		= 0,	// Fvisual
 	MT4_HIERRARHY		= 0x1,	// FHierrarhyVisual

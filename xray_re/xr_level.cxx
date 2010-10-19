@@ -98,7 +98,7 @@ bool xr_level::load(const char* game_data_path, const char* level_path)
 				r->r_cseq(sizeof(buf), buf);
 			}
 			// fall through
-		case XRLC_VERSION_9:
+		case XRLC_VERSION_8:
 		case XRLC_VERSION_12:
 		case XRLC_VERSION_13:
 		case XRLC_VERSION_14:
@@ -148,16 +148,12 @@ void xr_level::load(uint32_t xrlc_version, const char* game_data_path, const cha
 {
 	m_ltx = ::load<xr_level_ltx>(level_path, "level.ltx", true);
 
-	if (xrlc_version == XRLC_VERSION_12) {
-		m_geom = ::load<xr_level_geom>(level_path, "level", true);
-	}
-
 	if (xrlc_version >= XRLC_VERSION_13) {
 		m_geom = ::load<xr_level_geom>(level_path, "level.geom", true);
 //		m_geomx = ::load<xr_level_geom>(level_path, "level.geomx");
 	}
 	msg("loading %s", "level");
-	if (xrlc_version <= XRLC_VERSION_9) {
+	if (xrlc_version <= XRLC_VERSION_12) {
 		msg("...geom");
 		m_geom = new xr_level_geom(xrlc_version, r);
 	}
@@ -176,7 +172,7 @@ void xr_level::load(uint32_t xrlc_version, const char* game_data_path, const cha
 	msg("...glows");
 	m_glows = new xr_level_glows(xrlc_version, r);
 
-	if (xrlc_version <= XRLC_VERSION_9) {
+	if (xrlc_version <= XRLC_VERSION_8) {
 		msg("...cform");
 		m_cform = new xr_level_cform(xrlc_version, r);
 	} else {
@@ -186,12 +182,7 @@ void xr_level::load(uint32_t xrlc_version, const char* game_data_path, const cha
 	m_hom = ::load<xr_level_hom>(level_path, "level.hom");
 
 	m_details = ::load<xr_level_details>(level_path, "level.details");
-	if (m_details && xrlc_version == XRLC_VERSION_12) {
-		msg("...texture");
-		m_details->load_texture(level_path);
-	}
-
-	if (m_details && xrlc_version >= XRLC_VERSION_13) {
+	if (m_details && xrlc_version >= XRLC_VERSION_12) {
 		msg("...texture");
 		m_details->load_texture(level_path);
 	}
@@ -199,21 +190,7 @@ void xr_level::load(uint32_t xrlc_version, const char* game_data_path, const cha
 	if (xrlc_version == XRLC_VERSION_12) {
 		m_ai = ::load<xr_level_ai>(level_path, "level.ai");
 		m_game = ::load<xr_level_game>(level_path, "level.game");
-		m_spawn = ::load<xr_level_spawn>(level_path, "level.spawn");
-
-		m_wallmarks = ::load<xr_level_wallmarks>(level_path, "level.wallmarks");
-
-		m_som = ::load<xr_level_som>(level_path, "level.som");
-		m_snd_env = ::load<xr_level_snd_env>(level_path, "level.snd_env");
-		m_snd_static = ::load<xr_level_snd_static>(level_path, "level.snd_static");
-
-		m_ps_static = ::load<xr_level_ps_static>(level_path, "level.ps_static");
-
-		m_env_mod = ::load<xr_level_env_mod>(level_path, "level.env_mod");
-
-		m_fog_vol = ::load<xr_level_fog_vol>(level_path, "level.fog_vol");
-
-	if (xrlc_version >= XRLC_VERSION_13) {
+	} else if (xrlc_version >= XRLC_VERSION_13) {
 		m_ai = ::load<xr_level_ai>(level_path, "level.ai");
 		m_game = ::load<xr_level_game>(level_path, "level.game");
 		m_spawn = ::load<xr_level_spawn>(level_path, "level.spawn");
@@ -239,22 +216,6 @@ void xr_level::load(uint32_t xrlc_version, const char* game_data_path, const cha
 	m_lods = ::load<xr_image>(level_path, "level_lods.dds");
 	m_lods_nm = ::load<xr_image>(level_path, "level_lods_nm.dds");
 
-if (m_spawn && xrlc_version == XRLC_VERSION_12) {
-		for (xr_entity_vec_cit it = m_spawn->spawns().begin(),
-				end = m_spawn->spawns().end(); it != end; ++it) {
-			const cse_abstract* entity = *it;
-			if (entity->name() == "breakable_object") {
-				xr_ogf_v4* ogf = new xr_ogf_v4;
-				const char* name = entity->name_replace().c_str();
-				msg("loading %s", name);
-				if (!ogf->xr_ogf::load_ogf(level_path, name))
-					xr_not_expected();
-				m_brkbl_meshes.push_back(ogf);
-			}
-		}
-	}
-
-
 	if (m_spawn && xrlc_version >= XRLC_VERSION_13) {
 		for (xr_entity_vec_cit it = m_spawn->spawns().begin(),
 				end = m_spawn->spawns().end(); it != end; ++it) {
@@ -270,14 +231,10 @@ if (m_spawn && xrlc_version == XRLC_VERSION_12) {
 		}
 	}
 
-	if (xrlc_version == XRLC_VERSION_12)
-		m_gamemtls_lib = ::load<xr_gamemtls_lib>(game_data_path, "gamemtl.xr", true);
-
-	if (xrlc_version >= XRLC_VERSION_13)
+	if (xrlc_version >= XRLC_VERSION_12)
 		m_gamemtls_lib = ::load<xr_gamemtls_lib>(game_data_path, "gamemtl.xr", true);
 
 	m_xrlc_version = xrlc_version;
-}
 }
 
 void xr_level::clear_ltx() { delete m_ltx; m_ltx = 0; }

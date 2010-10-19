@@ -10,8 +10,8 @@ namespace xray_re {
 
 enum {
 	XRLC_VERSION_5	= 5,	// 1098
-	XRLC_VERSION_9	= 9,	// 1114, 1154
-	XRLC_VERSION_12	= 12,	// 1xxx
+	XRLC_VERSION_8	= 8,	// 1114, 1154
+	XRLC_VERSION_12	= 12,	// 1865
 	XRLC_VERSION_13	= 13,	// 2215
 	XRLC_VERSION_14	= 14,	// 2945+, 3456+
 };
@@ -33,10 +33,6 @@ enum {
 	FSL5_GLOWS		= 0xa,
 	FSL5_SECTORS		= 0xb,
 
-	//1xxx
-	//WTF?
-
-
 	// 1114, 1154
 	FSL8_HEADER		= 0x1,
 	FSL8_SHADERS		= 0x2,
@@ -47,6 +43,17 @@ enum {
 	FSL8_LIGHT_DYNAMIC	= 0x7,
 	FSL8_GLOWS		= 0x9,
 	FSL8_SECTORS		= 0xa,
+
+	// 1865
+	FSL12_HEADER		= 0x1,
+	FSL12_SHADERS		= 0x2,
+	FSL12_VISUALS		= 0x3,
+	FSL12_PORTALS		= 0x4,
+	FSL12_LIGHT_DYNAMIC	= 0x6,
+	FSL12_GLOWS			= 0x7,
+	FSL12_SECTORS		= 0x8,
+	FSL12_IB			= 0x9,
+	FSL12_VB			= 0xa,
 
 	// 2215+
 	FSL13_HEADER		= 0x1,

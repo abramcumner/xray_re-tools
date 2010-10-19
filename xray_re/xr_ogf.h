@@ -49,6 +49,7 @@ public:
 	virtual uint32_t		shader_l() const = 0;
 	virtual const xr_vbuf&		vb() const;
 	virtual const xr_ibuf&		ib() const;
+	const ogf4_lod_face*	lod_faces() const;
 
 	struct bone_motion_io: public xr_bone_motion {
 		void	insert_key(float time, const ogf_key_qr* value);
@@ -83,6 +84,8 @@ protected:
 	std::vector<uint32_t>	m_children_l;	// OGF_CHILDREN_L
 
 	std::vector<xr_ogf*>	m_lods;		// OGF_LODS and OGF_S_LODS
+
+	ogf4_lod_face	m_lod_faces[8];	// OGF_LODDEF2
 };
 
 TYPEDEF_STD_VECTOR_PTR(xr_ogf)
@@ -102,6 +105,7 @@ inline const std::string& xr_ogf::texture() const { return m_texture; }
 inline const std::string& xr_ogf::shader() const { return m_shader; }
 inline const xr_vbuf& xr_ogf::vb() const { return m_vb; }
 inline const xr_ibuf& xr_ogf::ib() const { return m_ib; }
+inline const ogf4_lod_face* xr_ogf::lod_faces() const { return m_lod_faces; }
 
 } // end of namespace xray_re
 

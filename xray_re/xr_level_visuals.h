@@ -31,6 +31,7 @@ public:
 private:
 	void			load_d3d7(xr_reader& r, const xr_level_geom* geom);
 	void			load_d3d9(xr_reader& r, const xr_level_geom* geom);
+	void			load_1865(xr_reader& r, const xr_level_geom* geom);
 
 private:
 	std::vector<xr_ogf*>	m_ogfs;

@@ -51,21 +51,15 @@ void xr_level_portals::load(uint32_t xrlc_version, xr_reader& r)
 		if (s)
 			load_v5(*s);
 	} else {
-		if (xrlc_version == XRLC_VERSION_9)
+		if (xrlc_version == XRLC_VERSION_8)
 			s = r.open_chunk(FSL8_PORTALS);
-		else if (xrlc_version >= XRLC_VERSION_13)
+		else if (xrlc_version >= XRLC_VERSION_12)
 			s = r.open_chunk(FSL13_PORTALS);
 		if (s)
 			load_v8(*s);
 	}
-	
-	if (xrlc_version == XRLC_VERSION_12) {
-    s = r.open_chunk(FSL13_PORTALS);
-	}
-
-r.close_chunk(s);
+	r.close_chunk(s);
 }
-
 
 void xr_level_portals::save(xr_writer& w) const
 {

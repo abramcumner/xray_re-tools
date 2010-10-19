@@ -32,7 +32,7 @@ public:
 	virtual uint32_t	texture_l() const;
 	virtual uint32_t	shader_l() const;
 	const fmatrix&		xform() const;
-	const ogf4_lod_face*	lod_faces() const;
+//	const ogf4_lod_face*	lod_faces() const;
 
 	uint32_t		ext_vb_index() const;
 	uint32_t		ext_vb_offset() const;
@@ -102,7 +102,7 @@ private:
 	xr_ibuf		m_ib0;		// proxy ib according to swi0
 	xr_swibuf	m_swib;		// OGF_SWIDATA or OGF_SWICONTAINER
 
-	ogf4_lod_face	m_lod_faces[8];	// OGF_LODDEF2
+	//ogf4_lod_face	m_lod_faces[8];	// OGF_LODDEF2
 
 	ogf4_5color	m_c_scale;	// OGF_TREEDEF2
 	ogf4_5color	m_c_bias;
@@ -135,7 +135,7 @@ inline const xr_ibuf& xr_ogf_v4::ib() const { return progressive() ? m_ib0 : m_i
 inline uint32_t xr_ogf_v4::texture_l() const { return m_shader_id; }
 inline uint32_t xr_ogf_v4::shader_l() const { return m_shader_id; }
 inline const fmatrix& xr_ogf_v4::xform() const { return m_tree_xform; }
-inline const ogf4_lod_face* xr_ogf_v4::lod_faces() const { return m_lod_faces; }
+//inline const ogf4_lod_face* xr_ogf_v4::lod_faces() const { return m_lod_faces; }
 
 inline uint32_t xr_ogf_v4::ext_vb_index() const { return m_ext_vb_index; }
 inline uint32_t xr_ogf_v4::ext_vb_offset() const { return m_ext_vb_offset; }

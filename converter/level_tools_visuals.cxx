@@ -77,7 +77,7 @@ xr_surface* level_tools::create_surface(const xr_raw_surface& raw_surface) const
 				msg("can't resolve game material %u", raw_surface.gamemtl);
 		}
 		if (raw_surface.automatic()) {
-			if (m_level->xrlc_version() <= XRLC_VERSION_9)
+			if (m_level->xrlc_version() <= XRLC_VERSION_8)
 				surface->gamemtl() = m_fake_gamemtl;
 			paint_automatic(surface, raw_surface.flags);
 		} else {
@@ -149,10 +149,77 @@ void level_tools::calculate_ext_meshes(size_t& vb_size, size_t& ib_size) const
 	}
 }
 
-void level_tools::push_subdivisions_v5(level_mesh* mesh, uint16_t sector_idx, uint32_t ogf_idx) const
+uint16_t level_tools::find_or_register_mu_model(xr_ogf_v3* new_mu, fmatrix& xform)
 {
-	const xr_ogf_v3* ogf = static_cast<const xr_ogf_v3*>(m_subdivisions->at(ogf_idx));
-	if (ogf->hierarchical()) {
+	for (std::vector<uint32_t>::const_iterator it0 = new_mu->children_l().begin(),
+			it = it0, end = new_mu->children_l().end(); it != end; ++it) {
+		const xr_ogf_v3* ogf = static_cast<const xr_ogf_v3*>(m_subdivisions->at(*it));
+		switch (ogf->model_type()) {
+		case MT3_TREE:
+			xform.set(ogf->xform());
+			xr_assert(it == it0 || std::memcmp(&ogf->xform(), &xform, sizeof(xform)) == 0);
+			xr_assert(xform._14 == 0 && xform._24 == 0 && xform._34 == 0);
+			break;
+		default:
+			xr_not_expected();
+			break;
+		}
+	}
+
+	uint16_t model_idx = 0;
+	for (xr_ogf_vec_cit it = m_mu_models.begin(), end = m_mu_models.end();
+			it != end; ++it, ++model_idx) {
+		const xr_ogf* mu = *it;
+		if (mu->children_l().size() != new_mu->children_l().size())
+			continue;
+		// FIXME: sort children for robustness
+		for (std::vector<uint32_t>::const_iterator it1 = mu->children_l().begin(),
+				end1 = mu->children_l().end(), it2 = new_mu->children_l().begin();
+				it1 != end1; ++it1, ++it2) {
+			const xr_ogf_v3* ogf1 = static_cast<const xr_ogf_v3*>(m_subdivisions->at(*it1));
+			const xr_ogf_v3* ogf2 = static_cast<const xr_ogf_v3*>(m_subdivisions->at(*it2));
+			if (ogf1->model_type() != ogf2->model_type())
+				goto skip;
+			// FIXME: though it is reasonably to assume MU-models always reference
+			// external VB/IB, better have some explicit check here.
+			if (ogf1->ext_vb_index() != ogf2->ext_vb_index())
+				goto skip;
+			if (ogf1->ext_vb_offset() != ogf2->ext_vb_offset())
+				goto skip;
+			if (ogf1->ext_vb_size() != ogf2->ext_vb_size())
+				goto skip;
+			if (ogf1->ext_ib_index() != ogf2->ext_ib_index())
+				goto skip;
+			if (ogf1->ext_ib_offset() != ogf2->ext_ib_offset())
+				goto skip;
+			if (ogf1->ext_ib_size() != ogf2->ext_ib_size())
+				goto skip;
+		}
+		return model_idx;
+skip:;
+	}
+	xr_assert(model_idx == m_mu_models.size());
+	m_mu_models.push_back(new_mu);
+	return model_idx;
+}
+
+void level_tools::push_subdivisions_v5(level_mesh* mesh, uint16_t sector_idx, uint32_t ogf_idx)
+{
+	xr_ogf_v3* ogf = static_cast<xr_ogf_v3*>(m_subdivisions->at(ogf_idx));
+	if (ogf->model_type() == MT3_LOD) {
+		fmatrix xform;
+		uint16_t model_idx = find_or_register_mu_model(ogf, xform);
+		uint32_t tag = mesh->instantiate_mu_model(model_idx, sector_idx, xform);
+		mesh->set_tc_fix(true);
+		for (std::vector<uint32_t>::const_iterator it = ogf->children_l().begin(),
+				end = ogf->children_l().end(); it != end; ++it) {
+			const xr_ogf* ogf1 = m_subdivisions->at(*it);
+			mesh->push(tag, ogf1->vb(), ogf1->ib(), xform,
+					m_uniq_textures[ogf1->texture_l()],
+					m_uniq_shaders[ogf1->shader_l()]);
+		}
+		mesh->set_tc_fix(false);
+	} else if (ogf->hierarchical()) {
 		for (std::vector<uint32_t>::const_iterator it = ogf->children_l().begin(),
 				end = ogf->children_l().end(); it != end; ++it) {
 			push_subdivisions_v5(mesh, sector_idx, *it);
@@ -185,9 +252,9 @@ uint16_t level_tools::find_or_register_mu_model(xr_ogf_v4* new_mu, fmatrix& xfor
 	}
 
 	uint16_t model_idx = 0;
-	for (xr_ogf_v4_vec_cit it = m_mu_models.begin(), end = m_mu_models.end();
+	for (xr_ogf_vec_cit it = m_mu_models.begin(), end = m_mu_models.end();
 			it != end; ++it, ++model_idx) {
-		const xr_ogf_v4* mu = *it;
+		const xr_ogf* mu = *it;
 		if (mu->children_l().size() != new_mu->children_l().size())
 			continue;
 		// FIXME: sort children for robustness
@@ -334,10 +401,6 @@ void level_tools::reconstruct_visuals()
 		// FIXME: avoid recursion.
 		calculate_subdivisions(vb_size, ib_size, (*it)->root);
 	}
-		if (xrlc_version == XRLC_VERSION_12) {
-		msg("calculating %s", "external meshes");
-		calculate_ext_meshes(vb_size, ib_size);
-	}
 	if (xrlc_version >= XRLC_VERSION_13) {
 		msg("calculating %s", "external meshes");
 		calculate_ext_meshes(vb_size, ib_size);
@@ -345,7 +408,16 @@ void level_tools::reconstruct_visuals()
 
 	level_mesh* mesh = new level_mesh(vb_size, ib_size);
 	msg("collecting %s", "subdivisions");
-	if (xrlc_version >= XRLC_VERSION_12) {
+	if (xrlc_version == XRLC_VERSION_12) {
+		uint16_t sector_idx = 0;
+		for (sector_data_vec_cit it = m_sectors->begin(),
+				end = m_sectors->end(); it != end; ++it) {
+			push_subdivisions_v5(mesh, sector_idx++, (*it)->root);
+		}
+		if (m_rflags & RF_WITH_LODS)
+			split_lod_textures();
+		xr_ogf_vec().swap(m_mu_models);
+	} else if (xrlc_version >= XRLC_VERSION_13) {
 		uint16_t sector_idx = 0;
 		for (sector_data_vec_cit it = m_sectors->begin(),
 				end = m_sectors->end(); it != end; ++it) {
@@ -355,7 +427,7 @@ void level_tools::reconstruct_visuals()
 		push_ext_meshes(mesh);
 		if (m_rflags & RF_WITH_LODS)
 			split_lod_textures();
-		xr_ogf_v4_vec().swap(m_mu_models);
+		xr_ogf_vec().swap(m_mu_models);
 	} else {
 		uint16_t sector_idx = 0;
 		for (sector_data_vec_cit it = m_sectors->begin(),
@@ -459,7 +531,7 @@ void level_tools::split_lod_textures() const
 		*it = (c == '\\') ? '_' : std::tolower(c);
 	}
 	xr_name_gen reference(path.c_str(), false);
-	for (xr_ogf_v4_vec_cit it = m_mu_models.begin(), end = m_mu_models.end();
+	for (xr_ogf_vec_cit it = m_mu_models.begin(), end = m_mu_models.end();
 			it != end; ++it, reference.next()) {
 		frect uvs;
 		uvs.invalidate();

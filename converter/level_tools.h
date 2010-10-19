@@ -20,6 +20,7 @@ namespace xray_re {
 	class xr_object;
 	class xr_ogf;
 	class xr_ogf_v4;
+	class xr_ogf_v3;
 	struct sector_data;
 	template<typename T> struct _vector3;
 	template<typename T> struct _matrix;
@@ -93,7 +94,7 @@ private:
 	void		reconstruct_visuals();
 	void		calculate_subdivisions(size_t& vb_size, size_t& ib_size, uint32_t ogf_idx) const;
 	void		calculate_ext_meshes(size_t& vb_size, size_t& ib_size) const;
-	void		push_subdivisions_v5(level_mesh* mesh, uint16_t sector_idx, uint32_t ogf_idx) const;
+	void		push_subdivisions_v5(level_mesh* mesh, uint16_t sector_idx, uint32_t ogf_idx);
 	void		push_subdivisions_v13(level_mesh* mesh, uint16_t sector_idx, uint32_t ogf_idx);
 	void		push_ext_meshes(level_mesh* mesh);
 	void		split_lod_textures() const;
@@ -109,6 +110,7 @@ private:
 	void		paint_debug_cform(xray_re::xr_surface* surface, uint16_t flags) const;
 
 	uint16_t	find_or_register_mu_model(xray_re::xr_ogf_v4* new_mu, xray_re::fmatrix& xform);
+	uint16_t	find_or_register_mu_model(xray_re::xr_ogf_v3* new_mu, xray_re::fmatrix& xform);
 
 	uint16_t	get_sector_idx(const xray_re::fvector3& p) const;
 	uint16_t	get_default_sector_idx() const;
@@ -146,7 +148,8 @@ private:
 	std::vector<uint16_t>			m_uniq_textures;// unique texture indices
 	std::vector<uint16_t>			m_uniq_shaders;	// unique shader indices
 
-	std::vector<xray_re::xr_ogf_v4*>	m_mu_models;
+	//std::vector<xray_re::xr_ogf_v4*>	m_mu_models;
+	std::vector<xray_re::xr_ogf*>	m_mu_models;
 
 	uint16_t		m_default_sector_idx;
 
