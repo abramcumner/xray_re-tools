@@ -1,0 +1,150 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_PANEL DIALOGEX 0, 0, 217, 173
+STYLE DS_SETFONT | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_EDIT,"CustEdit",WS_TABSTOP,162,13,35,10
+    CONTROL         "",IDC_SPIN,"SpinnerControl",0x0,199,13,7,10
+    LTEXT           "Map Channel:",IDC_STATIC,114,14,45,8
+    CONTROL         "Pick Camera",IDC_PICK_OBJECT,"CustButton",WS_TABSTOP,80,29,126,15
+    CONTROL         "Texture",IDC_PICK_TEXTURE,"CustButton",WS_TABSTOP,80,49,126,15
+    LTEXT           "Camera:",IDC_STATIC,12,30,37,10
+    LTEXT           "Texture:",IDC_STATIC,12,52,31,10
+    CONTROL         "ZBuffer",IDC_PICK_ZBUFFER,"CustButton",WS_TABSTOP,80,69,126,15
+    CONTROL         "Remove Back Face Pixels",IDC_BACKFACECHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,140,126,12
+    CONTROL         "ZBuffer Mask:",IDC_ZBUFFERCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,72,62,11
+    CONTROL         "Alpha",IDC_PICK_MASK,"CustButton",WS_TABSTOP,80,109,126,15
+    CONTROL         "Mask:",IDC_MASKCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,111,32,11
+    CONTROL         "",IDC_ZFUDGE,"CustEdit",WS_TABSTOP,162,89,35,10
+    CONTROL         "",IDC_ZFUDGESPIN,"SpinnerControl",0x0,199,89,7,10
+    RTEXT           "ZFudge:",IDC_STATIC,114,90,45,8
+    CONTROL         "",IDC_ANGLE,"CustEdit",WS_TABSTOP,162,151,35,10
+    CONTROL         "",IDC_ANGLESPIN,"SpinnerControl",0x0,199,151,7,10
+    RTEXT           "Angle Threshold:",IDC_STATIC,98,152,61,8
+    CONTROL         "Mask Uses the Camera Projection",IDC_MASKUSEPROJECTIONCHECKIDC_MASKUSEPROJECTIONCHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,126,126,12
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_PANEL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 206
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 166
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "#include ""veroverrides.h""\r\n"
+    "#include ""maxversion.r""\r\n"
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_LIBDESCRIPTION      "Camera Map Texture (Autodesk)"
+    IDS_CATEGORY            "CameraMapTexture"
+    IDS_CLASS_NAME          "Camera Map Per Pixel "
+    IDS_PARAMS              "Camera Map Parameters"
+    IDS_SPIN                "Map Channel"
+    IDS_MASKUSESPROJECTION  "Mask Uses the Camera Projection"
+    IDS_COORDS              "Coordinates"
+    IDS_PW_NODE             "Camera"
+    IDS_TEXTURE             "Texture"
+    IDS_BACKFACE            "BackFace"
+    IDS_USEZBUFFER          "UseZBuffer"
+    IDS_ZBUFFER             "ZBuffer"
+    IDS_ZFUDGE              "Z Fudge"
+    IDS_ANGLE               "Angle Threshold"
+    IDS_MASK                "Mask"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_USEMASK             "Use Mask"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+#include "veroverrides.h"
+#include "maxversion.r"
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
