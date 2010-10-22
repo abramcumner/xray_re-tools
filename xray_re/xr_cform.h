@@ -11,6 +11,7 @@
 namespace xray_re {
 
 const uint32_t CFORM_VERSION_2 = 2;
+const uint32_t CFORM_VERSION_3 = 3;
 const uint32_t CFORM_VERSION_4 = 4;
 const uint32_t CFORM_VERSION = CFORM_VERSION_4;
 

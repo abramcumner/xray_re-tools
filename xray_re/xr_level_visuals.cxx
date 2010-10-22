@@ -48,7 +48,7 @@ void xr_level_visuals::load_d3d9(xr_reader& r, const xr_level_geom* geom)
 void xr_level_visuals::load(uint32_t xrlc_version, xr_reader& r, const xr_level_geom* geom)
 {
 	xr_reader* s = 0;
-	if (xrlc_version == XRLC_VERSION_12) {
+	if (xrlc_version >= XRLC_VERSION_10 && xrlc_version <= XRLC_VERSION_12) {
 		s = r.open_chunk(FSL12_VISUALS);
 		xr_assert(s);
 		load_1865(*s, geom);

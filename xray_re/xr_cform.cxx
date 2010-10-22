@@ -39,13 +39,13 @@ struct read_face_v4 { void operator()(cf_face& face, xr_reader& r) const {
 void xr_cform::load(xr_reader& r)
 {
 	uint32_t version = r.r_u32();
-	xr_assert(version == CFORM_VERSION_2 || version == CFORM_VERSION_4);
+	xr_assert(version >= CFORM_VERSION_2 && version <= CFORM_VERSION_4);
 	size_t vertex_count = r.r_u32();
 	size_t face_count = r.r_u32();
 	r.r_fvector3(m_bbox.min);
 	r.r_fvector3(m_bbox.max);
 	r.r_seq(vertex_count, m_vertices, read_vertex());
-	if (version == CFORM_VERSION_2)
+	if (version == CFORM_VERSION_2 || version == CFORM_VERSION_3)
 		r.r_seq(face_count, m_faces, read_face_v2());
 	else if (version == CFORM_VERSION_4)
 		r.r_seq(face_count, m_faces, read_face_v4());

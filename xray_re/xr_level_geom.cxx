@@ -74,7 +74,7 @@ void xr_level_geom::load(uint32_t xrlc_version, xr_reader& r)
 		xrlc_version = r.r_u16();
 		r.debug_find_chunk();
 	}
-	if (xrlc_version == XRLC_VERSION_12) {
+	if (xrlc_version >= XRLC_VERSION_10 && xrlc_version <= XRLC_VERSION_12) {
 		load_1865(r);
 	} else if (xrlc_version >= XRLC_VERSION_13) {
 		load_d3d9(r);

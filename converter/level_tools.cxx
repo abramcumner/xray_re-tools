@@ -12,6 +12,7 @@
 #include "xr_ini_file.h"
 #include "xr_object.h"
 #include "xr_file_system.h"
+#include "xr_entity_factory.h"
 
 using namespace xray_re;
 
@@ -136,6 +137,10 @@ void level_tools::process(const cl_parser& cl)
 		if (m_ini->line_exist(m_sect_profile, PA_GAME_DATA))
 			fs.update_path("$temp_game_data$", m_ini->r_string(m_sect_profile, PA_GAME_DATA), "");
 		fs.update_path("$temp_level$", m_ini->r_string(m_sect_profile, PA_GAME_LEVELS), name);
+		
+		//load system ini from build for create spawn entity correctly
+		load_system_ini("$temp_game_data$");
+
 		m_level = new xr_level;
 		if (m_level->load("$temp_game_data$", "$temp_level$"))
 			reconstruct_scene(name, scene_name);

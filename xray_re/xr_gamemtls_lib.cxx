@@ -46,8 +46,9 @@ void xr_gamemtl::load(xr_reader& r)
 	snd_occlusion_factor = r.r_float();
 	r.debug_find_chunk();
 
+	//in build 1580 not present
 	if (!r.r_chunk<float>(GAMEMTL_CHUNK_FLOTATION, flotation_factor))
-		xr_not_expected();
+		flotation_factor = 1.0f;
 
 	//in build 1865 not present
 	if (!r.r_chunk<float>(GAMEMTL_CHUNK_INJURY, injurious_speed))

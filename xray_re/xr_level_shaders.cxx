@@ -97,11 +97,11 @@ void xr_level_shaders::load(uint32_t xrlc_version, xr_reader& r)
 		s = r.open_chunk(FSL8_SHADERS);
 		xr_assert(s);
 		load_v8(*s);
-	} else if (xrlc_version == XRLC_VERSION_12) {
-		s = r.open_chunk(FSL12_SHADERS);
+	} else if (xrlc_version == XRLC_VERSION_10) {
+		s = r.open_chunk(FSL10_SHADERS);
 		xr_assert(s);
-		load_v13(*s);
-	} else if (xrlc_version >= XRLC_VERSION_13) {
+		load_v8(*s);
+	} else if (xrlc_version >= XRLC_VERSION_12) {
 		s = r.open_chunk(FSL13_SHADERS);
 		xr_assert(s);
 		load_v13(*s);

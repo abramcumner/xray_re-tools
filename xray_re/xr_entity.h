@@ -122,6 +122,9 @@ enum {
 	CSE_VERSION_0x7b	= 0x7b,
 	CSE_VERSION_0x7c	= 0x7c,
 
+	// build 1580
+	CSE_VERSION_1580 = 0x27,
+
 	// patch 04 introduced following changes:
 	// 1) se_level_changer instead of cse_alife_level_changer (0x7b)
 	// 2) save markers (0x7b)

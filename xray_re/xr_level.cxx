@@ -99,6 +99,7 @@ bool xr_level::load(const char* game_data_path, const char* level_path)
 			}
 			// fall through
 		case XRLC_VERSION_8:
+		case XRLC_VERSION_10:
 		case XRLC_VERSION_12:
 		case XRLC_VERSION_13:
 		case XRLC_VERSION_14:
@@ -121,7 +122,7 @@ template<typename T> static T* load(const char* path, const char* name, bool req
 	xr_reader* r = fs.r_open(path, name);
 	if (r) {
 		msg("loading %s", name);
-		T* instance = new T(*r);;
+		T* instance = new T(*r);
 		fs.r_close(r);
 		return instance;
 	} else if (required) {
@@ -187,9 +188,12 @@ void xr_level::load(uint32_t xrlc_version, const char* game_data_path, const cha
 		m_details->load_texture(level_path);
 	}
 
-	if (xrlc_version == XRLC_VERSION_12) {
+	if (xrlc_version == XRLC_VERSION_10) {
 		m_ai = ::load<xr_level_ai>(level_path, "level.ai");
 		m_game = ::load<xr_level_game>(level_path, "level.game");
+		//m_spawn = ::load<xr_level_spawn>(level_path, "level.spawn");
+		//m_snd_static = ::load<xr_level_snd_static>(level_path, "level.sound_static");
+		//m_ps_static = ::load<xr_level_ps_static>(level_path, "level.ps_static");
 	} else if (xrlc_version >= XRLC_VERSION_13) {
 		m_ai = ::load<xr_level_ai>(level_path, "level.ai");
 		m_game = ::load<xr_level_game>(level_path, "level.game");

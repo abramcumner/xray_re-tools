@@ -73,7 +73,7 @@ struct write_node_v10 { void operator()(const ai_node& node, xr_writer& w) const
 void xr_level_ai::load(xr_reader& r)
 {
 	m_version = r.r_u32();
-	xr_assert(m_version >= AI_VERSION_7 && m_version <= AI_VERSION_10);
+	xr_assert(m_version >= AI_VERSION_6 && m_version <= AI_VERSION_10 || m_version == AI_VERSION_3);
 	m_num_nodes = r.r_u32();
 	m_size = r.r_float();
 	m_size_y = r.r_float();
@@ -82,11 +82,19 @@ void xr_level_ai::load(xr_reader& r)
 	if (m_version >= AI_VERSION_8)
 		m_guid.load(r);
 
-	m_nodes = new ai_node[m_num_nodes];
-	if (m_version >= AI_VERSION_10)
-		r.r_cseq(m_num_nodes, m_nodes, read_node_v10());
-	else
-		r.r_cseq(m_num_nodes, m_nodes, read_node_v8());
+	if (m_version == AI_VERSION_3) {
+		m_num_nodes = 0; // because unknown format
+		m_nodes = 0;
+	} else if (m_version == AI_VERSION_6) {
+		m_num_nodes = 0; // because unknown format
+		m_nodes = 0;
+	} else {
+		m_nodes = new ai_node[m_num_nodes];
+		if (m_version >= AI_VERSION_10)
+			r.r_cseq(m_num_nodes, m_nodes, read_node_v10());
+		else
+			r.r_cseq(m_num_nodes, m_nodes, read_node_v8());
+	}
 
 	m_column_length = unsigned(std::floor((m_aabb.max.x - m_aabb.min.x)/m_size + 1.501f));
 	m_row_length = unsigned(std::floor((m_aabb.max.z - m_aabb.min.z)/m_size + 1.501f));

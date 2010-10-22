@@ -11,6 +11,12 @@ namespace xray_re {
 // builds 1098, 1114, 1154
 const uint32_t AI_VERSION_2 = 2;
 
+// 1580
+const uint32_t AI_VERSION_3 = 3;
+
+// 1844
+const uint32_t AI_VERSION_6 = 6;
+
 // 1865
 const uint32_t AI_VERSION_7 = 7;
 
