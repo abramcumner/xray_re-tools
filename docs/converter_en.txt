@@ -89,7 +89,7 @@ Command line:
  converter -level <build number>:<level_name> [-out <scene_name>] [-mode maya|le|le2]
 
 Examples:
- converter -level 2947:l01_escape -out l01_escape -mode le
+ converter -level default:l01_escape -out l01_escape -mode le
 
  converter -level 1844:military_game -out military_game -mode le
 

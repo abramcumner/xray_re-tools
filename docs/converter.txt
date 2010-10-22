@@ -96,7 +96,7 @@ Windows XP SP2/SP3.
  converter -level <номер сборки>:<имя_карты> [-out <имя_сцены>] [-mode maya|le|le2]
 
 Примеры:
- converter -level 2947:l01_escape -out l01_escape -mode le
+ converter -level default:l01_escape -out l01_escape -mode le
 
  converter -level 1844:military_game -out military_game -mode le
 
