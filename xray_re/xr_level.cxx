@@ -188,7 +188,7 @@ void xr_level::load(uint32_t xrlc_version, const char* game_data_path, const cha
 		m_details->load_texture(level_path);
 	}
 
-	if (xrlc_version == XRLC_VERSION_10) {
+	if (xrlc_version >= XRLC_VERSION_10 && xrlc_version <= XRLC_VERSION_12) {
 		m_ai = ::load<xr_level_ai>(level_path, "level.ai");
 		m_game = ::load<xr_level_game>(level_path, "level.game");
 		//m_spawn = ::load<xr_level_spawn>(level_path, "level.spawn");
