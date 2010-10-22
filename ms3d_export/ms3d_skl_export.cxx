@@ -13,7 +13,7 @@ int ms3d_skl_export::do_export(const char* path)
 		return -1;
 
 	int num_frames = msModel_GetTotalFrames(m_model);
-	xr_bone_motion_vec bmotions(size_t(num_frames & INT_MAX));
+	xr_bone_motion_vec bmotions(size_t(num_bones & INT_MAX));
 	for (int i = 0; i != num_bones; ++i) {
 		msBone* bone = msModel_GetBoneAt(m_model, i);
 
