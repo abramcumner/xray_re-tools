@@ -58,6 +58,7 @@ void level_tools::reconstruct_spawns()
 			xr_spawn_object* new_rpoint = new xr_spawn_object(*m_scene, "$rpoint");
 			new_rpoint->co_name() = name.get();
 			new_rpoint->co_position().set(rpoint->p);
+			new_rpoint->co_rotation().set(rpoint->a);
 			new_rpoint->team() = rpoint->team;
 			new_rpoint->respawn() = rpoint->respawn;
 			new_rpoint->game() = rpoint->game;
