@@ -93,7 +93,12 @@ Windows XP SP2/SP3.
 
 [Преобразование игровых карт в формат SDK]
 Команда:
- converter -level <имя_карты> [-out <имя_сцены>] [-mode maya|le|le2]
+ converter -level <номер сборки>:<имя_карты> [-out <имя_сцены>] [-mode maya|le|le2]
+
+Примеры:
+ converter -level 2947:l01_escape -out l01_escape -mode le
+
+ converter -level 1844:military_game -out military_game -mode le
 
 Ключ -mode задаёт режим работы:
  maya	- декомпилировать только геометрию карты.
