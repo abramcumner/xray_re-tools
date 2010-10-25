@@ -261,6 +261,9 @@ void se_monster::state_read(xr_packet& packet, uint16_t size)
 		}
 		if (m_script_version >= 5)
 			packet.r_bool(m_was_in_smart_terrain);
+	} else if (m_version == CSE_VERSION_2571) {
+		if (m_script_version >= 4)
+			packet.r_u8(m_job_online);
 	} else if (m_version == CSE_VERSION_2215) {
 		if (m_script_version >= 2)
 			packet.r_bool(m_was_in_smart_terrain);
@@ -324,6 +327,10 @@ void se_stalker::state_read(xr_packet& packet, uint16_t size)
 			packet.r_bool(m_was_in_smart_terrain);
 		if (m_script_version >= 6)
 			packet.r_bool(m_death_dropped);
+	} else if (m_version == CSE_VERSION_2571) {
+		if (m_script_version >= 3) {
+			packet.r_u8(m_job_online);
+		}	
 	} else if (m_version == CSE_VERSION_2215) {
 		if (m_script_version >= 2)
 			packet.r_bool(m_was_in_smart_terrain);
@@ -365,7 +372,7 @@ void se_stalker::state_write(xr_packet& packet)
 void se_respawn::state_read(xr_packet& packet, uint16_t size)
 {
 	cse_alife_smart_zone::state_read(packet, size);
-	if (m_version >= CSE_VERSION_SOC) {
+	if (m_version >= CSE_VERSION_2571) {
 		packet.r_seq(packet.r_u8(), m_spawned_obj);
 	} else if (m_version == CSE_VERSION_2215) {
 		// there is no se_respawn in 2215 so we should not ever get here.
@@ -438,6 +445,8 @@ void se_smart_terrain::state_read(xr_packet& packet, uint16_t size)
 		r_ctime(packet);		// idle_end
 		if (packet.r_bool())		// gulag_working
 			xr_not_implemented();
+	} else if (m_version == CSE_VERSION_2571) {
+		//script save nothing
 	} else if (m_version == CSE_VERSION_2215) {
 		packet.r_u8();			// gulagN
 		r_ctime(packet);		// duration_end

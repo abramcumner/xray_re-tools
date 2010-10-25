@@ -116,6 +116,7 @@ enum {
 	CSE_VERSION_0x71	= 0x71,
 	CSE_VERSION_0x73	= 0x73,
 	CSE_VERSION_0x74	= 0x74,
+	CSE_VERSION_0x75	= 0x75,
 	CSE_VERSION_0x76	= 0x76,
 	CSE_VERSION_0x78	= 0x78,
 	CSE_VERSION_0x7a	= 0x7a,
@@ -134,6 +135,9 @@ enum {
 
 	// build 2215: version=0x65, script_version=2
 	CSE_VERSION_2215	= CSE_VERSION_0x65,
+
+	// build 2571: version 0x75 script_version = 4
+	CSE_VERSION_2571	= CSE_VERSION_0x75,
 
 	// builds 2945, 2939, 2947: version=0x76, script_version=5
 	// builds 2942, 3006+, 3120: version=0x76, script_version=6

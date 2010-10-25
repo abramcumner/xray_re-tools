@@ -237,7 +237,9 @@ xr_mesh* level_mesh::commit(xr_object& object, const b_model_instance* instance)
 	create_mappings(faces, mesh->vmrefs(), mesh->vmaps(), face_remap, vert_remap);
 
 	xr_assert(faces.size() >= 2);
-	xr_assert(points.size() >= 4);
+	
+	xr_assert(points.size() >= 3);//xr_assert(points.size() >= 4);
+
 
 	if (identity)
 		mesh->bbox().set(instance->aabb);
