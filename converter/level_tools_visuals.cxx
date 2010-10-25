@@ -229,7 +229,7 @@ void level_tools::push_subdivisions_v12(level_mesh* mesh, uint16_t sector_idx, u
 		for (std::vector<uint32_t>::const_iterator it = ogf->children_l().begin(),
 				end = ogf->children_l().end(); it != end; ++it) {
 			const xr_ogf_v3* ogf_child = static_cast<const xr_ogf_v3*>(m_subdivisions->at(*it));
-			switch (ogf->model_type()) {
+			switch (ogf_child->model_type()) {
 			case MT3_TREE:
 				break;
 			default:
@@ -476,7 +476,7 @@ void level_tools::reconstruct_visuals()
 		}
 	}
 
-	mesh->build(xrlc_version >= XRLC_VERSION_9 ? 1e-1f : 4.f);
+	mesh->build(xrlc_version >= XRLC_VERSION_10 ? 1e-1f : 4.f);
 	m_level->clear_geom();
 
 	if (xr_cform* cform = m_level->cform()) {
