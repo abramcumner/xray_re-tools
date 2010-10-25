@@ -25,7 +25,7 @@ private:
 	void			load_d3d7(xr_reader& r);
 	void			load_d3d9(xr_reader& r);
 	void			load_1865(xr_reader& r);
-
+	void			load_v9(xr_reader& r);
 private:
 	xr_vbuf_vec		m_vbufs;
 	xr_ibuf_vec		m_ibufs;

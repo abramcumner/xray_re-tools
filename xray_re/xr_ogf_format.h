@@ -48,7 +48,7 @@ enum ogf_chunk_id {
 	OGF4_TEXTURE		= 0x2,
 	OGF4_VERTICES		= 0x3,
 	OGF4_INDICES		= 0x4,
-	OGF4_P_MAP		= 0x5,
+	OGF4_P_MAP			= 0x5,
 	OGF4_SWIDATA		= 0x6,
 	OGF4_VCONTAINER		= 0x7,
 	OGF4_ICONTAINER		= 0x8,
@@ -91,8 +91,8 @@ enum ogf_model_type {
 	MT3_CACHED		= 0x8,	// FCached
 	MT3_PARTICLE		= 0x9,	// CPSVisual
 	MT3_PROGRESSIVE2	= 0xa,	// FProgressive
-	MT3_LOD			= 0xb,	// FLOD build 1865
-	MT3_TREE		= 0xc,	// FTreeVisual build 1865
+	MT3_LOD			= 0xb,	// FLOD build 1472 - 1865
+	MT3_TREE		= 0xc,	// FTreeVisual build 1472 - 1865
 
 	MT4_NORMAL		= 0,	// Fvisual
 	MT4_HIERRARHY		= 0x1,	// FHierrarhyVisual

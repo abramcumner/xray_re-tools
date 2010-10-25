@@ -646,12 +646,7 @@ void xr_ogf_v4::load_lod(xr_reader& r)
 
 void xr_ogf_v4::load_tree_visual(xr_reader& r)
 {
-	load_render_visual(r);
-	if (!r.find_chunk(OGF4_GCONTAINER))
-		xr_not_expected();
-	load_gcontainer(r);
-	r.debug_find_chunk();
-
+	load_visual(r);
 	if (!r.find_chunk(OGF4_TREEDEF2))
 		xr_not_expected();
 	load_treedef2(r);

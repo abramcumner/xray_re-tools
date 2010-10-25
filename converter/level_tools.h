@@ -95,6 +95,7 @@ private:
 	void		calculate_subdivisions(size_t& vb_size, size_t& ib_size, uint32_t ogf_idx) const;
 	void		calculate_ext_meshes(size_t& vb_size, size_t& ib_size) const;
 	void		push_subdivisions_v5(level_mesh* mesh, uint16_t sector_idx, uint32_t ogf_idx);
+	void		push_subdivisions_v12(level_mesh* mesh, uint16_t sector_idx, uint32_t ogf_idx);
 	void		push_subdivisions_v13(level_mesh* mesh, uint16_t sector_idx, uint32_t ogf_idx);
 	void		push_ext_meshes(level_mesh* mesh);
 	void		split_lod_textures() const;

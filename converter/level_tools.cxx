@@ -139,7 +139,7 @@ void level_tools::process(const cl_parser& cl)
 		fs.update_path("$temp_level$", m_ini->r_string(m_sect_profile, PA_GAME_LEVELS), name);
 		
 		//load system ini from build for create spawn entity correctly
-		load_system_ini("$temp_game_data$");
+		//load_system_ini("$temp_game_data$");
 
 		m_level = new xr_level;
 		if (m_level->load("$temp_game_data$", "$temp_level$"))

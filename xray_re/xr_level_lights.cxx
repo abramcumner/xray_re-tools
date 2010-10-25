@@ -76,7 +76,12 @@ void xr_level_lights::load(uint32_t xrlc_version, xr_reader& r)
 		xr_assert(s);
 		load_v8(*s);
 		break;
-	default:
+	case XRLC_VERSION_9:
+		s = r.open_chunk(FSL9_LIGHT_DYNAMIC);
+		xr_assert(s);
+		load_v13(*s);
+		break;
+	default: //10+
 		s = r.open_chunk(FSL13_LIGHT_DYNAMIC);
 		xr_assert(s);
 		load_v13(*s);

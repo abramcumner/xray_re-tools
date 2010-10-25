@@ -99,6 +99,7 @@ bool xr_level::load(const char* game_data_path, const char* level_path)
 			}
 			// fall through
 		case XRLC_VERSION_8:
+		case XRLC_VERSION_9:
 		case XRLC_VERSION_10:
 		case XRLC_VERSION_12:
 		case XRLC_VERSION_13:
@@ -173,7 +174,7 @@ void xr_level::load(uint32_t xrlc_version, const char* game_data_path, const cha
 	msg("...glows");
 	m_glows = new xr_level_glows(xrlc_version, r);
 
-	if (xrlc_version <= XRLC_VERSION_8) {
+	if (xrlc_version <= XRLC_VERSION_9) {
 		msg("...cform");
 		m_cform = new xr_level_cform(xrlc_version, r);
 	} else {
@@ -188,12 +189,15 @@ void xr_level::load(uint32_t xrlc_version, const char* game_data_path, const cha
 		m_details->load_texture(level_path);
 	}
 
-	if (xrlc_version >= XRLC_VERSION_10 && xrlc_version <= XRLC_VERSION_12) {
+	if (xrlc_version >= XRLC_VERSION_9 && xrlc_version <= XRLC_VERSION_12) {
 		m_ai = ::load<xr_level_ai>(level_path, "level.ai");
 		m_game = ::load<xr_level_game>(level_path, "level.game");
 		//m_spawn = ::load<xr_level_spawn>(level_path, "level.spawn");
 		//m_snd_static = ::load<xr_level_snd_static>(level_path, "level.sound_static");
-		//m_ps_static = ::load<xr_level_ps_static>(level_path, "level.ps_static");
+		m_ps_static = ::load<xr_level_ps_static>(level_path, "level.ps_static");
+		m_wallmarks = ::load<xr_level_wallmarks>(level_path, "level.wallmarks");
+		m_env_mod = ::load<xr_level_env_mod>(level_path, "level.env_mod");
+		m_snd_env = ::load<xr_level_snd_env>(level_path, "level.sound_environment");
 	} else if (xrlc_version >= XRLC_VERSION_13) {
 		m_ai = ::load<xr_level_ai>(level_path, "level.ai");
 		m_game = ::load<xr_level_game>(level_path, "level.game");

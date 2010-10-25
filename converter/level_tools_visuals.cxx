@@ -206,6 +206,23 @@ skip:;
 void level_tools::push_subdivisions_v5(level_mesh* mesh, uint16_t sector_idx, uint32_t ogf_idx)
 {
 	xr_ogf_v3* ogf = static_cast<xr_ogf_v3*>(m_subdivisions->at(ogf_idx));
+	if (ogf->hierarchical()) {
+		for (std::vector<uint32_t>::const_iterator it = ogf->children_l().begin(),
+				end = ogf->children_l().end(); it != end; ++it) {
+			push_subdivisions_v5(mesh, sector_idx, *it);
+		}
+	} else if (is_compiled_wallmark(ogf->shader_l())) {
+		;
+	} else {
+		mesh->push(sector_idx, ogf->vb(), ogf->ib(),
+				m_uniq_textures[ogf->texture_l()],
+				m_uniq_shaders[ogf->shader_l()]);
+	}
+}
+
+void level_tools::push_subdivisions_v12(level_mesh* mesh, uint16_t sector_idx, uint32_t ogf_idx)
+{
+	xr_ogf_v3* ogf = static_cast<xr_ogf_v3*>(m_subdivisions->at(ogf_idx));
 	if (ogf->model_type() == MT3_LOD) {
 		fmatrix xform;
 		uint16_t model_idx = find_or_register_mu_model(ogf, xform);
@@ -222,7 +239,7 @@ void level_tools::push_subdivisions_v5(level_mesh* mesh, uint16_t sector_idx, ui
 	} else if (ogf->hierarchical()) {
 		for (std::vector<uint32_t>::const_iterator it = ogf->children_l().begin(),
 				end = ogf->children_l().end(); it != end; ++it) {
-			push_subdivisions_v5(mesh, sector_idx, *it);
+			push_subdivisions_v12(mesh, sector_idx, *it);
 		}
 	} else if (is_compiled_wallmark(ogf->shader_l())) {
 		;
@@ -392,6 +409,7 @@ void level_tools::reconstruct_visuals()
 		msg("building %s", "scene_object.part");
 
 	uint32_t xrlc_version = m_level->xrlc_version();
+	ogf_version version = m_subdivisions->at(0)->version();
 
 	size_t vb_size = 0, ib_size = 0;
 	msg("calculating %s", "subdivisions");
@@ -401,23 +419,25 @@ void level_tools::reconstruct_visuals()
 		// FIXME: avoid recursion.
 		calculate_subdivisions(vb_size, ib_size, (*it)->root);
 	}
-	if (xrlc_version >= XRLC_VERSION_13) {
+	if (xrlc_version >= XRLC_VERSION_12) {
 		msg("calculating %s", "external meshes");
 		calculate_ext_meshes(vb_size, ib_size);
 	}
 
 	level_mesh* mesh = new level_mesh(vb_size, ib_size);
 	msg("collecting %s", "subdivisions");
-	if (xrlc_version == XRLC_VERSION_12) {
+	if (xrlc_version >= XRLC_VERSION_10 && xrlc_version <= XRLC_VERSION_12 && version == OGF3_VERSION) {
 		uint16_t sector_idx = 0;
 		for (sector_data_vec_cit it = m_sectors->begin(),
 				end = m_sectors->end(); it != end; ++it) {
-			push_subdivisions_v5(mesh, sector_idx++, (*it)->root);
+			push_subdivisions_v12(mesh, sector_idx++, (*it)->root);
 		}
+		msg("collecting %s", "external meshes");
+		push_ext_meshes(mesh);
 		if (m_rflags & RF_WITH_LODS)
 			split_lod_textures();
 		xr_ogf_vec().swap(m_mu_models);
-	} else if (xrlc_version >= XRLC_VERSION_13) {
+	} else if (xrlc_version >= XRLC_VERSION_13 || version == OGF4_VERSION) {
 		uint16_t sector_idx = 0;
 		for (sector_data_vec_cit it = m_sectors->begin(),
 				end = m_sectors->end(); it != end; ++it) {
@@ -436,7 +456,7 @@ void level_tools::reconstruct_visuals()
 		}
 	}
 
-	mesh->build(xrlc_version >= XRLC_VERSION_12 ? 1e-1f : 4.f);
+	mesh->build(xrlc_version >= XRLC_VERSION_9 ? 1e-1f : 4.f);
 	m_level->clear_geom();
 
 	if (xr_cform* cform = m_level->cform()) {
