@@ -224,18 +224,38 @@ void level_tools::push_subdivisions_v12(level_mesh* mesh, uint16_t sector_idx, u
 {
 	xr_ogf_v3* ogf = static_cast<xr_ogf_v3*>(m_subdivisions->at(ogf_idx));
 	if (ogf->model_type() == MT3_LOD) {
-		fmatrix xform;
-		uint16_t model_idx = find_or_register_mu_model(ogf, xform);
-		uint32_t tag = mesh->instantiate_mu_model(model_idx, sector_idx, xform);
-		mesh->set_tc_fix(true);
+		// fix build 1472 - MT3_LOD contains MT3_TREE and MT3_NORMAL
+		bool isMu = true;
 		for (std::vector<uint32_t>::const_iterator it = ogf->children_l().begin(),
 				end = ogf->children_l().end(); it != end; ++it) {
-			const xr_ogf* ogf1 = m_subdivisions->at(*it);
-			mesh->push(tag, ogf1->vb(), ogf1->ib(), xform,
-					m_uniq_textures[ogf1->texture_l()],
-					m_uniq_shaders[ogf1->shader_l()]);
+			const xr_ogf_v3* ogf_child = static_cast<const xr_ogf_v3*>(m_subdivisions->at(*it));
+			switch (ogf->model_type()) {
+			case MT3_TREE:
+				break;
+			default:
+				isMu = false;
+				break;
+			}
 		}
-		mesh->set_tc_fix(false);
+		if (isMu) {
+			fmatrix xform;
+			uint16_t model_idx = find_or_register_mu_model(ogf, xform);
+			uint32_t tag = mesh->instantiate_mu_model(model_idx, sector_idx, xform);
+			mesh->set_tc_fix(true);
+			for (std::vector<uint32_t>::const_iterator it = ogf->children_l().begin(),
+					end = ogf->children_l().end(); it != end; ++it) {
+				const xr_ogf* ogf1 = m_subdivisions->at(*it);
+				mesh->push(tag, ogf1->vb(), ogf1->ib(), xform,
+						m_uniq_textures[ogf1->texture_l()],
+						m_uniq_shaders[ogf1->shader_l()]);
+			}
+			mesh->set_tc_fix(false);
+		} else {
+			for (std::vector<uint32_t>::const_iterator it = ogf->children_l().begin(),
+					end = ogf->children_l().end(); it != end; ++it) {
+				push_subdivisions_v12(mesh, sector_idx, *it);
+			}
+		}
 	} else if (ogf->hierarchical()) {
 		for (std::vector<uint32_t>::const_iterator it = ogf->children_l().begin(),
 				end = ogf->children_l().end(); it != end; ++it) {
