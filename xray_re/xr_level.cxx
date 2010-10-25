@@ -239,7 +239,7 @@ void xr_level::load(uint32_t xrlc_version, const char* game_data_path, const cha
 		}
 	}
 
-	if (xrlc_version >= XRLC_VERSION_12)
+	if (xrlc_version >= XRLC_VERSION_9)
 		m_gamemtls_lib = ::load<xr_gamemtls_lib>(game_data_path, "gamemtl.xr", true);
 
 	m_xrlc_version = xrlc_version;

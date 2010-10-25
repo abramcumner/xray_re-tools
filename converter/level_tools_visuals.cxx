@@ -426,7 +426,7 @@ void level_tools::reconstruct_visuals()
 
 	level_mesh* mesh = new level_mesh(vb_size, ib_size);
 	msg("collecting %s", "subdivisions");
-	if (xrlc_version >= XRLC_VERSION_10 && xrlc_version <= XRLC_VERSION_12 && version == OGF3_VERSION) {
+	if (xrlc_version >= XRLC_VERSION_9 && xrlc_version <= XRLC_VERSION_12 && version == OGF3_VERSION) {
 		uint16_t sector_idx = 0;
 		for (sector_data_vec_cit it = m_sectors->begin(),
 				end = m_sectors->end(); it != end; ++it) {
