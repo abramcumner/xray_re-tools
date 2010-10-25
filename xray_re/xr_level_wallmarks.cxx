@@ -28,7 +28,11 @@ struct read_wm_slot { void operator()(wm_slot*& _slot, xr_reader& r) const {
 void xr_level_wallmarks::load(xr_reader& r)
 {
 	xr_reader* s = r.open_chunk(1);
-	xr_assert(s);
+	
+	//before 1935 chunk_id = 0
+	if (s == 0)
+		s = r.open_chunk(0);
+
 	s->r_seq(s->r_u32(), m_slots, read_wm_slot());
 	r.close_chunk(s);
 }

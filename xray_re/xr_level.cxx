@@ -195,7 +195,10 @@ void xr_level::load(uint32_t xrlc_version, const char* game_data_path, const cha
 		//m_spawn = ::load<xr_level_spawn>(level_path, "level.spawn");
 		//m_snd_static = ::load<xr_level_snd_static>(level_path, "level.sound_static");
 		m_ps_static = ::load<xr_level_ps_static>(level_path, "level.ps_static");
-		m_wallmarks = ::load<xr_level_wallmarks>(level_path, "level.wallmarks");
+
+		//unknown format old level.wallmarks
+		//m_wallmarks = ::load<xr_level_wallmarks>(level_path, "level.wallmarks");
+		
 		m_env_mod = ::load<xr_level_env_mod>(level_path, "level.env_mod");
 		m_snd_env = ::load<xr_level_snd_env>(level_path, "level.sound_environment");
 	} else if (xrlc_version >= XRLC_VERSION_13) {
