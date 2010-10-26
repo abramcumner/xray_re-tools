@@ -274,7 +274,10 @@ template<typename T> _matrix<T>& _matrix<T>::invert_43(const _matrix<T>& a)
 	T cf3 = a._21*a._32 - a._22*a._31;
 
 	T det = a._11*cf1 - a._12*cf2 + a._13*cf3;
-	xr_assert(!equivalent<T>(det, 0));
+	
+	//xr_assert(!equivalent<T>(det, 0));
+	// 1850 xform asserted
+	xr_assert(!equivalent<T>(det, 0, 0.0000001f));
 
 	_11 = cf1/det;
 	_21 =-cf2/det;
