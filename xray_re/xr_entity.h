@@ -136,6 +136,9 @@ enum {
 	// build 2215: version=0x65, script_version=2
 	CSE_VERSION_2215	= CSE_VERSION_0x65,
 
+	// build 22xx-2571: version=0x6a(dunno, where to look this?), script_version=3
+	CSE_VERSION_2232	= CSE_VERSION_0x68, //guest it.. lol
+
 	// build 2571: version 0x75 script_version = 4
 	CSE_VERSION_2571	= CSE_VERSION_0x75,
 
