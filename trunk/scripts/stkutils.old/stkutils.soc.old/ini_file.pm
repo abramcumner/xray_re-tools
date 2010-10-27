@@ -1,66 +1,33 @@
-#author: bardak
-#2010-04-30: XiaNi - added handling of parented sections and includes
-#2010-05-06: XiaNi - comments handling "key = value  ; comment" and "[section]:parent ;comment"
-#2010-05-06: XiaNi - added handling of multyple parenting "[section]: parent1, parent0"
-#2010-05-06: XiaNi - sections to lower ... M_rat == m_rat
-#2010-05-10: XiaNi - added base_path and ext_path
-
 package stkutils::ini_file;
 
 use strict;
 use IO::File;
-use File::Basename;
 
-sub _include_ini {
-	autoflush STDOUT 1;
-	
-	my ($self, $base_fn) = @_;
-	my $fn = $self->{base_path}. $base_fn;
-	my $path = $self->{base_path};
-	if (defined $self->{ext_path} and (-e $self->{ext_path} . $base_fn))
-	{
-		$fn = $self->{ext_path} . $base_fn;
-		$path = $self->{ext_path};
-		#print "ini: reading '$fn'\n";
-	}
-	
-	my $fh = IO::File->new($fn, 'r') or die "cannot include $fn\n";
-	#print "ini: reading '$fn'\n";
-	
-	my $dirname = dirname($fn);
-	$dirname = substr($dirname, length $path);
-	defined $dirname or $dirname = "";
-	$dirname ne "" and $dirname = $dirname."/" ;
-	#print "dirname=" . $dirname. "\n";
-	
+sub new {
+	my $class = shift;
+	my ($fn, $mode) = @_;
+
+	my $fh = IO::File->new($fn, $mode) or die "cannot open $fn\n";
+
+	my $self = {};
+	$self->{fh} = $fh;
+	$self->{sections_list} = [];
+	$self->{sections_hash} = ();
+	bless($self, $class);
+
+	$mode eq 'w' and return $self;
+
 	my $section;
-	my $section_parent;
 	my $skip_section = 0;
 	while (<$fh>) {
-		$section_parent = '';
 		$_ =~ qr/^\s*;/ and next;
-		if (/^\s*#include\s*"(\w.*)"/) {
-			if (defined $1) {
-				#print "include!:", $1, "\n";
-				#$self = _include_ini($self, dirname($fn)."/".$1);
-				$self = _include_ini($self, $dirname.$1);
+		if (/^\[(.*)\]\s*:*\s*(\w.*)?/) {
+			if (defined $2 && !::is_flag_defined($2)) {
+				$skip_section = 1;
 				next;
 			}
-		}
-		if (/^\[(.*)\]\s*:*\s*(\w.*)?/) {
-			$section = lc($1);
-			if (defined $2 && !::is_flag_defined($2)) {
-				#$skip_section = 1;
-				#next;
-				$section_parent = lc($2);
-				if ($section_parent =~ /^(.*?)\s*;(.+)$/) {
-					my $comment;
-					($section_parent, $comment) = ($1, $2);
-				}
-				$self->{sections_parents}{$section}=$section_parent;
-			}
-			
-			die "dublicate section '$section' " if defined $self->{sections_hash}->{$section};
+			$section = $1;
+			die if defined $self->{sections_hash}->{$section};
 			push @{$self->{sections_list}}, $section;
 			my %tmp = ();
 			$self->{sections_hash}{$section} = \%tmp;
@@ -68,7 +35,7 @@ sub _include_ini {
 			next;
 		}
 		if (/^([^=]*?)\s*=\s*(.*?)\s*$/) {
-			my ($name, $value) = (lc($1), $2);
+			my ($name, $value) = ($1, $2);
 			if ($value =~ /^<<(.+)$/) {
 				my $terminator = $1;
 				$value = '';
@@ -80,50 +47,11 @@ sub _include_ini {
 				die unless defined $_;
 				substr ($value, 0, 1) = '';
 			}
-			else
-			{
-				if ($value =~ /^(.*?)\s*;(.+)$/) {
-					my $comment;
-					($value, $comment) = ($1, $2);
-				}
-			}
 			$skip_section == 1 and next;
 			die unless defined $section;
 			$self->{sections_hash}{$section}{$name} = $value;
 		}
 	}
-	$fh->close();
-	return $self;
-}
-
-sub new {
-	my $class = shift;
-	my ($base_fn, $mode, $base_path, $ext_path) = @_;
-	my $fh;
-	my $fn;
-	
-	defined $base_path or $base_path = "";
-	$fn = $base_path . $base_fn;
-	
-	if (defined $ext_path and (-e $ext_path . $base_fn))
-	{
-		$fn = $ext_path . $base_fn;
-	}
-	$fh = IO::File->new($fn, $mode) or die "cannot open $fn\n";
-	
-	my $self = {};
-	$self->{fh} = $fh;
-	$self->{sections_list} = [];
-	$self->{sections_hash} = ();
-	$self->{sections_parents} = ();
-	$self->{base_path} = $base_path;
-	$self->{ext_path} = $ext_path;
-	bless($self, $class);
-
-	$mode eq 'w' and return $self;
-	
-	$self = _include_ini($self, $base_fn);
-	
 	return $self;
 }
 sub close {
@@ -154,13 +82,13 @@ sub export_properties {
 	print $fh "; $comment properties\n" if defined $comment;
 	foreach my $p (@_) {
 		my $format = format_for_number->{$p->{type}};
-		if ($p->{type} eq 'f32') {
+		if ($p->{type} eq "f32") {
 			print $fh "$p->{name} = $container->{$p->{name}}\n";
 		} elsif (defined $format) {
 die "undefined field $p->{name}\n" unless defined $container->{$p->{name}};
 			next if defined($p->{default}) && $container->{$p->{name}} == $p->{default};
 			printf $fh "$p->{name} = $format\n", $container->{$p->{name}};
-		} elsif ($p->{type} eq 'sz') {
+		} elsif ($p->{type} eq "sz") {
 			next if defined($p->{default}) && $container->{$p->{name}} eq $p->{default};
 			my $value = $container->{$p->{name}};
 			if ($value =~ /\n/) {
@@ -256,64 +184,9 @@ sub import_shape_properties {
 sub value {
 	my $self = shift;
 	my ($section, $name) = @_;
-	$section = lc($section);
-	$name = lc($name);
-	
-	die "section $section is not found... trying to get [$section][$name]\n" unless defined $self->{sections_hash}{$section};
-	my $val = $self->{sections_hash}{$section}{$name};
-	if (!defined $val)
-	{
-		if (defined $self->{sections_parents}{$section})
-		{
-			my $parent = $self->{sections_parents}{$section};
-			if ($parent !~ /,/)
-			{
-				for ($parent) {
-				s/^\s+//;
-				s/\s+$//;
-				}
-				if (defined $self->{sections_hash}{$parent})
-				{
-					#$val = $self->{sections_hash}{$parent}{$name};
-					$val = $self->value($parent, $name);
-				}
-				else
-				{
-					die "parent section '" .$parent. "' not found for '" .$section. "'\n";
-				}
-			}
-			else
-			{
-				my @parents_list = split(/,/, $parent);
-				@parents_list = reverse(@parents_list);
-				foreach (@parents_list) {
-					my $p2 = $_;
-					for ($p2) {
-					s/^\s+//;
-					s/\s+$//;
-					}
-					
-					if (defined $self->{sections_hash}{$p2})
-					{
-						$val = $self->value($p2, $name);
-						defined $val and last;
-					}
-					else
-					{
-						die "parent section '" .$p2. "' not found for '" .$section. "'\n";
-					}
-				}
-			}
-		}
-	}
-	return $val;
-}
 
-sub section_exists()
-{
-	my $self = shift;
-	my ($section) = @_;
-	return (defined $self->{sections_hash}{lc($section)});
+	die unless defined $self->{sections_hash}{$section};
+	return $self->{sections_hash}{$section}{$name};
 }
 
 1;

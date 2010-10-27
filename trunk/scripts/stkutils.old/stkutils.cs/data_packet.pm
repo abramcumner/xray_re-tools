@@ -1,4 +1,4 @@
-# FIXME: this is very SLOW!!!
+# SLOW!!!
 
 package stkutils::data_packet;
 use strict;
@@ -8,7 +8,6 @@ sub new {
 	my $data = shift;
 	my $self = {};
 	$self->{data} = ($data or '');
-	$self->{init_length} = CORE::length($self->{data});
 	bless($self, $class);
 	return $self;
 }
@@ -18,8 +17,8 @@ sub unpack {
 die if !(defined $self);
 die if !(defined $self->{data});
 die if !(defined $template);
-die if CORE::length($self->{data}) == 0;
-	my @values = CORE::unpack($template.'a*', $self->{data});
+die if length($self->{data}) == 0;
+	my @values = unpack($template.'a*', $self->{data});
 die if $#values == -1;
 	$self->{data} = splice(@values, -1);
 die if !(defined $self->{data});
@@ -31,7 +30,7 @@ sub pack {
 die if !(defined($template));
 die if !(defined(@_));
 die unless defined $_[0];
-	$self->{data} .= CORE::pack($template, @_);
+	$self->{data} .= pack($template, @_);
 }
 use constant template_for_scalar => {
 	h32	=> 'V',
@@ -46,27 +45,24 @@ use constant template_for_scalar => {
 	s8	=> 'C',
 	sz	=> 'Z*',
 	f32	=> 'f',
-	guid	=> 'a[16]',
 };
 use constant template_for_vector => {
-	l8u8v	=> 'C/C',
 	l32u8v	=> 'V/C',
 	l32u16v	=> 'V/v',
-	l32szv	=> 'V/(Z*)',
-	l8szbv	=> 'C/(Z*C)',
+	guid	=> 'C16',
 	u8v8	=> 'C8',
 	u8v4	=> 'C4',
 	f32v3	=> 'f3',
 	f32v4	=> 'f4',
-	s32v3	=> 'l3',
-	s32v4	=> 'l4',
+	h32v3	=> 'V3',
+	h32v4	=> 'V4',	
+	actorData => 'C171',
 };
 sub unpack_properties {
 	my $self = shift;
 	my $container = shift;
 
 	foreach my $p (@_) {
-		#print "unpacking $p->{name} type $p->{type}\n";
 		if ($p->{type} eq 'shape') {
 			my ($count) = $self->unpack('C');
 			while ($count--) {
@@ -121,41 +117,34 @@ sub pack_properties {
 				$self->pack("Vv$n", $n, @{$container->{$p->{name}}});
 			} elsif ($p->{type} eq 'l32u8v') {
 				$self->pack("VC$n", $n, @{$container->{$p->{name}}});
-			} elsif ($p->{type} eq 'l32szv') {
-				$self->pack("V(Z*)$n", $n, @{$container->{$p->{name}}});
-			} elsif ($p->{type} eq 'l8u8v') {
-				$self->pack("CC$n", $n, @{$container->{$p->{name}}});
-			} elsif ($p->{type} eq 'u8v8' or $p->{type} eq 'u8v4') {
+			} elsif ($p->{type} eq 'u8v8' or $p->{type} eq 'u8v4' or $p->{type} eq 'guid') {
 				$self->pack("C$n", @{$container->{$p->{name}}});
 			} elsif ($p->{type} eq 'f32v3') {
 				$self->pack('f3', @{$container->{$p->{name}}});
-			} elsif ($p->{type} eq 'f32v4') {
-				$self->pack('f4', @{$container->{$p->{name}}});
-			} elsif ($p->{type} eq 's32v3') {
-				$self->pack('l3', @{$container->{$p->{name}}});
-			} elsif ($p->{type} eq 's32v4') {
-				$self->pack('l4', @{$container->{$p->{name}}});
 			} elsif ($p->{type} eq 'q8v') {
 				$self->pack("C$n", @{$container->{$p->{name}}});
-			} elsif ($p->{type} eq 'l8szbv') {
-				$self->pack("C(Z*C)$n", $n/2, @{$container->{$p->{name}}});
+			} elsif ($p->{type} eq 'f32v4') {
+				$self->pack('f4', @{$container->{$p->{name}}});				
+			} elsif ($p->{type} eq 'h32v3') {
+				$self->pack('V3', @{$container->{$p->{name}}});	
+			} elsif ($p->{type} eq 'h32v4') {
+				$self->pack('V4', @{$container->{$p->{name}}});					
+			} elsif ($p->{type} eq 'actorData') {
+				$self->pack('C171', @{$container->{$p->{name}}});						
 			} else {
+				print "name=$p->{name} type=$p->{type}";
 				die;
 			}
 		}
 	}
 }
 sub length {
-	return CORE::length($_[0]->{data});
-}
-sub r_tell {
-	return $_[0]->{init_length} - CORE::length($_[0]->{data});
-}
-sub w_tell {
-	return CORE::length($_[0]->{data});
+	my $self = shift;
+	return length($self->{data});
 }
 sub data {
-	return $_[0]->{data};
+	my $self = shift;
+	return $self->{data};
 }
 
 1;

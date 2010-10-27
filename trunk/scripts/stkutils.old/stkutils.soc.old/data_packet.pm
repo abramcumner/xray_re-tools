@@ -46,14 +46,13 @@ use constant template_for_scalar => {
 	s8	=> 'C',
 	sz	=> 'Z*',
 	f32	=> 'f',
-	guid	=> 'a[16]',
 };
 use constant template_for_vector => {
 	l8u8v	=> 'C/C',
 	l32u8v	=> 'V/C',
 	l32u16v	=> 'V/v',
 	l32szv	=> 'V/(Z*)',
-	l8szbv	=> 'C/(Z*C)',
+	guid	=> 'C16',
 	u8v8	=> 'C8',
 	u8v4	=> 'C4',
 	f32v3	=> 'f3',
@@ -66,7 +65,6 @@ sub unpack_properties {
 	my $container = shift;
 
 	foreach my $p (@_) {
-		#print "unpacking $p->{name} type $p->{type}\n";
 		if ($p->{type} eq 'shape') {
 			my ($count) = $self->unpack('C');
 			while ($count--) {
@@ -125,7 +123,7 @@ sub pack_properties {
 				$self->pack("V(Z*)$n", $n, @{$container->{$p->{name}}});
 			} elsif ($p->{type} eq 'l8u8v') {
 				$self->pack("CC$n", $n, @{$container->{$p->{name}}});
-			} elsif ($p->{type} eq 'u8v8' or $p->{type} eq 'u8v4') {
+			} elsif ($p->{type} eq 'u8v8' or $p->{type} eq 'u8v4' or $p->{type} eq 'guid') {
 				$self->pack("C$n", @{$container->{$p->{name}}});
 			} elsif ($p->{type} eq 'f32v3') {
 				$self->pack('f3', @{$container->{$p->{name}}});
@@ -137,8 +135,6 @@ sub pack_properties {
 				$self->pack('l4', @{$container->{$p->{name}}});
 			} elsif ($p->{type} eq 'q8v') {
 				$self->pack("C$n", @{$container->{$p->{name}}});
-			} elsif ($p->{type} eq 'l8szbv') {
-				$self->pack("C(Z*C)$n", $n/2, @{$container->{$p->{name}}});
 			} else {
 				die;
 			}

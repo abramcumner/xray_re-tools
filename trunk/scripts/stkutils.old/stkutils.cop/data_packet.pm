@@ -66,7 +66,6 @@ sub unpack_properties {
 	my $container = shift;
 
 	foreach my $p (@_) {
-		#print "unpacking $p->{name} type $p->{type}\n";
 		if ($p->{type} eq 'shape') {
 			my ($count) = $self->unpack('C');
 			while ($count--) {
