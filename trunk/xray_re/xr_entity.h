@@ -122,6 +122,7 @@ enum {
 	CSE_VERSION_0x7a	= 0x7a,
 	CSE_VERSION_0x7b	= 0x7b,
 	CSE_VERSION_0x7c	= 0x7c,
+	CSE_VERSION_0x80	= 0x80,
 
 	// build 1580
 	CSE_VERSION_1580 = 0x27,
@@ -151,6 +152,9 @@ enum {
 	// build 3487: version=0x7b, script_version=8
 	// build 3502: version=0x7c, script_version=8
 	CSE_VERSION_CS		= CSE_VERSION_0x7c,
+	
+	// build 3967: COP 1.6.0.2 version 0x80, script_version=12
+	CSE_VERSION_COP		= CSE_VERSION_0x80,
 };
 
 struct ph_net_state {
@@ -559,10 +563,15 @@ public:
 
 class cse_inventory_box: public cse_alife_dynamic_object_visual {
 public:
+  cse_inventory_box();
 	virtual void	state_read(xr_packet& packet, uint16_t size);
 	virtual void	state_write(xr_packet& packet);
 	virtual void	update_read(xr_packet& packet);
 	virtual void	update_write(xr_packet& packet);
+	
+	uint8_t cse_alive_inventory_box__unk1_u8;
+	uint8_t cse_alive_inventory_box__unk2_u8;
+	std::string tip;
 };
 
 class cse_alife_object_breakable: public cse_alife_dynamic_object_visual {
@@ -906,6 +915,17 @@ public:
 	virtual cse_motion*	motion();
 };
 
+class se_zone_torrid: public cse_alife_torrid_zone
+{
+public:
+	virtual void		state_read(xr_packet& packet, uint16_t size);
+	virtual void		state_write(xr_packet& packet);
+	virtual void		update_read(xr_packet& packet);
+	virtual void		update_write(xr_packet& packet);
+  
+  uint8_t last_spawn_time_present;
+};
+
 class cse_alife_online_offline_group: public cse_alife_dynamic_object {
 public:
 	virtual void	state_read(xr_packet& packet, uint16_t size);
@@ -1107,6 +1127,18 @@ public:
 	virtual void	update_write(xr_packet& packet);
 protected:
 	std::vector<uint8_t>	m_ammo_ids;
+};
+
+
+class cse_alife_item_helmet: public cse_alife_item {
+public:
+  cse_alife_item_helmet();
+	virtual void	state_read(xr_packet& packet, uint16_t size);
+	virtual void	state_write(xr_packet& packet);
+	virtual void	update_read(xr_packet& packet);
+	virtual void	update_write(xr_packet& packet);
+protected:
+	float		m_upd_condition;
 };
 
 } // end of namespace xray_re

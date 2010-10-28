@@ -599,7 +599,7 @@ void cse_alife_object_physic::update_read(xr_packet& packet)
 {
 	cse_ph_skeleton::update_read(packet);
 	if (!packet.r_eof()) {
-		xr_assert(m_version >= CSE_VERSION_0x7a && m_version <= CSE_VERSION_CS);
+		xr_assert(m_version >= CSE_VERSION_0x7a && m_version <= CSE_VERSION_COP);
 		packet.r_u8(m_num_items);
 		if (m_num_items) {
 			packet.r_vec3(m_state.force);
@@ -780,14 +780,29 @@ void cse_alife_object_projector::update_write(xr_packet& packet) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// XiaNi: check this... unsure...
+cse_inventory_box::cse_inventory_box():cse_alive_inventory_box__unk1_u8(1), cse_alive_inventory_box__unk2_u8(0), tip(""){};
+
 void cse_inventory_box::state_read(xr_packet& packet, uint16_t size)
 {
 	cse_alife_dynamic_object_visual::state_read(packet, size);
+	if (m_version >= CSE_VERSION_COP)
+	{
+    packet.r_u8(cse_alive_inventory_box__unk1_u8);
+    packet.r_u8(cse_alive_inventory_box__unk2_u8);
+    packet.r_sz(tip);
+	}
 }
 
 void cse_inventory_box::state_write(xr_packet& packet)
 {
 	cse_alife_dynamic_object_visual::state_write(packet);
+	if (m_version >= CSE_VERSION_COP)
+	{
+    packet.w_u8(cse_alive_inventory_box__unk1_u8);
+    packet.w_u8(cse_alive_inventory_box__unk2_u8);
+    packet.w_sz(tip);
+	}
 }
 
 void cse_inventory_box::update_read(xr_packet& packet)
@@ -1927,6 +1942,30 @@ cse_motion* cse_alife_torrid_zone::motion()
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void se_zone_torrid::state_read(xr_packet& packet, uint16_t size)
+{
+  cse_alife_torrid_zone::state_read(packet, size);
+  packet.r_u8(last_spawn_time_present);
+}
+
+void se_zone_torrid::state_write(xr_packet& packet)
+{
+  cse_alife_torrid_zone::state_write(packet);
+  packet.w_u8(last_spawn_time_present);
+}
+void se_zone_torrid::update_read(xr_packet& packet)
+{
+	cse_alife_torrid_zone::update_read(packet);
+}
+
+void se_zone_torrid::update_write(xr_packet& packet)
+{
+	cse_alife_torrid_zone::update_write(packet);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
 void cse_alife_online_offline_group::state_read(xr_packet& packet, uint16_t size)
 {
 	cse_alife_dynamic_object::state_read(packet, size);
@@ -1991,7 +2030,7 @@ void cse_alife_inventory_item::state_write(xr_packet& packet)
 void cse_alife_inventory_item::update_read(xr_packet& packet)
 {
 	if (base()->version() >= CSE_VERSION_0x7a) {
-		xr_assert(base()->version() <= CSE_VERSION_CS);
+		xr_assert(base()->version() <= CSE_VERSION_COP);
 		m_num_items = packet.r_u8();
 		if (m_num_items) {
 			packet.r_vec3(m_state.force);
@@ -2574,4 +2613,29 @@ void cse_alife_item_weapon_shotgun::update_write(xr_packet& packet)
 	cse_alife_item_weapon_magazined::update_write(packet);
 	packet.w_size_u8(m_ammo_ids.size());
 	packet.w_seq(m_ammo_ids);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+cse_alife_item_helmet::cse_alife_item_helmet():m_upd_condition(1.f){};
+
+void cse_alife_item_helmet::state_read(xr_packet& packet, uint16_t size)
+{
+	cse_alife_item::state_read(packet, size);
+}
+
+void cse_alife_item_helmet::state_write(xr_packet& packet)
+{
+	cse_alife_item::state_write(packet);
+}
+
+void cse_alife_item_helmet::update_read(xr_packet& packet)
+{
+	cse_alife_item::update_read(packet);
+	packet.r_float(m_upd_condition);
+}
+
+void cse_alife_item_helmet::update_write(xr_packet& packet)
+{
+	cse_alife_item::update_write(packet);
+	packet.w_float(m_upd_condition);
 }

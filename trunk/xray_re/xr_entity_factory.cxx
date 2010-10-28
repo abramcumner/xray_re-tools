@@ -263,6 +263,29 @@ void xr_entity_factory::init()
 	m_clsids.push_back(new factory_item<se_turret_mgun>("TURRETMG"));
 	m_clsids.push_back(new factory_item<se_zone_anom>("Z_MINES"));
 
+	// Call of pripyat classes
+	// @TODO: check changes in all other items ... this are checked
+  m_clsids.push_back(new factory_item<cse_alife_object_hanging_lamp>("SO_HLAMP"));
+  m_clsids.push_back(new factory_item<cse_inventory_box>("S_INVBOX")); // modified
+  m_clsids.push_back(new factory_item<se_zone_anom>("ZS_RADIO"));
+  m_clsids.push_back(new factory_item<cse_alife_item_pda>("S_PDA"));
+  m_clsids.push_back(new factory_item<cse_alife_item_grenade>("G_RGD5_S"));
+  m_clsids.push_back(new factory_item<cse_alife_item_grenade>("G_F1_S"));
+  m_clsids.push_back(new factory_item<cse_alife_item>("S_FOOD"));
+  m_clsids.push_back(new factory_item<cse_alife_object_physic>("O_DSTR_S"));
+  m_clsids.push_back(new factory_item<se_zone_torrid>("ZS_TORRD")); // new
+  m_clsids.push_back(new factory_item<cse_alife_item_weapon_shotgun>("WP_ASHTG"));
+  m_clsids.push_back(new factory_item<cse_alife_item_ammo>("AMMO_S"));
+  m_clsids.push_back(new factory_item<cse_alife_item_ammo>("S_VOG25"));
+  m_clsids.push_back(new factory_item<cse_alife_item_ammo>("S_OG7B"));
+  m_clsids.push_back(new factory_item<cse_alife_item_ammo>("S_M209"));
+  m_clsids.push_back(new factory_item<cse_alife_item>("WP_GLAUN"));
+  m_clsids.push_back(new factory_item<cse_alife_item>("WP_SILEN"));
+  m_clsids.push_back(new factory_item<cse_alife_item_helmet>("E_HLMET")); // new
+  m_clsids.push_back(new factory_item<cse_alife_item_explosive>("S_EXPLO"));
+  m_clsids.push_back(new factory_item<cse_alife_item_detector>("DET_ELIT"));
+
+
 	// prepare for bisection
 	std::sort(m_clsids.begin(), m_clsids.end(), clsid_pred());
 }
@@ -280,12 +303,20 @@ cse_abstract* xr_entity_factory::create(const char* name)
 	if (m_system_ini == 0)
 		m_system_ini = new xr_ini_file(PA_GAME_CONFIG, "system.ltx");
 
+
+  
 	if (m_system_ini->section_exist(name)) {
 		xr_clsid clsid(m_system_ini->r_clsid(name, "class"));
 		std::vector<factory_item_base*>::iterator it = lower_bound_if(
 				m_clsids.begin(), m_clsids.end(), clsid_pred2(clsid));
 		if (it != m_clsids.end() && (*it)->clsid() == clsid)
 			return (*it)->create();
+			
+    msg("inknown entity class [%s]", m_system_ini->r_string(name, "class"));
+	}
+	else
+	{
+	  msg("system.ltx:[%s] section not found", name);
 	}
 	msg("can't create entity %s", name);
 	return 0;
