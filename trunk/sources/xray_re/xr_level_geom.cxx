@@ -68,6 +68,15 @@ void xr_level_geom::load_1865(xr_reader& r)
 	for (xr_ibuf_vec_it it = m_ibufs.begin(), end = m_ibufs.end(); it != end; ++it)
 		it->load(*s, s->r_u32());
 	r.close_chunk(s);
+
+	s = r.open_chunk(FSL12_SWIS);
+	if (s != 0)
+	{
+		m_swibufs.resize(s->r_u32());
+		for (xr_swibuf_vec_it it = m_swibufs.begin(), end = m_swibufs.end(); it != end; ++it)
+			it->load(*s);
+		r.close_chunk(s);
+	}
 }
 
 void xr_level_geom::load_d3d9(xr_reader& r)

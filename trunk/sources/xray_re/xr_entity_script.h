@@ -70,6 +70,15 @@ class se_smart_terrain: public cse_alife_smart_zone {
 public:
 	virtual void	state_read(xr_packet& packet, uint16_t size);
 	virtual void	state_write(xr_packet& packet);
+	
+	// ZP
+	uint8_t arriving_npc_count;
+	uint8_t npc_info_count;
+	uint8_t dead_time_count;
+	uint8_t base_on_actor_control_present;
+	uint8_t is_respawn_point;
+	uint8_t population;
+	
 };
 
 class se_sim_faction: public cse_alife_smart_zone {

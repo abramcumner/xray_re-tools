@@ -41,7 +41,10 @@ static void w_object_collection(xr_packet& packet)
 void se_actor::state_read(xr_packet& packet, uint16_t size)
 {
 	cse_alife_creature_actor::state_read(packet, size);
-	if (m_version >= CSE_VERSION_0x7a) {
+	if (m_version >= CSE_VERSION_COP) {
+	  // do nothing
+	}
+	else if (m_version >= CSE_VERSION_0x7a) {
 		xr_assert(m_version <= CSE_VERSION_CS);
 
 		set_save_marker(packet, SM_LOAD, false, "se_actor");
@@ -406,7 +409,20 @@ void se_respawn::state_write(xr_packet& packet)
 void se_smart_terrain::state_read(xr_packet& packet, uint16_t size)
 {
 	cse_alife_smart_zone::state_read(packet, size);
-	if (m_version >= CSE_VERSION_0x7a) {
+	if (m_version >= CSE_VERSION_COP) {
+
+		set_save_marker(packet, SM_LOAD, false, "se_smart_terrain");
+
+    packet.r_u8(arriving_npc_count);
+    packet.r_u8(npc_info_count);
+    packet.r_u8(dead_time_count);
+    packet.r_u8(base_on_actor_control_present);
+    packet.r_u8(is_respawn_point);
+    packet.r_u8(population);
+	  
+	  set_save_marker(packet, SM_LOAD, true, "se_smart_terrain");
+	}
+	else if (m_version >= CSE_VERSION_0x7a) {
 		xr_assert(m_version <= CSE_VERSION_CS);
 
 		set_save_marker(packet, SM_LOAD, false, "se_smart_terrain");
@@ -469,7 +485,21 @@ void se_smart_terrain::state_read(xr_packet& packet, uint16_t size)
 void se_smart_terrain::state_write(xr_packet& packet)
 {
 	cse_alife_smart_zone::state_write(packet);
-	if (m_version >= CSE_VERSION_0x7a) {
+	if (m_version >= CSE_VERSION_COP) {
+	  xr_assert(m_version <= CSE_VERSION_COP);
+
+		set_save_marker(packet, SM_SAVE, false, "se_smart_terrain");
+
+    packet.w_u8(arriving_npc_count);
+    packet.w_u8(npc_info_count);
+    packet.w_u8(dead_time_count);
+    packet.w_u8(base_on_actor_control_present);
+    packet.w_u8(is_respawn_point);
+    packet.w_u8(population);
+	  
+	  set_save_marker(packet, SM_SAVE, true, "se_smart_terrain");
+	}
+	else if (m_version >= CSE_VERSION_0x7a) {
 		xr_assert(m_version <= CSE_VERSION_CS);
 
 		set_save_marker(packet, SM_SAVE, false, "se_smart_terrain");

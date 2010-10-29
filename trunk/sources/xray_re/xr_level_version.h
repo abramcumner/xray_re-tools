@@ -81,6 +81,7 @@ enum {
 	FSL12_SECTORS		= 0x8,
 	FSL12_IB			= 0x9,
 	FSL12_VB			= 0xa,
+	FSL12_SWIS			= 0xb,// build 2218
 
 	// 2215+
 	FSL13_HEADER		= 0x1,

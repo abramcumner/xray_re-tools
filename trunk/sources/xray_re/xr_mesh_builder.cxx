@@ -354,7 +354,12 @@ void xr_mesh_builder::remove_back_faces(float normal_tolerance)
 							break;
 						}
 					}
-					next = adjacent.next_face_idx(v0, v1);
+
+					// check for endless cycle. It`s in build 2232 l06_rostok
+					uint_fast32_t temp = adjacent.next_face_idx(v0, v1);
+					if (next == temp)
+						break;
+					next = temp;
 				}
 			}
 			if (adjacents.empty())

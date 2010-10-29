@@ -53,8 +53,10 @@ void level_mesh::separate_terrain(uint16_t texture, const details_header& header
 		it->temp = free_temp;
 		if (sector == UINT16_MAX)
 			sector = it->sector;
-		else
-			xr_assert(sector == it->sector);
+		// in build 2232 l06_rostok, 2571 pripyat terrain is in different sectors
+		//else
+		//	xr_assert(sector == it->sector);
+
 		uint32_t num_faces = 0, num_contacts = 0;
 		for (uint32_t face_idx = uint32_t((it - it0) & UINT32_MAX);;) {
 			++num_faces;
