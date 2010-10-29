@@ -41,8 +41,12 @@ static void w_object_collection(xr_packet& packet)
 void se_actor::state_read(xr_packet& packet, uint16_t size)
 {
 	cse_alife_creature_actor::state_read(packet, size);
-	if (m_version >= CSE_VERSION_COP) {
-	  // do nothing
+	if (m_version >= CSE_VERSION_0x80) {
+		set_save_marker(packet, SM_LOAD, false, "se_actor");
+		
+		bool start_position_filled = packet.r_bool();
+		
+		set_save_marker(packet, SM_LOAD, true, "se_actor");
 	}
 	else if (m_version >= CSE_VERSION_0x7a) {
 		xr_assert(m_version <= CSE_VERSION_CS);
@@ -164,7 +168,14 @@ void se_actor::state_read(xr_packet& packet, uint16_t size)
 void se_actor::state_write(xr_packet& packet)
 {
 	cse_alife_creature_actor::state_write(packet);
-	if (m_version >= CSE_VERSION_0x7a) {
+	if (m_version >= CSE_VERSION_0x80) {
+		xr_assert(m_version <= CSE_VERSION_COP);
+		
+		set_save_marker(packet, SM_SAVE, false, "se_actor");
+		packet.w_bool(0);		//start_position_filled
+		set_save_marker(packet, SM_SAVE, true, "se_actor");
+
+	} else if (m_version >= CSE_VERSION_0x7a) {
 		xr_assert(m_version <= CSE_VERSION_CS);
 
 		set_save_marker(packet, SM_SAVE, false, "se_actor");
@@ -247,7 +258,13 @@ se_monster::se_monster(): m_job_online(0), m_was_in_smart_terrain(false),
 void se_monster::state_read(xr_packet& packet, uint16_t size)
 {
 	cse_alife_monster_base::state_read(packet, size);
-	if (m_version >= CSE_VERSION_0x7a) {
+	if (m_version >= CSE_VERSION_0x80) {
+		xr_assert(m_version <= CSE_VERSION_COP);
+
+		packet.r_sz(m_off_level_vertex_id);
+		packet.r_sz(m_active_section);
+	}
+	else if (m_version >= CSE_VERSION_0x7a) {
 		xr_assert(m_version <= CSE_VERSION_CS);
 		packet.r_u8(m_job_online);
 		if (m_job_online > 2)
@@ -283,7 +300,13 @@ void se_monster::state_read(xr_packet& packet, uint16_t size)
 void se_monster::state_write(xr_packet& packet)
 {
 	cse_alife_monster_base::state_write(packet);
-	if (m_version >= CSE_VERSION_0x7a) {
+	if (m_version >= CSE_VERSION_0x80) {
+		xr_assert(m_version <= CSE_VERSION_COP);
+
+		packet.w_sz(m_off_level_vertex_id);
+		packet.w_sz(m_active_section);
+	}
+	else if (m_version >= CSE_VERSION_0x7a) {
 		xr_assert(m_version <= CSE_VERSION_CS);
 		packet.w_u8(m_job_online);
 		if (m_job_online > 2)
@@ -313,7 +336,13 @@ se_stalker::se_stalker(): m_job_online(0), m_was_in_smart_terrain(false), m_deat
 void se_stalker::state_read(xr_packet& packet, uint16_t size)
 {
 	cse_alife_human_stalker::state_read(packet, size);
-	if (m_version >= CSE_VERSION_0x7a) {
+	if (m_version >= CSE_VERSION_0x80) {
+		xr_assert(m_version <= CSE_VERSION_COP);
+		packet.r_sz(m_old_lvid);
+		packet.r_sz(m_active_section);
+		packet.r_bool(m_death_dropped);
+	}
+	else if (m_version >= CSE_VERSION_0x7a) {
 		xr_assert(m_version <= CSE_VERSION_CS);
 		packet.r_u8(m_job_online);
 		if (m_job_online > 2)
@@ -351,7 +380,13 @@ void se_stalker::state_read(xr_packet& packet, uint16_t size)
 void se_stalker::state_write(xr_packet& packet)
 {
 	cse_alife_human_stalker::state_write(packet);
-	if (m_version >= CSE_VERSION_0x7a) {
+	if (m_version >= CSE_VERSION_0x80) {
+		xr_assert(m_version <= CSE_VERSION_COP);
+		
+		packet.w_sz(m_old_lvid);
+		packet.w_sz(m_active_section);
+		packet.w_bool(m_death_dropped);
+	} else if (m_version >= CSE_VERSION_0x7a) {
 		xr_assert(m_version <= CSE_VERSION_CS);
 		packet.w_u8(m_job_online);
 		if (m_job_online > 2)
@@ -409,18 +444,23 @@ void se_respawn::state_write(xr_packet& packet)
 void se_smart_terrain::state_read(xr_packet& packet, uint16_t size)
 {
 	cse_alife_smart_zone::state_read(packet, size);
-	if (m_version >= CSE_VERSION_COP) {
+	if (m_version >= CSE_VERSION_0x80) {
+		xr_assert(m_version <= CSE_VERSION_COP);
 
 		set_save_marker(packet, SM_LOAD, false, "se_smart_terrain");
 
-    packet.r_u8(arriving_npc_count);
-    packet.r_u8(npc_info_count);
-    packet.r_u8(dead_time_count);
-    packet.r_u8(base_on_actor_control_present);
-    packet.r_u8(is_respawn_point);
-    packet.r_u8(population);
+    	packet.r_u8(arriving_npc_count);
+    	packet.r_u8(npc_info_count);
+    	packet.r_u8(dead_time_count);
+    	packet.r_u8(base_on_actor_control_present);
+		if (base_on_actor_control == true)
+			return;
+    	packet.r_u8(is_respawn_point);
+		if (respawn_point == true)
+			return;
+    	packet.r_u8(population);
 	  
-	  set_save_marker(packet, SM_LOAD, true, "se_smart_terrain");
+	  	set_save_marker(packet, SM_LOAD, true, "se_smart_terrain");
 	}
 	else if (m_version >= CSE_VERSION_0x7a) {
 		xr_assert(m_version <= CSE_VERSION_CS);
@@ -485,17 +525,17 @@ void se_smart_terrain::state_read(xr_packet& packet, uint16_t size)
 void se_smart_terrain::state_write(xr_packet& packet)
 {
 	cse_alife_smart_zone::state_write(packet);
-	if (m_version >= CSE_VERSION_COP) {
-	  xr_assert(m_version <= CSE_VERSION_COP);
+	if (m_version >= CSE_VERSION_0x80) {
+		xr_assert(m_version <= CSE_VERSION_COP);
 
 		set_save_marker(packet, SM_SAVE, false, "se_smart_terrain");
-
-    packet.w_u8(arriving_npc_count);
-    packet.w_u8(npc_info_count);
-    packet.w_u8(dead_time_count);
-    packet.w_u8(base_on_actor_control_present);
-    packet.w_u8(is_respawn_point);
-    packet.w_u8(population);
+	
+	    packet.w_u8(arriving_npc_count);
+	    packet.w_u8(npc_info_count);
+	    packet.w_u8(dead_time_count);
+	    packet.w_u8(base_on_actor_control_present);
+	    packet.w_u8(is_respawn_point);
+	    packet.w_u8(population);
 	  
 	  set_save_marker(packet, SM_SAVE, true, "se_smart_terrain");
 	}
@@ -650,5 +690,53 @@ void se_level_changer::state_write(xr_packet& packet)
 		packet.w_bool(m_enabled);
 		packet.w_sz(m_hint);
 		set_save_marker(packet, SM_SAVE, true, "se_level_changer");
+	}
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+inline se_smart_cover::loophole::loophole(const char* _id, bool _enabled):
+	id(_id), enabled(_enabled) {}
+
+void se_smart_cover::state_read(xr_packet& packet, uint16_t size)
+{
+	cse_smart_cover::state_read(packet, size);
+	if (m_version >= CSE_VERSION_0x80) {
+		packet.r_sz(m_last_description);
+		packet.r_u8(m_loopholes_count);
+
+		if (m_loopholes_count > 0)
+		{
+			m_loopholes = new std::vector<loophole>();
+
+			m_loopholes->reserve(m_loopholes_count);
+
+			for (int i = 0; i < m_loopholes_count; ++i)
+			{
+				std::string *id = new std::string;
+				packet.r_sz(*id);
+				m_loopholes->push_back(loophole(id->c_str(), packet.r_bool()));
+			}
+		}
+	}
+}
+
+void se_smart_cover::state_write(xr_packet& packet)
+{
+	cse_smart_cover::state_write(packet);
+	if (m_version >= CSE_VERSION_0x80) {
+		packet.w_sz(m_last_description);
+		packet.w_u8(m_loopholes_count);
+
+		if (m_loopholes_count > 0)
+		{
+			for (std::vector<loophole>::iterator it = m_loopholes->begin(), end = m_loopholes->end();
+				it != end; ++it){
+				packet.w_sz(it->id);
+				packet.w_bool(it->enabled);
+			}
+		}
 	}
 }

@@ -152,8 +152,10 @@ enum {
 	// build 3487: version=0x7b, script_version=8
 	// build 3502: version=0x7c, script_version=8
 	CSE_VERSION_CS		= CSE_VERSION_0x7c,
-
-	//·build·3967:·COP·1.6.0.2·version·0x80,·script_version=12
+	
+	// build 3870: CoP 1.6.00
+	// build 3912: CoP 1.6.01
+	//·build·3967:·COP·1.6.02·version·0x80,·script_version=12
 	CSE_VERSION_COP		= CSE_VERSION_0x80,
 };
 
@@ -478,6 +480,9 @@ public:
 	virtual cse_shape*	shape();
 protected:
 	uint16_t		m_flags;
+
+	// CoP addition
+	std::string		m_game_material;
 };
 
 class cse_smart_cover: public cse_shape, public cse_alife_dynamic_object {
@@ -494,6 +499,9 @@ protected:
 	float			m_enter_min_enemy_distance;
 	float			m_exit_min_enemy_distance;
 	bool			m_is_combat_cover;
+
+	// CoP addition
+	uint8_t		m_cs_unk3_u8;
 };
 
 class cse_alife_object_physic: public cse_alife_dynamic_object_visual, public cse_ph_skeleton {
@@ -760,6 +768,10 @@ protected:
 	std::string	m_character_profile;
 	std::string	m_specific_character;
 	std::string	m_character_name;
+
+	// CoP additions
+	uint8_t		m_unk1_u8;
+	uint8_t		m_unk2_u8;
 };
 
 class cse_alife_trader: public cse_alife_dynamic_object_visual, public cse_alife_trader_abstract {
@@ -1025,6 +1037,14 @@ public:
 	virtual void	update_write(xr_packet& packet);
 };
 
+class cse_alife_item_helmet: public cse_alife_item {
+public:
+	virtual void	state_read(xr_packet& packet, uint16_t size);
+	virtual void	state_write(xr_packet& packet);
+	virtual void	update_read(xr_packet& packet);
+	virtual void	update_write(xr_packet& packet);
+};
+
 class cse_alife_item_custom_outfit: public cse_alife_item {
 public:
 	virtual void	state_read(xr_packet& packet, uint16_t size);
@@ -1127,17 +1147,6 @@ public:
 	virtual void	update_write(xr_packet& packet);
 protected:
 	std::vector<uint8_t>	m_ammo_ids;
-};
-
-class cse_alife_item_helmet: public cse_alife_item {
-public:
-	cse_alife_item_helmet();
-	virtual void	state_read(xr_packet& packet, uint16_t size);
-	virtual void	state_write(xr_packet& packet);
-	virtual void	update_read(xr_packet& packet);
-	virtual void	update_write(xr_packet& packet);
-protected:
-	float		m_upd_condition;
 };
 
 } // end of namespace xray_re

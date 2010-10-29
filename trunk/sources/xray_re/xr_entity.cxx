@@ -488,19 +488,25 @@ cse_visual* cse_alife_dynamic_object_visual::visual()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-cse_alife_object_climable::cse_alife_object_climable(): m_flags(0) {}
+cse_alife_object_climable::cse_alife_object_climable(): m_flags(0), m_game_material("materials\\fake_ladders") {}
 
 void cse_alife_object_climable::state_read(xr_packet& packet, uint16_t size)
 {
 	if (m_version > CSE_VERSION_0x63)
 		cse_alife_dynamic_object::state_read(packet, size);
 	cse_shape::cform_read(packet);
+
+	if (m_version >= CSE_VERSION_0x80)
+		packet.r_sz(m_game_material);
 }
 
 void cse_alife_object_climable::state_write(xr_packet& packet)
 {
 	cse_alife_dynamic_object::state_write(packet);
 	cse_shape::cform_write(packet);
+
+	if (m_version >= CSE_VERSION_0x80)
+		packet.w_sz(m_game_material);
 }
 
 void cse_alife_object_climable::update_read(xr_packet& packet) {}
@@ -531,6 +537,8 @@ void cse_smart_cover::state_read(xr_packet& packet, uint16_t size)
 	}
 	if (m_version >= CSE_VERSION_0x7a)
 		packet.r_bool(m_is_combat_cover);
+	if (m_version >= CSE_VERSION_0x80)
+		packet.r_u8(m_cs_unk3_u8);
 }
 
 void cse_smart_cover::state_write(xr_packet& packet)
@@ -545,6 +553,8 @@ void cse_smart_cover::state_write(xr_packet& packet)
 	}
 	if (m_version >= CSE_VERSION_0x7a)
 		packet.w_bool(m_is_combat_cover);
+	if (m_version >= CSE_VERSION_0x80)
+		packet.w_u8(m_cs_unk3_u8);
 }
 
 void cse_smart_cover::update_read(xr_packet& packet) {}
@@ -629,7 +639,7 @@ void cse_alife_object_physic::update_write(xr_packet& packet)
 {
 	cse_ph_skeleton::update_write(packet);
 	if (m_version >= CSE_VERSION_0x7a) {
-		xr_assert(m_version <= CSE_VERSION_CS);
+		xr_assert(m_version <= CSE_VERSION_COP);
 		if (m_num_items) {
 			uint8_t num_items = uint8_t(m_num_items & 0x1f);
 			if (m_state.enabled)
@@ -780,28 +790,27 @@ void cse_alife_object_projector::update_write(xr_packet& packet) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// XiaNi: check this... unsure...
 cse_inventory_box::cse_inventory_box():cse_alive_inventory_box__unk1_u8(1), cse_alive_inventory_box__unk2_u8(0), tip(""){};
 
 void cse_inventory_box::state_read(xr_packet& packet, uint16_t size)
 {
 	cse_alife_dynamic_object_visual::state_read(packet, size);
-	if (m_version >= CSE_VERSION_COP)
+	if (m_version >= CSE_VERSION_0x80)
 	{
-    packet.r_u8(cse_alive_inventory_box__unk1_u8);
-    packet.r_u8(cse_alive_inventory_box__unk2_u8);
-    packet.r_sz(tip);
+    	packet.r_u8(cse_alive_inventory_box__unk1_u8);
+    	packet.r_u8(cse_alive_inventory_box__unk2_u8);
+    	packet.r_sz(tip);
 	}
 }
 
 void cse_inventory_box::state_write(xr_packet& packet)
 {
 	cse_alife_dynamic_object_visual::state_write(packet);
-	if (m_version >= CSE_VERSION_COP)
+	if (m_version >= CSE_VERSION_0x80)
 	{
-    packet.w_u8(cse_alive_inventory_box__unk1_u8);
-    packet.w_u8(cse_alive_inventory_box__unk2_u8);
-    packet.w_sz(tip);
+    	packet.w_u8(cse_alive_inventory_box__unk1_u8);
+    	packet.w_u8(cse_alive_inventory_box__unk2_u8);
+    	packet.w_sz(tip);
 	}
 }
 
@@ -2100,7 +2109,7 @@ void cse_alife_inventory_item::update_read(xr_packet& packet)
 void cse_alife_inventory_item::update_write(xr_packet& packet)
 {
 	if (base()->version() >= CSE_VERSION_0x7a) {
-		xr_assert(base()->version() <= CSE_VERSION_CS);
+		xr_assert(base()->version() <= CSE_VERSION_COP);
 		if (m_num_items & ~FLAG_NO_POSITION) {
 			uint8_t num_items = uint8_t(m_num_items & 0x1f);
 			if (m_state.enabled)
@@ -2380,6 +2389,33 @@ void cse_alife_item_custom_outfit::update_write(xr_packet& packet)
 		packet.w_float_q8(m_condition);
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+
+void cse_alife_item_helmet::state_read(xr_packet& packet, uint16_t size)
+{
+	cse_alife_item::state_read(packet, size);
+}
+
+void cse_alife_item_helmet::state_write(xr_packet& packet)
+{
+	cse_alife_item::state_write(packet);
+}
+
+void cse_alife_item_helmet::update_read(xr_packet& packet)
+{
+	cse_alife_item::update_read(packet);
+	if (m_version >= CSE_VERSION_0x76 && m_script_version > 5)
+		packet.r_float_q8(m_condition);
+}
+
+void cse_alife_item_helmet::update_write(xr_packet& packet)
+{
+	cse_alife_item::update_write(packet);
+	if (m_version >= CSE_VERSION_0x76 && m_script_version > 5)
+		packet.w_float_q8(m_condition);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 cse_alife_item_pda::cse_alife_item_pda(): m_original_owner(UNDEF16) {}
@@ -2613,29 +2649,4 @@ void cse_alife_item_weapon_shotgun::update_write(xr_packet& packet)
 	cse_alife_item_weapon_magazined::update_write(packet);
 	packet.w_size_u8(m_ammo_ids.size());
 	packet.w_seq(m_ammo_ids);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-cse_alife_item_helmet::cse_alife_item_helmet():m_upd_condition(1.f){};
-
-void cse_alife_item_helmet::state_read(xr_packet& packet, uint16_t size)
-{
-	cse_alife_item::state_read(packet, size);
-}
-
-void cse_alife_item_helmet::state_write(xr_packet& packet)
-{
-	cse_alife_item::state_write(packet);
-}
-
-void cse_alife_item_helmet::update_read(xr_packet& packet)
-{
-	cse_alife_item::update_read(packet);
-	packet.r_float(m_upd_condition);
-}
-
-void cse_alife_item_helmet::update_write(xr_packet& packet)
-{
-	cse_alife_item::update_write(packet);
-	packet.w_float(m_upd_condition);
 }

@@ -21,7 +21,42 @@ class se_outfit: public cse_alife_item_custom_outfit {};
 class se_physic: public cse_alife_object_physic {};
 class se_restrictor: public cse_alife_space_restrictor {};
 class se_trader: public cse_alife_trader {};
-class se_smart_cover: public cse_smart_cover {};
+
+class se_zone_torrid: public cse_alife_torrid_zone {
+public:
+					se_zone_torrid();
+	virtual void	state_read(xr_packet& packet, uint16_t size);
+	virtual void	state_write(xr_packet& packet);
+protected:
+	uint8_t			m_last_spawn_time_present;
+};
+
+class se_invbox: public cse_inventory_box {
+public:
+					se_invbox();
+	virtual void	state_read(xr_packet& packet, uint16_t size);
+	virtual void	state_write(xr_packet& packet);
+protected:
+	std::string		m_tip;
+};
+
+class se_smart_cover: public cse_smart_cover {
+public:
+	virtual void	state_read(xr_packet& packet, uint16_t size);
+	virtual void	state_write(xr_packet& packet);
+
+protected:
+	std::string		m_last_description;
+	uint8_t			m_loopholes_count;
+
+	struct loophole {
+		loophole(const char *id, bool enabled);
+		const char *id;
+		bool		enabled;
+	};
+
+	std::vector<loophole>	*m_loopholes;
+};
 
 class se_actor: public cse_alife_creature_actor {
 public:
@@ -41,6 +76,10 @@ protected:
 	// clear sky additions
 	std::string	m_squad_id;
 	bool		m_sim_forced_online;
+
+	// CoP additions
+	std::string m_off_level_vertex_id;
+	std::string m_active_section;
 };
 
 class se_stalker: public cse_alife_human_stalker {
@@ -56,6 +95,11 @@ protected:
 	// clear sky additions
 	std::string	m_squad_id;
 	bool		m_sim_forced_online;
+
+	// CoP additions
+	std::string m_old_lvid;
+	std::string m_active_section;
+	// also m_death_dropped
 };
 
 class se_respawn: public cse_alife_smart_zone {
@@ -78,7 +122,6 @@ public:
 	uint8_t base_on_actor_control_present;
 	uint8_t is_respawn_point;
 	uint8_t population;
-	
 };
 
 class se_sim_faction: public cse_alife_smart_zone {

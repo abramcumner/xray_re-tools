@@ -199,6 +199,23 @@ void xr_entity_factory::init()
 	m_clsids.push_back(new factory_item<cse_alife_anomalous_zone>("Z_CFIRE"));
 	m_clsids.push_back(new factory_item<cse_alife_item_artefact>("AF_CTA"));
 
+	// CoP new engine classes
+	m_clsids.push_back(new factory_item<cse_alife_object_physic>("O_DSTR_S"));
+	m_clsids.push_back(new factory_item<cse_alife_object_hanging_lamp>("SO_HLAMP"));
+	m_clsids.push_back(new factory_item<cse_alife_item_grenade>("G_F1_S"));
+	m_clsids.push_back(new factory_item<cse_alife_item_grenade>("G_RGD5_S"));
+	m_clsids.push_back(new factory_item<cse_alife_item_pda>("S_PDA"));
+	m_clsids.push_back(new factory_item<cse_alife_item>("S_FOOD"));
+	m_clsids.push_back(new factory_item<cse_alife_item>("WP_GLAUN"));
+	m_clsids.push_back(new factory_item<cse_alife_item>("WP_SILEN"));
+	m_clsids.push_back(new factory_item<cse_alife_item_ammo>("AMMO_S"));
+	m_clsids.push_back(new factory_item<cse_alife_item_ammo>("S_VOG25"));
+	m_clsids.push_back(new factory_item<cse_alife_item_ammo>("S_M209"));
+	m_clsids.push_back(new factory_item<cse_alife_item_ammo>("S_OG7B"));
+	m_clsids.push_back(new factory_item<cse_alife_item_helmet>("E_HLMET"));
+	m_clsids.push_back(new factory_item<cse_alife_item_explosive>("S_EXPLO"));
+	m_clsids.push_back(new factory_item<cse_alife_item_detector>("DET_ELIT"));
+
 	// script classes
 	m_clsids.push_back(new factory_item<se_level_changer>("LVL_CHNG"));	// was cse_alife_level_changer in pre-3502 builds
 	m_clsids.push_back(new factory_item<se_smart_terrain>("SMRTTRRN"));
@@ -254,37 +271,20 @@ void xr_entity_factory::init()
 	m_clsids.push_back(new factory_item<se_zone_anom>("ZS_GALAN"));
 	m_clsids.push_back(new factory_item<se_zone_anom>("ZS_MINCE"));
 	// clear sky script classes
-	m_clsids.push_back(new factory_item<se_actor>("S_ACTOR"));
+	m_clsids.push_back(new factory_item<se_actor>("S_ACTOR"));			// + CoP
 	m_clsids.push_back(new factory_item<se_sim_faction>("SFACTION"));
-	m_clsids.push_back(new factory_item<se_smart_cover>("SMRT_C_S"));
+	m_clsids.push_back(new factory_item<se_smart_cover>("SMRT_C_S"));	// + CoP
 
 	// ZENOBIAN mod script classes
 	m_clsids.push_back(new factory_item<se_anomaly_field>("ANOMFLD1"));
 	m_clsids.push_back(new factory_item<se_turret_mgun>("TURRETMG"));
 	m_clsids.push_back(new factory_item<se_zone_anom>("Z_MINES"));
-
-	// Call of pripyat classes
-	// @TODO: check changes in all other items ... this are checked
-  m_clsids.push_back(new factory_item<cse_alife_object_hanging_lamp>("SO_HLAMP"));
-  m_clsids.push_back(new factory_item<cse_inventory_box>("S_INVBOX")); // modified
-  m_clsids.push_back(new factory_item<se_zone_anom>("ZS_RADIO"));
-  m_clsids.push_back(new factory_item<cse_alife_item_pda>("S_PDA"));
-  m_clsids.push_back(new factory_item<cse_alife_item_grenade>("G_RGD5_S"));
-  m_clsids.push_back(new factory_item<cse_alife_item_grenade>("G_F1_S"));
-  m_clsids.push_back(new factory_item<cse_alife_item>("S_FOOD"));
-  m_clsids.push_back(new factory_item<cse_alife_object_physic>("O_DSTR_S"));
-  m_clsids.push_back(new factory_item<se_zone_torrid>("ZS_TORRD")); // new
-  m_clsids.push_back(new factory_item<cse_alife_item_weapon_shotgun>("WP_ASHTG"));
-  m_clsids.push_back(new factory_item<cse_alife_item_ammo>("AMMO_S"));
-  m_clsids.push_back(new factory_item<cse_alife_item_ammo>("S_VOG25"));
-  m_clsids.push_back(new factory_item<cse_alife_item_ammo>("S_OG7B"));
-  m_clsids.push_back(new factory_item<cse_alife_item_ammo>("S_M209"));
-  m_clsids.push_back(new factory_item<cse_alife_item>("WP_GLAUN"));
-  m_clsids.push_back(new factory_item<cse_alife_item>("WP_SILEN"));
-  m_clsids.push_back(new factory_item<cse_alife_item_helmet>("E_HLMET")); // new
-  m_clsids.push_back(new factory_item<cse_alife_item_explosive>("S_EXPLO"));
-  m_clsids.push_back(new factory_item<cse_alife_item_detector>("DET_ELIT"));
-
+	
+	// CoP new script classes
+	m_clsids.push_back(new factory_item<se_invbox>("S_INVBOX"));
+	m_clsids.push_back(new factory_item<se_zone_anom>("ZS_RADIO"));
+	m_clsids.push_back(new factory_item<se_zone_torrid>("ZS_TORRD"));
+	m_clsids.push_back(new factory_item<se_weapon_shotgun>("WP_ASHTG"));
 
 	// prepare for bisection
 	std::sort(m_clsids.begin(), m_clsids.end(), clsid_pred());
