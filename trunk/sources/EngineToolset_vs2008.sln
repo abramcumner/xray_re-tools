@@ -1,0 +1,78 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rd party", "3rd party", "{DCB0C650-B557-4B4A-A88E-197C769D07B2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugins", "plugins", "{E2C59309-09DB-4416-847F-5AB965D22DFB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utils", "utils", "{D3491318-1407-45BC-BBFF-F9CAE3C21E10}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nvtt", "3rd party\nvtt\bld-vs2008\nvtt.vcproj", "{938E23B7-2436-4ECC-B960-6894655447F1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ms3d_import", "plugins\ms3d_import\bld-vs2008\ms3d_import.vcproj", "{C28B4754-2914-4255-94C9-17ACFE443585}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7ADF7F28-CC62-489D-81EB-B4922F0611CB} = {7ADF7F28-CC62-489D-81EB-B4922F0611CB}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ms3d_export", "plugins\ms3d_export\bld-vs2008\ms3d_export.vcproj", "{3654E3D8-ECAB-4800-97AC-1034D7D169D4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7ADF7F28-CC62-489D-81EB-B4922F0611CB} = {7ADF7F28-CC62-489D-81EB-B4922F0611CB}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aiwrapper", "utils\aiwrapper\bld-vs2008\aiwrapper.vcproj", "{05DE5C01-AA87-47F2-ADAA-7D078F6FFBB5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7ADF7F28-CC62-489D-81EB-B4922F0611CB} = {7ADF7F28-CC62-489D-81EB-B4922F0611CB}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "converter", "utils\converter\bld-vs2008\converter.vcproj", "{251A6DE4-30F3-43A4-8315-AB4E306BD58D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7ADF7F28-CC62-489D-81EB-B4922F0611CB} = {7ADF7F28-CC62-489D-81EB-B4922F0611CB}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xray_re", "xray_re\bld-vs2008\xray_re.vcproj", "{7ADF7F28-CC62-489D-81EB-B4922F0611CB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{938E23B7-2436-4ECC-B960-6894655447F1} = {938E23B7-2436-4ECC-B960-6894655447F1}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{938E23B7-2436-4ECC-B960-6894655447F1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{938E23B7-2436-4ECC-B960-6894655447F1}.Debug|Win32.Build.0 = Debug|Win32
+		{938E23B7-2436-4ECC-B960-6894655447F1}.Release|Win32.ActiveCfg = Release|Win32
+		{938E23B7-2436-4ECC-B960-6894655447F1}.Release|Win32.Build.0 = Release|Win32
+		{C28B4754-2914-4255-94C9-17ACFE443585}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C28B4754-2914-4255-94C9-17ACFE443585}.Debug|Win32.Build.0 = Debug|Win32
+		{C28B4754-2914-4255-94C9-17ACFE443585}.Release|Win32.ActiveCfg = Release|Win32
+		{C28B4754-2914-4255-94C9-17ACFE443585}.Release|Win32.Build.0 = Release|Win32
+		{3654E3D8-ECAB-4800-97AC-1034D7D169D4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3654E3D8-ECAB-4800-97AC-1034D7D169D4}.Debug|Win32.Build.0 = Debug|Win32
+		{3654E3D8-ECAB-4800-97AC-1034D7D169D4}.Release|Win32.ActiveCfg = Release|Win32
+		{3654E3D8-ECAB-4800-97AC-1034D7D169D4}.Release|Win32.Build.0 = Release|Win32
+		{05DE5C01-AA87-47F2-ADAA-7D078F6FFBB5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{05DE5C01-AA87-47F2-ADAA-7D078F6FFBB5}.Debug|Win32.Build.0 = Debug|Win32
+		{05DE5C01-AA87-47F2-ADAA-7D078F6FFBB5}.Release|Win32.ActiveCfg = Release|Win32
+		{05DE5C01-AA87-47F2-ADAA-7D078F6FFBB5}.Release|Win32.Build.0 = Release|Win32
+		{251A6DE4-30F3-43A4-8315-AB4E306BD58D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{251A6DE4-30F3-43A4-8315-AB4E306BD58D}.Debug|Win32.Build.0 = Debug|Win32
+		{251A6DE4-30F3-43A4-8315-AB4E306BD58D}.Release|Win32.ActiveCfg = Release|Win32
+		{251A6DE4-30F3-43A4-8315-AB4E306BD58D}.Release|Win32.Build.0 = Release|Win32
+		{7ADF7F28-CC62-489D-81EB-B4922F0611CB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7ADF7F28-CC62-489D-81EB-B4922F0611CB}.Debug|Win32.Build.0 = Debug|Win32
+		{7ADF7F28-CC62-489D-81EB-B4922F0611CB}.Release|Win32.ActiveCfg = Release|Win32
+		{7ADF7F28-CC62-489D-81EB-B4922F0611CB}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{938E23B7-2436-4ECC-B960-6894655447F1} = {DCB0C650-B557-4B4A-A88E-197C769D07B2}
+		{C28B4754-2914-4255-94C9-17ACFE443585} = {E2C59309-09DB-4416-847F-5AB965D22DFB}
+		{3654E3D8-ECAB-4800-97AC-1034D7D169D4} = {E2C59309-09DB-4416-847F-5AB965D22DFB}
+		{05DE5C01-AA87-47F2-ADAA-7D078F6FFBB5} = {D3491318-1407-45BC-BBFF-F9CAE3C21E10}
+		{251A6DE4-30F3-43A4-8315-AB4E306BD58D} = {D3491318-1407-45BC-BBFF-F9CAE3C21E10}
+	EndGlobalSection
+EndGlobal
