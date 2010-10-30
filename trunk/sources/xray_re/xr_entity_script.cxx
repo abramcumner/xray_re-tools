@@ -453,10 +453,10 @@ void se_smart_terrain::state_read(xr_packet& packet, uint16_t size)
     	packet.r_u8(npc_info_count);
     	packet.r_u8(dead_time_count);
     	packet.r_u8(base_on_actor_control_present);
-		if (base_on_actor_control == true)
+		if (base_on_actor_control_present == true)
 			return;
     	packet.r_u8(is_respawn_point);
-		if (respawn_point == true)
+		if (is_respawn_point == true)
 			return;
     	packet.r_u8(population);
 	  
