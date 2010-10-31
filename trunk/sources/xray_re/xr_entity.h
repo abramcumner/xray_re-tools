@@ -927,16 +927,7 @@ public:
 	virtual cse_motion*	motion();
 };
 
-class se_zone_torrid: public cse_alife_torrid_zone
-{
-public:
-	virtual void		state_read(xr_packet& packet, uint16_t size);
-	virtual void		state_write(xr_packet& packet);
-	virtual void		update_read(xr_packet& packet);
-	virtual void		update_write(xr_packet& packet);
 
-	uint8_t last_spawn_time_present;
-};
 
 class cse_alife_online_offline_group: public cse_alife_dynamic_object {
 public:

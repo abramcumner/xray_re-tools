@@ -1951,30 +1951,6 @@ cse_motion* cse_alife_torrid_zone::motion()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void se_zone_torrid::state_read(xr_packet& packet, uint16_t size)
-{
-  cse_alife_torrid_zone::state_read(packet, size);
-  packet.r_u8(last_spawn_time_present);
-}
-
-void se_zone_torrid::state_write(xr_packet& packet)
-{
-  cse_alife_torrid_zone::state_write(packet);
-  packet.w_u8(last_spawn_time_present);
-}
-void se_zone_torrid::update_read(xr_packet& packet)
-{
-	cse_alife_torrid_zone::update_read(packet);
-}
-
-void se_zone_torrid::update_write(xr_packet& packet)
-{
-	cse_alife_torrid_zone::update_write(packet);
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-
 void cse_alife_online_offline_group::state_read(xr_packet& packet, uint16_t size)
 {
 	cse_alife_dynamic_object::state_read(packet, size);

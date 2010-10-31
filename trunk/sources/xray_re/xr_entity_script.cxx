@@ -453,10 +453,10 @@ void se_smart_terrain::state_read(xr_packet& packet, uint16_t size)
     	packet.r_u8(npc_info_count);
     	packet.r_u8(dead_time_count);
     	packet.r_u8(base_on_actor_control_present);
-		if (base_on_actor_control_present == true)
+		if (base_on_actor_control_present == 1)
 			return;
     	packet.r_u8(is_respawn_point);
-		if (is_respawn_point == true)
+		if (is_respawn_point == 1)
 			return;
     	packet.r_u8(population);
 	  
@@ -739,4 +739,18 @@ void se_smart_cover::state_write(xr_packet& packet)
 			}
 		}
 	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void se_zone_torrid::state_read(xr_packet& packet, uint16_t size)
+{
+  cse_alife_torrid_zone::state_read(packet, size);
+  packet.r_u8(last_spawn_time_present);
+}
+
+void se_zone_torrid::state_write(xr_packet& packet)
+{
+  cse_alife_torrid_zone::state_write(packet);
+  packet.w_u8(last_spawn_time_present);
 }
