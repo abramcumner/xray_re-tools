@@ -795,23 +795,11 @@ cse_inventory_box::cse_inventory_box():cse_alive_inventory_box__unk1_u8(1), cse_
 void cse_inventory_box::state_read(xr_packet& packet, uint16_t size)
 {
 	cse_alife_dynamic_object_visual::state_read(packet, size);
-	if (m_version >= CSE_VERSION_0x80)
-	{
-    	packet.r_u8(cse_alive_inventory_box__unk1_u8);
-    	packet.r_u8(cse_alive_inventory_box__unk2_u8);
-    	packet.r_sz(tip);
-	}
 }
 
 void cse_inventory_box::state_write(xr_packet& packet)
 {
 	cse_alife_dynamic_object_visual::state_write(packet);
-	if (m_version >= CSE_VERSION_0x80)
-	{
-    	packet.w_u8(cse_alive_inventory_box__unk1_u8);
-    	packet.w_u8(cse_alive_inventory_box__unk2_u8);
-    	packet.w_sz(tip);
-	}
 }
 
 void cse_inventory_box::update_read(xr_packet& packet)

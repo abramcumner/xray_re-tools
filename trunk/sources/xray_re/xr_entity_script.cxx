@@ -743,6 +743,35 @@ void se_smart_cover::state_write(xr_packet& packet)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+se_invbox::se_invbox(): m_tip("inventory_box_use") {}
+
+void se_invbox::state_read(xr_packet& packet, uint16_t size)
+{
+	cse_inventory_box::state_read(packet, size);
+
+	if (m_version >= CSE_VERSION_0x80)
+	{
+		uint16_t cse_alive_inventory_box__unk1_u8 = packet.r_u8();
+		uint16_t cse_alive_inventory_box__unk2_u8 = packet.r_u8();
+		packet.r_sz(m_tip);
+	}
+}
+
+void se_invbox::state_write(xr_packet& packet)
+{
+	cse_inventory_box::state_write(packet);
+
+	if (m_version >= CSE_VERSION_0x80)
+	{
+		packet.w_u8(1);
+		packet.w_u8(0);
+
+		packet.w_sz(m_tip);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void se_zone_torrid::state_read(xr_packet& packet, uint16_t size)
 {
   cse_alife_torrid_zone::state_read(packet, size);
