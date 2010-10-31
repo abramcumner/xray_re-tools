@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="aiwrapper"
 	ProjectGUID="{05DE5C01-AA87-47F2-ADAA-7D078F6FFBB5}"
 	RootNamespace="aiwrapper"
@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\xray_re"
+				AdditionalIncludeDirectories="..\..\..\xray_re"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -64,9 +64,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xray_re.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\bld-vs2005\debug"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -202,7 +201,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="1"
-				AdditionalIncludeDirectories="..\..\xray_re"
+				AdditionalIncludeDirectories="..\..\..\xray_re"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -223,8 +222,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xray_re.lib"
-				AdditionalLibraryDirectories="..\..\bld-vs2005\release"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"

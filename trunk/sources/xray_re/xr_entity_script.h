@@ -31,14 +31,7 @@ public:
 	uint8_t last_spawn_time_present;
 };
 
-class se_invbox: public cse_inventory_box {
-public:
-					se_invbox();
-	virtual void	state_read(xr_packet& packet, uint16_t size);
-	virtual void	state_write(xr_packet& packet);
-protected:
-	std::string		m_tip;
-};
+class se_invbox: public cse_inventory_box {};
 
 class se_smart_cover: public cse_smart_cover {
 public:

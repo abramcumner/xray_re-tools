@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="converter"
 	ProjectGUID="{251A6DE4-30F3-43A4-8315-AB4E306BD58D}"
 	RootNamespace="converter"
@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\xray_re;..\opcode"
+				AdditionalIncludeDirectories="..\..\..\xray_re;..\opcode"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;ICE_NO_DLL;BAN_OPCODE_AUTOLINK"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -64,9 +64,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xray_re.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\bld-vs2005\debug"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -201,7 +200,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
-				AdditionalIncludeDirectories="..\..\xray_re;..\opcode"
+				AdditionalIncludeDirectories="..\..\..\xray_re;..\opcode"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;ICE_NO_DLL;BAN_OPCODE_AUTOLINK"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -224,8 +223,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/LARGEADDRESSAWARE"
-				AdditionalDependencies="xray_re.lib"
-				AdditionalLibraryDirectories="..\..\bld-vs2005\release"
+				AdditionalLibraryDirectories=""
 				GenerateManifest="true"
 				GenerateDebugInformation="false"
 				SubSystem="1"
