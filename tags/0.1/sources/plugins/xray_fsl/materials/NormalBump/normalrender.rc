@@ -1,0 +1,159 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_PANEL DIALOGEX 0, 0, 217, 95
+STYLE DS_SETFONT | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_GN_MULT_EDIT,"CustEdit",WS_TABSTOP,178,7,20,10
+    CONTROL         "",IDC_GN_MULT_SPIN,"SpinnerControl",0x0,202,7,7,10
+    CONTROL         "Tangent",IDC_GN_UV_RAD,"Button",BS_AUTORADIOBUTTON,138,45,60,10
+    CONTROL         "Local XYZ",IDC_GN_XYZ_RAD,"Button",BS_AUTORADIOBUTTON,138,56,60,10
+    CONTROL         "Screen",IDC_GN_SCREEN_RAD,"Button",BS_AUTORADIOBUTTON,138,66,60,10
+    CONTROL         "Flip Red (X)",IDC_GN_FLIP_RED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,49,55,10
+    CONTROL         "Flip Green (Y)",IDC_GN_FLIP_GREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,59,55,10
+    CONTROL         "Swap Red && Green",IDC_GN_SWAP_RG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,70,85,10
+    GROUPBOX        "Channel Direction",IDC_STATIC,5,36,105,52
+    GROUPBOX        "Method",IDC_STATIC,119,36,90,52
+    CONTROL         "World",IDC_GN_WORLD_RAD,"Button",BS_AUTORADIOBUTTON,138,76,60,10
+    CONTROL         "map1on",IDC_GN_MAP1ON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,165,8,10,10
+    CONTROL         "Custom1",IDC_GN_NORMAL_MAP,"CustButton",WS_TABSTOP,60,7,102,12
+    LTEXT           "Normal:",IDC_STATIC,35,7,25,8
+    CONTROL         "Custom1",IDC_GN_BUMP_MAP,"CustButton",WS_TABSTOP,60,21,102,12
+    LTEXT           "Additional Bump:",IDC_STATIC,7,21,54,8
+    CONTROL         "map2on",IDC_GN_MAP2ON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,165,21,10,10
+    CONTROL         "",IDC_GN_BMULT_EDIT,"CustEdit",WS_TABSTOP,178,21,20,10
+    CONTROL         "",IDC_GN_BMULT_SPIN,"SpinnerControl",0x0,202,21,7,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_PANEL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 209
+        VERTGUIDE, 29
+        VERTGUIDE, 60
+        VERTGUIDE, 113
+        VERTGUIDE, 162
+        VERTGUIDE, 165
+        VERTGUIDE, 198
+        VERTGUIDE, 202
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 88
+        HORZGUIDE, 21
+        HORZGUIDE, 36
+        HORZGUIDE, 88
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "#include ""veroverrides.h""\r\n"
+    "#include ""maxversion.r""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_LIBDESCRIPTION      "Normal Bump Texture (Autodesk)"
+    IDS_CATEGORY            "other"
+    IDS_CLASS_NAME          "Normal Bump"
+    IDS_PARAMS              "Parameters"
+    IDS_GN_MULT_SPIN        "Multiplier"
+    IDS_GN_MAP_BUMP         "Additional Bumpmap"
+    IDS_GN_MAP_NORMAL       "Map1"
+    IDS_GN_MCHAN_SPIN       "channel"
+    IDS_GN_METHOD_RADIO     "Methods"
+    IDS_GN_MAP1ON           "Map1on"
+    IDS_GN_FLIP_RED         "flip red"
+    IDS_GN_FLIP_GREEN       "flip green"
+    IDS_GN_SWAP_RG          "swap red green"
+    IDS_GN_MAP_PARALLAX     "Paralaxmap"
+    IDS_GN_MAP2ON           "Map2on"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_GN_MAP3ON           "Map3on"
+    IDS_GN_BMULT_SPIN       "Bump Multiplier"
+    IDS_GN_CHANNEL          "Channel"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+#include "veroverrides.h"
+#include "maxversion.r"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

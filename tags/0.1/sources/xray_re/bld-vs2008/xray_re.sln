@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xray_re", "xray_re.vcproj", "{7ADF7F28-CC62-489D-81EB-B4922F0611CB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7ADF7F28-CC62-489D-81EB-B4922F0611CB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7ADF7F28-CC62-489D-81EB-B4922F0611CB}.Debug|Win32.Build.0 = Debug|Win32
+		{7ADF7F28-CC62-489D-81EB-B4922F0611CB}.Release|Win32.ActiveCfg = Release|Win32
+		{7ADF7F28-CC62-489D-81EB-B4922F0611CB}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

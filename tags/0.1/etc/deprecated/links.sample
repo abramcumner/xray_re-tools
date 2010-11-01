@@ -1,0 +1,22 @@
+; регистр в именах уровней имеет значение. см. написание в поле
+; name в gamedata\config\game_levels.ltx:[levelNN]
+
+[l01_escape]
+; добавляем ещё один переход для ИИ с Кордона на Свалку.
+; en: add another AI-path from Escape to Garbage.
+esc_graph_point_0033	= L02_Garbage, gar_graph_point_0037
+; добавляем переход для ИИ с Кордона на тестовый уровень.
+; en: add AI-path from Escape to test level.
+esc_graph_point_0034	= mp_atp_test, atp_graph_point
+
+[l02_garbage]
+; добавляем переход для ИИ со Свалки прямо на АС.
+; en: add AI-path from Military to Garbage.
+gar_graph_point_0015	= L07_Military, mil_graph_point_0300
+
+[l10u_bunker]
+; убираем ребро ИИ-графа из Бункера (X-19) на Радар.
+; это не влияет на обратный переход, который задаётся другим ребром!
+; en: delete AI-path from Bunker (X-19) to Radar. NB: this does not
+; affect the AI-path from Radar to X-19!
+exit_bunker_01		=
