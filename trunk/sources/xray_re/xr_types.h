@@ -68,6 +68,20 @@ const uint32_t UINT_FAST32_MAX = UINT32_MAX;
 
 const uint32_t BAD_IDX = UINT32_MAX;
 
+/*
+ *	String types
+ */
+typedef	char string16		[16];
+typedef	char string32		[32];
+typedef	char string64		[64];
+typedef	char string128		[128];
+typedef	char string256		[256];
+typedef	char string512		[512];
+typedef	char string1024		[1024];
+typedef	char string2048		[2048];
+typedef	char string4096		[4096];
+typedef	char string_path	[2*_MAX_PATH];
+
 #include <cstddef>
 #include <cassert>
 

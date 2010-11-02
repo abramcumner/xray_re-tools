@@ -38,6 +38,17 @@ static inline int xr_stricmp(const char* s1, const char* s2)
 #define xr_snprintf	snprintf
 #endif
 
+static char* xr_strdup(const char* string)
+{
+	xr_assert(string);
+	uint32_t len = uint32_t(strlen(string)) + 1;
+	
+	char* mem = (char*)malloc(len);
+	CopyMemory(mem, string, len);
+
+	return mem;
+}
+
 } // end of namespace xray_re
 
 #endif
