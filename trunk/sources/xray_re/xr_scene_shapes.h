@@ -11,6 +11,7 @@ namespace xray_re {
 
 // shape_object (CEditShape)
 const uint16_t SHAPE_VERSION = 1;
+const uint16_t SHAPE_VERSION_V12 = 2;
 
 enum {
 	SHAPE_CHUNK_VERSION	= 0x0000,
@@ -23,6 +24,8 @@ public:
 	virtual		~xr_shape_object();
 	virtual void	load(xr_reader& r);
 	virtual void	save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 
 	shape_def_vec&	shapes();
 
@@ -47,6 +50,8 @@ public:
 	virtual		~xr_scene_shapes();
 	virtual void	load(xr_reader& r);
 	virtual void	save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 
 	uint32_t&	flags();
 

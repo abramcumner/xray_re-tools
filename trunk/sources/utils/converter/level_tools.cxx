@@ -215,7 +215,7 @@ void level_tools::reconstruct_scene(const char* level_name, const char* scene_na
 	m_scene->set_quality(m_level->xrlc_quality());
 	if (const xr_level_ltx* ltx = m_level->ltx()) {
 		if (m_level->xrlc_version() >= XRLC_VERSION_12) {
-			xr_assert(ltx->data().size() < 3*1024);
+			xr_assert(ltx->data().size() < 4*1024);
 			m_scene->custom_data() = ltx->data();
 		}
 		m_level->clear_ltx();
@@ -267,6 +267,20 @@ void level_tools::reconstruct_scene(const char* level_name, const char* scene_na
 	if (m_rmode == RM_MAYA) {
 		reconstruct_visuals();
 	} else {
+		if (m_ini->line_exist(m_sect_profile, "spawn_version") == false)
+			m_spawn_version = CSE_VERSION_SOC;
+		else
+		{
+			std::string& version = std::string(m_ini->r_string(m_sect_profile, "spawn_version"));
+			xr_strlwr(version);
+			if (version == "soc")
+				m_spawn_version = CSE_VERSION_SOC;
+			else if (version == "cs")
+				m_spawn_version = CSE_VERSION_CS;
+			else if (version == "cop")
+				m_spawn_version = CSE_VERSION_COP;
+		}
+
 		reconstruct_details();
 		reconstruct_sectors();
 		reconstruct_portals();
@@ -282,7 +296,12 @@ void level_tools::reconstruct_scene(const char* level_name, const char* scene_na
 		reconstruct_wallmarks();
 		reconstruct_ways();
 		reconstruct_spawns();
+		
+		msg("saving %s", "scene");
+		if (m_spawn_version == CSE_VERSION_SOC)
 		m_scene->save(m_scene_name);
+		else
+			m_scene->save_v12(m_scene_name);
 	}
 
 	delete m_scene;

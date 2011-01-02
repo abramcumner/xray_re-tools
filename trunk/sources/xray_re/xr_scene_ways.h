@@ -24,6 +24,8 @@ public:
 	virtual void		load(xr_reader& r);
 	virtual void		save(xr_writer& w) const;
 
+	virtual void		save_v12(xr_ini_writer* w) const;
+
 	way_point_le_vec&	points();
 	way_link_vec&		links();
 	uint32_t&		type();
@@ -46,6 +48,8 @@ public:
 	virtual			~xr_scene_ways();
 	virtual void		load(xr_reader& r);
 	virtual void		save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 };
 
 } // end of namespace xray_re

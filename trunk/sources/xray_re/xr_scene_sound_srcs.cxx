@@ -1,3 +1,4 @@
+#include "xr_scene.h"
 #include "xr_scene_sound_srcs.h"
 #include "xr_reader.h"
 #include "xr_writer.h"
@@ -86,6 +87,26 @@ void xr_sound_src_object::save(xr_writer& w) const
 	w.close_chunk();
 }
 
+void xr_sound_src_object::save_v12(xr_ini_writer* w) const
+{
+	xr_custom_object::save_v12(w);
+
+	w->write("active_time", m_active_time);
+	w->write("flags", m_flags);
+	w->write("freq", m_frequency);
+	w->write("max_ai_dist", m_max_ai_dist);
+	w->write("max_dist", m_max_dist);
+	w->write("min_dist", m_min_dist);
+	w->write("play_time", m_play_time);
+	w->write("random_pause", m_pause_time);
+	w->write("snd_name", m_source_name, false);
+	w->write("snd_position", m_sound_pos);
+	w->write("snd_type", m_type);
+
+	w->write("version", SOUNDSRC_VERSION);
+	w->write("volume", m_volume);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 xr_scene_sound_srcs::xr_scene_sound_srcs(xr_scene& scene):
@@ -105,4 +126,16 @@ void xr_scene_sound_srcs::save(xr_writer& w) const
 {
 	xr_scene_objects::save(w);
 	w.w_chunk<uint16_t>(TOOLS_CHUNK_VERSION, 0);
+}
+
+void xr_scene_sound_srcs::save_v12(xr_ini_writer* w) const
+{
+	w->open_section("main");
+	w->write("objects_count", this->objects().size());
+	w->write("version", 0);
+	w->close_section();
+
+	scene().write_revision(w);
+
+	xr_scene_objects::save_v12(w);
 }

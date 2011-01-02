@@ -23,3 +23,22 @@ void xr_scene_revision::save(xr_writer& w) const
 	w.w_u32(m_modified_time);
 	w.close_chunk();
 }
+
+
+void xr_scene_revision::save_v12(xr_ini_writer *w, bool scene_part)
+{
+	if (scene_part == false)
+	{
+		w->open_section("level_tag");
+		w->write("create_time", m_modified_time);
+		w->write("owner", m_modifier);
+		w->close_section();
+	}
+	else
+	{
+		w->open_section("modif");
+		w->write("name", m_modifier);
+		w->write("time", m_modified_time);
+		w->close_section();
+	}
+}

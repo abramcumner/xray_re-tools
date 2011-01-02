@@ -112,3 +112,10 @@ void xr_scene_ai_map::save(xr_writer& w) const
 	w.w_seq(m_snap_objects, xr_writer::f_w_sz());
 	w.close_chunk();
 }
+
+
+void xr_scene_ai_map::save_v12(xr_ini_writer* w) const
+{
+}
+
+//void xr_scene_ai_map::save

@@ -523,7 +523,7 @@ cse_shape* cse_alife_object_climable::shape()
 cse_smart_cover::cse_smart_cover():
 	m_cs_unk1_sz(""), m_cs_unk2_float(0.f),
 	m_enter_min_enemy_distance(15.f), m_exit_min_enemy_distance(10.f),
-	m_is_combat_cover(true) {}
+	m_is_combat_cover(true), m_cs_unk3_u8(0) {}
 
 void cse_smart_cover::state_read(xr_packet& packet, uint16_t size)
 {
@@ -1269,7 +1269,8 @@ void cse_alife_psy_dog_phantom::update_write(xr_packet& packet)
 
 cse_alife_trader_abstract::cse_alife_trader_abstract():
 	m_money(0), m_trader_flags(FLAG_INFINITE_AMMO),
-	m_community_index(-1), m_reputation(0), m_rank(0) {}
+	m_community_index(-1), m_reputation(0), m_rank(0),
+	m_unk1_u8(1), m_unk2_u8(0) {}
 
 void cse_alife_trader_abstract::state_merge(xr_packet& packet, uint16_t version)
 {
@@ -1299,6 +1300,12 @@ void cse_alife_trader_abstract::state_merge(xr_packet& packet, uint16_t version)
 		}
 		if (version > CSE_VERSION_0x68)
 			packet.skip_sz();
+
+		if (version >= CSE_VERSION_0x80)
+		{
+			packet.r_u8();
+			packet.r_u8();
+		}
 	}
 }
 
@@ -1331,6 +1338,12 @@ void cse_alife_trader_abstract::state_read(xr_packet& packet, uint16_t size)
 		}
 		if (version > CSE_VERSION_0x68)
 			packet.r_sz(m_character_name);
+
+		if (version >= CSE_VERSION_0x80)
+		{
+			m_unk1_u8 = packet.r_u8();
+			m_unk2_u8 = packet.r_u8();
+		}
 	}
 }
 
@@ -1348,6 +1361,12 @@ void cse_alife_trader_abstract::state_write(xr_packet& packet)
 	packet.w_s32(m_reputation);
 	if (version > CSE_VERSION_0x68)
 		packet.w_sz(m_character_name);
+	
+	if (version >= CSE_VERSION_0x80)
+	{
+		packet.w_u8(m_unk1_u8);
+		packet.w_u8(m_unk2_u8);
+	}
 }
 
 void cse_alife_trader_abstract::update_read(xr_packet& packet) {}

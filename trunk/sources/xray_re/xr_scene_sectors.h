@@ -11,6 +11,7 @@ namespace xray_re {
 
 // CSector
 const uint16_t SECTOR_VERSION = 0x11;
+const uint16_t SECTOR_VERSION_V12 = 0x12;
 
 enum {
 	SECTOR_CHUNK_VERSION	= 0xf010,
@@ -32,6 +33,8 @@ public:
 	virtual			~xr_sector_object();
 	virtual void		load(xr_reader& r);
 	virtual void		save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 
 	fcolor&			color();
 	uint8_t&		priv();
@@ -62,6 +65,8 @@ public:
 	virtual		~xr_scene_sectors();
 	virtual void	load(xr_reader& r);
 	virtual void	save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 
 	uint32_t&	flags();
 

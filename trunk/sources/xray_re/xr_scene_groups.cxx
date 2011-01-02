@@ -32,6 +32,22 @@ void xr_group_object::load(xr_reader& r)
 	}
 }
 
+void xr_group_object::save_v12(xr_ini_writer* w) const
+{
+	xr_custom_object::save_v12(w);
+
+	w->write("flags", this->m_flags);
+	w->write("ref_name", this->m_reference);
+	w->write("version", GROUPOBJ_VERSION_V12);
+
+	if (m_flags & GOF_OPEN)
+	{
+
+	}
+	else
+		scene().save_objects(w, m_objects, "ingroup");
+}
+
 void xr_group_object::save(xr_writer& w) const
 {
 	xr_custom_object::save(w);
@@ -67,4 +83,16 @@ void xr_scene_groups::save(xr_writer& w) const
 {
 	xr_scene_objects::save(w);
 	w.w_chunk<uint16_t>(TOOLS_CHUNK_VERSION, 0);
+}
+
+void xr_scene_groups::save_v12(xr_ini_writer* w) const
+{
+	w->open_section("main");
+	w->write("objects_count", this->objects().size());
+	w->write("version", 0);
+	w->close_section();
+
+	scene().write_revision(w);
+
+	xr_scene_objects::save_v12(w);
 }

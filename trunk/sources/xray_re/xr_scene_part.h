@@ -8,11 +8,13 @@
 #include "xr_types.h"
 #include "xr_scene_common.h"
 #include "xr_scene_revision.h"
+#include "xr_writer.h"
 
 namespace xray_re {
 
 class xr_reader;
 class xr_writer;
+class xr_ini_writer;
 class xr_scene;
 
 class xr_scene_part {
@@ -20,6 +22,8 @@ public:
 	virtual			~xr_scene_part() = 0;
 	virtual void		load(xr_reader& r) = 0;
 	virtual void		save(xr_writer& w) const = 0;
+	
+	virtual void		save_v12(xr_ini_writer* w) const = 0;
 
 	xr_scene&		scene() const;
 	const char*		file_name() const;

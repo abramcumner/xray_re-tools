@@ -149,6 +149,8 @@ private:
 	std::vector<uint16_t>			m_uniq_textures;// unique texture indices
 	std::vector<uint16_t>			m_uniq_shaders;	// unique shader indices
 
+	uint16_t		m_spawn_version;
+
 	//std::vector<xray_re::xr_ogf_v4*>	m_mu_models;
 	std::vector<xray_re::xr_ogf*>	m_mu_models;
 

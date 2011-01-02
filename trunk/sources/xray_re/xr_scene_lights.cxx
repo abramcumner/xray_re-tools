@@ -1,3 +1,4 @@
+#include "xr_scene.h"
 #include "xr_scene_lights.h"
 #include "xr_d3d_light.h"
 #include "xr_reader.h"
@@ -89,6 +90,30 @@ void xr_light_object::load(xr_reader& r)
 	} else {
 		m_flags &= ~LIGHT_FLAG_FUZZY;
 	}
+}
+
+void xr_light_object::save_v12(xr_ini_writer* w) const
+{
+	xr_custom_object::save_v12(w);
+
+	w->write("anim_ref_name", this->m_animation, false);
+
+	w->write("attenuation0", this->m_attenuation_constant);
+	w->write("attenuation1", this->m_attenuation_linear);
+	w->write("attenuation2", this->m_attenuation_quadratic);
+	w->write("brightness", this->m_brightness);
+	w->write("color", this->m_color);
+	w->write("cone", this->m_cone_angle);
+
+	w->write("fallof_texture", this->m_texture, false);
+
+	w->write("light_control", this->m_control);
+	w->write("light_flags", this->m_flags);
+	w->write("range", this->m_range);
+	w->write("type", this->m_type);
+	w->write("use_in_d3d", this->m_use_in_d3d ? "on" : "off");
+	w->write("version", LIGHT_VERSION);
+	w->write("virtual_size", 0.0f);
 }
 
 void xr_light_object::save(xr_writer& w) const
@@ -196,4 +221,27 @@ void xr_scene_lights::save(xr_writer& w) const
 	w.open_chunk(LIGHTS_CHUNK_COMMON_CONTROLS);
 	w.w_seq(m_controls, write_token());
 	w.close_chunk();
+}
+
+struct write_ini_token { void operator()(const xr_token& t, xr_ini_writer* w, uint32_t dummy) const {
+	w->write(t.name.c_str(), t.id);
+}};
+
+void xr_scene_lights::save_v12(xr_ini_writer* w) const
+{
+	w->open_section("lcontrols");
+	w->w_ini_seq(m_controls, write_ini_token());
+	w->close_section();
+
+	w->open_section("main");
+	w->write("flags", this->m_flags);
+	w->write("lcontrol_last_idx", this->m_controls.size());
+	w->write("objects_count", this->objects().size());
+	w->write("sun_shadow_dir", this->m_sun);
+	w->write("version", 0);
+	w->close_section();
+
+	scene().write_revision(w);
+
+	xr_scene_objects::save_v12(w);
 }

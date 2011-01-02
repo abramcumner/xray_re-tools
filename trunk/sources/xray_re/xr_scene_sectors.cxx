@@ -1,6 +1,8 @@
+#include "xr_scene.h"
 #include "xr_scene_sectors.h"
 #include "xr_reader.h"
 #include "xr_writer.h"
+#include "xr_string_utils.h"
 
 using namespace xray_re;
 
@@ -57,6 +59,30 @@ void xr_sector_object::save(xr_writer& w) const
 	w.close_chunk();
 }
 
+struct write_ini_item { void operator()(const sector_item& item, xr_ini_writer* w, uint32_t id) const {
+	char buf[128];
+	int n = xr_snprintf(buf, sizeof(buf), "item_mesh_name_%04d", id);
+	if (n > 0)
+		w->write(buf, item.mesh, false);
+
+	n = xr_snprintf(buf, sizeof(buf), "item_object_name_%04d", id);
+	if (n > 0)
+		w->write(buf, item.object, false);
+}};
+
+void xr_sector_object::save_v12(xr_ini_writer* w) const
+{
+	xr_custom_object::save_v12(w);
+
+	w->write("change_map_to_idx", 255);
+	w->write("sector_color", this->m_color);
+	w->write("default", this->m_private ? "on" : "off");
+
+	w->w_ini_seq(this->m_items, write_ini_item());
+	w->write("items_count", this->m_items.size());
+	w->write("version", SECTOR_VERSION_V12);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 xr_scene_sectors::xr_scene_sectors(xr_scene& scene):
@@ -78,4 +104,17 @@ void xr_scene_sectors::save(xr_writer& w) const
 	xr_scene_objects::save(w);
 	w.w_chunk<uint16_t>(TOOLS_CHUNK_VERSION, 0);
 	w.w_chunk<uint32_t>(SECTORS_CHUNK_COMMON_FLAGS, m_flags);
+}
+
+void xr_scene_sectors::save_v12(xr_ini_writer* w) const
+{
+	w->open_section("main");
+	w->write("flags", this->m_flags);
+	w->write("objects_count", this->objects().size());
+	w->write("version", 0);
+	w->close_section();
+
+	scene().write_revision(w);
+
+	xr_scene_objects::save_v12(w);
 }

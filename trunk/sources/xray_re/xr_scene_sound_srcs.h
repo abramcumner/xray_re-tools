@@ -35,6 +35,8 @@ public:
 	virtual void	load(xr_reader& r);
 	virtual void	save(xr_writer& w) const;
 
+	virtual void		save_v12(xr_ini_writer* w) const;
+
 	uint32_t&	flags();
 	uint8_t&	type();
 	std::string&	source_name();
@@ -81,6 +83,8 @@ public:
 	virtual		~xr_scene_sound_srcs();
 	virtual void	load(xr_reader& r);
 	virtual void	save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 };
 
 } // end of namespace xray_re

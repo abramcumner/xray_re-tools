@@ -48,6 +48,7 @@ struct b_params {
 	void		init();
 	void		set_debug();
 	void		set_release();
+	void		save_v12(xr_ini_writer *w);
 
 	float		sm_angle;
 	float		weld_distance;
@@ -89,8 +90,11 @@ public:
 	bool			load(const char* name);
 	bool			save(const char* name);
 
+	bool			save_v12(const char* name);
+
 	void			load_objects(xr_reader& r, uint32_t chunk_id, std::vector<xr_custom_object*>& objects);
 	void			save_objects(xr_writer& w, uint32_t chunk_id, const std::vector<xr_custom_object*>& objects) const;
+	void			save_objects(xr_ini_writer* w, const std::vector<xr_custom_object*>& objects, const char* prefix = "object") const;
 
 	xr_custom_object*	create_object(tools_class_id class_id);
 
@@ -119,6 +123,9 @@ public:
 	void			set_quality(unsigned xrlc_quality);
 
 	xr_scene_part*		part(scene_chunk_id chunk_id);
+
+	void			write_guid(xr_ini_writer* w);
+	void			write_revision(xr_ini_writer *w, bool scene_part = true);
 
 protected:
 	void			load_options(xr_reader& r);

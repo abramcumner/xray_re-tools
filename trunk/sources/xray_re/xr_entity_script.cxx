@@ -416,7 +416,7 @@ void se_stalker::state_write(xr_packet& packet)
 void se_respawn::state_read(xr_packet& packet, uint16_t size)
 {
 	cse_alife_smart_zone::state_read(packet, size);
-          if (m_version >= CSE_VERSION_2232) {
+    if (m_version >= CSE_VERSION_2232) {
 		packet.r_seq(packet.r_u8(), m_spawned_obj);
 	} else if (m_version == CSE_VERSION_2215) {
 		// there is no se_respawn in 2215 so we should not ever get here.
@@ -772,14 +772,20 @@ void se_invbox::state_write(xr_packet& packet)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+se_zone_torrid::se_zone_torrid() : m_last_spawn_time_present(0) {}
+
 void se_zone_torrid::state_read(xr_packet& packet, uint16_t size)
 {
-  cse_alife_torrid_zone::state_read(packet, size);
-  packet.r_u8(last_spawn_time_present);
+	cse_alife_torrid_zone::state_read(packet, size);
+
+	if (m_version >= CSE_VERSION_0x80)
+		m_last_spawn_time_present = packet.r_u8();
 }
 
 void se_zone_torrid::state_write(xr_packet& packet)
 {
-  cse_alife_torrid_zone::state_write(packet);
-  packet.w_u8(last_spawn_time_present);
+	cse_alife_torrid_zone::state_write(packet);
+
+	if (m_version >= CSE_VERSION_0x80)
+		packet.w_u8(m_last_spawn_time_present);
 }

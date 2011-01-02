@@ -40,6 +40,8 @@ public:
 	virtual void		load(xr_reader& r);
 	virtual void		save(xr_writer& w) const;
 
+	virtual void		save_v12(xr_ini_writer* w) const;
+
 	tools_class_id		class_id() const;
 	uint32_t&		co_flags();
 	uint32_t		co_flags() const;
@@ -89,6 +91,8 @@ public:
 	virtual			~xr_scene_objects();
 	virtual void		load(xr_reader& r);
 	virtual void		save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 
 	const xr_custom_object_vec&	objects() const;
 	xr_custom_object_vec&		objects();

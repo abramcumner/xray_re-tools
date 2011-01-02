@@ -60,6 +60,17 @@ void xr_custom_object::load(xr_reader& r)
 	}
 }
 
+void xr_custom_object::save_v12(xr_ini_writer* w) const
+{
+	w->write("clsid", m_class_id);
+	w->write("co_flags", m_flags);
+	w->write("flags", 0);
+	w->write("name", m_name, false);
+	w->write("position", m_position);
+	w->write("rotation", m_rotation);
+	w->write("scale", m_scale);
+}
+
 void xr_custom_object::save(xr_writer& w) const
 {
 	w.w_chunk(CUSTOMOBJECT_CHUNK_FLAGS, m_flags);
@@ -111,4 +122,9 @@ void xr_scene_objects::save(xr_writer& w) const
 	w.close_chunk();
 
 	scene().save_objects(w, TOOLS_CHUNK_OBJECTS, m_objects);
+}
+
+void xr_scene_objects::save_v12(xr_ini_writer* w) const
+{
+	scene().save_objects(w, m_objects);
 }

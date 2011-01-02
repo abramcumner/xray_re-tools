@@ -11,6 +11,7 @@ namespace xray_re {
 // CSceneObject
 const uint16_t SCENEOBJ_VERSION_16 = 0x10;
 const uint16_t SCENEOBJ_VERSION_17 = 0x11;
+const uint16_t SCENEOBJ_VERSION_18 = 0x12;
 const uint16_t SCENEOBJ_VERSION = SCENEOBJ_VERSION_17;
 
 enum {
@@ -26,6 +27,8 @@ public:
 	virtual		~xr_visual_object();
 	virtual void	load(xr_reader& r);
 	virtual void	save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 
 	uint32_t&	file_version();
 	std::string&	reference();
@@ -59,6 +62,8 @@ public:
 	virtual			~xr_scene_visuals();
 	virtual void		load(xr_reader& r);
 	virtual void		save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 
 	uint32_t&		flags();
 	uint32_t		flags() const;

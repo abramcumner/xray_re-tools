@@ -11,6 +11,7 @@ namespace xray_re {
 
 class xr_reader;
 class xr_writer;
+class xr_ini_writer;
 
 class xr_scene_revision {
 public:
@@ -18,6 +19,8 @@ public:
 
 	void		load(xr_reader& r);
 	void		save(xr_writer& w) const;
+
+	void		save_v12(xr_ini_writer *w, bool scene_part = false);
 
 private:
 	std::string	m_modifier;

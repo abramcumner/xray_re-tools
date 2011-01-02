@@ -31,8 +31,22 @@ void level_tools::reconstruct_spawns()
 			new_spawn->co_name() = entity->name_replace();
 			new_spawn->co_position()= entity->position();
 			new_spawn->co_rotation() = entity->rotation();
+			if (m_spawn_version == CSE_VERSION_SOC)
+			{
 			entity->version() = CSE_VERSION_SOC;
 			entity->script_version() = 6;
+			}
+			else if (m_spawn_version == CSE_VERSION_CS)
+			{
+				entity->version() = CSE_VERSION_CS;
+				entity->script_version() = 8;
+			}
+			else if (m_spawn_version == CSE_VERSION_COP)
+			{
+				entity->version() = CSE_VERSION_COP;
+				entity->script_version() = 12;
+			}
+
 			new_spawn->entity() = entity;
 			if (entity->shape()) {
 				xr_shape_object* new_shape = new xr_shape_object(*m_scene);

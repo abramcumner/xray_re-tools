@@ -1,3 +1,4 @@
+#include "xr_scene.h"
 #include "xr_scene_visuals.h"
 #include "xr_reader.h"
 #include "xr_writer.h"
@@ -50,6 +51,14 @@ void xr_visual_object::save(xr_writer& w) const
 	w.w_chunk<uint32_t>(SCENEOBJ_CHUNK_FLAGS, m_flags);
 }
 
+void xr_visual_object::save_v12(xr_ini_writer* w) const
+{
+	xr_custom_object::save_v12(w);
+
+	w->write("reference_name", m_reference, false);
+	w->write("version", SCENEOBJ_VERSION_18);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 xr_scene_visuals::xr_scene_visuals(xr_scene& scene):
@@ -95,4 +104,26 @@ void xr_scene_visuals::save(xr_writer& w) const
 	w.w_size_u32(m_snap_objects.size());
 	w.w_seq(m_snap_objects, xr_writer::f_w_sz());
 	w.close_chunk();
+}
+
+void xr_scene_visuals::save_v12(xr_ini_writer* w) const
+{
+	w->open_section("appendrandom");
+	w->write("AppendRandomMaxRotation", m_max_rotate);
+	w->write("AppendRandomMaxScale", m_max_scale);
+	w->write("AppendRandomMinRotation", m_min_rotate);
+	w->write("AppendRandomMinScale", m_min_scale);
+	w->write("AppendRandomObjects_size", m_snap_objects.size());
+
+	w->close_section();
+
+	w->open_section("main");
+	w->write("flags", this->m_flags);
+	w->write("version", 0);
+	w->write("objects_count", this->objects().size());
+	w->close_section();
+
+	scene().write_revision(w);
+
+	xr_scene_objects::save_v12(w);
 }

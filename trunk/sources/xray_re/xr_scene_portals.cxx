@@ -1,3 +1,4 @@
+#include "xr_scene.h"
 #include "xr_scene_portals.h"
 #include "xr_reader.h"
 #include "xr_writer.h"
@@ -27,6 +28,19 @@ void xr_portal_object::load(xr_reader& r)
 	size_t n = r.r_u16();
 	xr_assert(n > 3);
 	r.r_seq(n, m_vertices);
+}
+
+void xr_portal_object::save_v12(xr_ini_writer* w) const
+{
+	xr_custom_object::save_v12(w);
+
+	w->write("version", PORTAL_VERSION);
+	
+	w->write("sector_back", this->m_sector_back, false);
+	w->write("sector_front", this->m_sector_front, false);
+
+	w->write("vert_count", this->m_vertices.size());
+	w->w_ini_seq(m_vertices, "vertex");
 }
 
 void xr_portal_object::save(xr_writer& w) const
@@ -65,4 +79,17 @@ void xr_scene_portals::save(xr_writer& w) const
 	xr_scene_objects::save(w);
 	w.w_chunk<uint16_t>(TOOLS_CHUNK_VERSION, 0);
 	w.w_chunk<uint32_t>(PORTALS_CHUNK_COMMON_FLAGS, m_flags);
+}
+
+void xr_scene_portals::save_v12(xr_ini_writer* w) const
+{
+	w->open_section("main");
+	w->write("flags", this->m_flags);
+	w->write("objects_count", this->objects().size());
+	w->write("version", 0);
+	w->close_section();
+
+	scene().write_revision(w);
+
+	xr_scene_objects::save_v12(w);
 }

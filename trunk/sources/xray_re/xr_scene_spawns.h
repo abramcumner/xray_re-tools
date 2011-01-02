@@ -13,6 +13,7 @@ class cse_abstract;
 
 // CSpawnPoint
 const uint16_t SPAWNPOINT_VERSION = 0x14;
+const uint16_t SPAWNPOINT_VERSION_V12 = 0x17;
 
 enum {
 	SPAWNPOINT_TYPE_RPOINT	= 0,
@@ -37,6 +38,8 @@ public:
 	virtual		~xr_spawn_object();
 	virtual void	load(xr_reader& r);
 	virtual void	save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 
 	uint32_t&	type();
 
@@ -110,6 +113,8 @@ public:
 	virtual		~xr_scene_spawns();
 	virtual void	load(xr_reader& r);
 	virtual void	save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 
 	uint32_t&	flags();
 	uint32_t	flags() const;

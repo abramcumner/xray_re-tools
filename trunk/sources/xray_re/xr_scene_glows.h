@@ -29,6 +29,8 @@ public:
 	virtual	void	load(xr_reader& r);
 	virtual	void	save(xr_writer& w) const;
 
+	virtual void		save_v12(xr_ini_writer* w) const;
+
 	std::string&	shader();
 	std::string&	texture();
 	float&		radius();
@@ -62,6 +64,8 @@ public:
 	virtual		~xr_scene_glows();
 	virtual void	load(xr_reader& r);
 	virtual void	save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 
 	uint32_t&	flags();
 	uint32_t	flags() const;

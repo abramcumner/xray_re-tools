@@ -1,3 +1,4 @@
+#include "xr_scene.h"
 #include "xr_scene_glows.h"
 #include "xr_reader.h"
 #include "xr_writer.h"
@@ -39,6 +40,18 @@ void xr_glow_object::load(xr_reader& r)
 	r.r_chunk<uint16_t>(GLOW_CHUNK_FLAGS, m_flags);
 }
 
+void xr_glow_object::save_v12(xr_ini_writer* w) const
+{
+	xr_custom_object::save_v12(w);
+
+	w->write("version", GLOW_VERSION);
+	w->write("radius", m_radius);
+	w->write("shader_name", m_shader, false);
+	w->write("texture_name", m_texture, false);
+
+	w->write("flags", m_flags);
+}
+
 void xr_glow_object::save(xr_writer& w) const
 {
 	xr_custom_object::save(w);
@@ -77,4 +90,17 @@ void xr_scene_glows::save(xr_writer& w) const
 	xr_scene_objects::save(w);
 	w.w_chunk<uint16_t>(TOOLS_CHUNK_VERSION, 0);
 	w.w_chunk<uint32_t>(GLOWS_CHUNK_COMMON_FLAGS, m_flags);
+}
+
+void xr_scene_glows::save_v12(xr_ini_writer* w) const
+{
+	w->open_section("main");
+	w->write("flags", this->m_flags);
+	w->write("glow_tool_version", 0);
+	w->write("objects_count", this->objects().size());
+	w->close_section();
+
+	scene().write_revision(w);
+
+	xr_scene_objects::save_v12(w);
 }

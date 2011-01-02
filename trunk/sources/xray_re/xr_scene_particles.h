@@ -10,6 +10,7 @@ namespace xray_re {
 
 // EParticlesObject
 const uint16_t CPSOBJECT_VERSION = 0x11;
+const uint16_t CPSOBJECT_VERSION_V12 = 0x13;
 
 enum {
 	CPSOBJECT_CHUNK_VERSION		= 0x0001,
@@ -22,6 +23,8 @@ public:
 	virtual		~xr_particle_object();
 	virtual void	load(xr_reader& r);
 	virtual void	save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 
 	std::string&	reference();
 
@@ -38,6 +41,8 @@ public:
 	virtual		~xr_scene_particles();
 	virtual void	load(xr_reader& r);
 	virtual void	save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 };
 
 } // end of namespace xray_re

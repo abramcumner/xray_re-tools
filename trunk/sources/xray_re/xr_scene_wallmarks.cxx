@@ -110,3 +110,7 @@ void xr_scene_wallmarks::save(xr_writer& w) const
 	w.w_chunks(m_slots, write_slot());
 	w.close_chunk();
 }
+
+void xr_scene_wallmarks::save_v12(xr_ini_writer* w) const
+{
+}

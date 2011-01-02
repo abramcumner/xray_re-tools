@@ -3,6 +3,40 @@
 
 using namespace xray_re;
 
+xr_ini_packet::xr_ini_packet() : m_counter(0)
+{
+	w = new xr_ini_writer();
+}
+
+void xr_ini_packet::w_raw(const void *data, size_t size)
+{
+	w->w_raw(data, size);
+}
+
+void xr_ini_packet::w_sz(const std::string& value)
+{
+	write(value);
+}
+
+inline void xr_ini_packet::w_u64(uint64_t value) { write_number(value); }
+inline void xr_ini_packet::w_u32(uint32_t value) { write_number(value); }
+inline void xr_ini_packet::w_s32(int32_t value) { write_number(value); }
+inline void xr_ini_packet::w_u16(uint16_t value) { write_number(value); }
+inline void xr_ini_packet::w_s16(int16_t value) { write_number(value); }
+inline void xr_ini_packet::w_u8(uint8_t value) { write_number(value); }
+inline void xr_ini_packet::w_s8(int8_t value) { write_number(value); }
+inline void xr_ini_packet::w_bool(bool value) { write(value ? 1 : 0); }
+inline void xr_ini_packet::w_float(float value) { write(value); }
+inline void xr_ini_packet::w_float_q8(float value, float min, float max) { w_u8(uint8_t((value - min)*255.f/(max - min))); }
+inline void xr_ini_packet::w_vec3(const fvector3& value) { write(value); }
+/*
+inline void xr_ini_packet::w_vec4(const fvector4& value) { write(value); }
+inline void xr_ini_packet::w_quat(const fquaternion& value) { write(value); }
+*/
+inline void xr_ini_packet::w_size_u32(size_t value) { w_u32(static_cast<uint32_t>(value & UINT32_MAX)); }
+inline void xr_ini_packet::w_size_u16(size_t value) { w_u16(static_cast<uint16_t>(value & UINT16_MAX)); }
+inline void xr_ini_packet::w_size_u8(size_t value) { w_u8(static_cast<uint8_t>(value & UINT8_MAX)); }
+
 xr_packet::xr_packet(): m_w_pos(0), m_r_pos(0)
 {
 	std::memset(m_buf, 0, sizeof(m_buf));

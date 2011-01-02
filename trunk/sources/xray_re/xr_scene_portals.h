@@ -25,6 +25,8 @@ public:
 	virtual void	load(xr_reader& r);
 	virtual void	save(xr_writer& w) const;
 
+	virtual void		save_v12(xr_ini_writer* w) const;
+
 	std::string&		sector_front();
 	std::string&		sector_back();
 	std::vector<fvector3>&	vertices();
@@ -56,6 +58,8 @@ public:
 	virtual		~xr_scene_portals();
 	virtual void	load(xr_reader& r);
 	virtual void	save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 
 	uint32_t&	flags();
 

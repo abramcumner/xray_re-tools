@@ -6,6 +6,8 @@
 
 #include <string>
 #include <vector>
+#include "xr_string_utils.h"
+#include "xr_writer.h"
 #include "xr_vector3.h"
 #include "xr_vector4.h"
 #include "xr_matrix.h"
@@ -26,33 +28,38 @@ public:
 	template<typename T> void	w(const T& value);
 	template<typename T> void	w_cseq(size_t n, const T values[]);
 	template<typename T> void	w_seq(const T& container);
-	void		w_raw(const void* data, size_t size);
-	void		w_sz(const std::string& value);
-	void		w_u64(uint64_t value);
+
+	virtual void		w_cseq(size_t n, const uint8_t values[]) { w_cseq<uint8_t>(n, values); }
+	virtual void		w_seq(std::vector<uint8_t> container) { w_seq<std::vector<uint8_t>>(container); }
+	virtual void		w_seq(std::vector<uint16_t> container) { w_seq<std::vector<uint16_t>>(container); }
+
+	virtual void		w_raw(const void* data, size_t size);
+	virtual void		w_sz(const std::string& value);
+	virtual void		w_u64(uint64_t value);
 	void		w_s64(int64_t value);
-	void		w_u32(uint32_t value);
-	void		w_s32(int32_t value);
+	virtual void		w_u32(uint32_t value);
+	virtual void		w_s32(int32_t value);
 	void		w_u24(uint32_t value);
-	void		w_u16(uint16_t value);
-	void		w_s16(int16_t value);
-	void		w_u8(uint8_t value);
-	void		w_s8(int8_t value);
-	void		w_bool(bool value);
-	void		w_float(float value);
+	virtual void		w_u16(uint16_t value);
+	virtual void		w_s16(int16_t value);
+	virtual void		w_u8(uint8_t value);
+	virtual void		w_s8(int8_t value);
+	virtual void		w_bool(bool value);
+	virtual void		w_float(float value);
 	void		w_float_q16(float value, float min = 0, float max = 1.f);
-	void		w_float_q8(float value, float min = 0, float max = 1.f);
-	void		w_vec3(const fvector3& value);
-	void		w_vec4(const fvector4& value);
-	void		w_quat(const fquaternion& value);
-	void		w_matrix(const fmatrix& value);
-	void		w_size_u32(size_t size);
-	void		w_size_u16(size_t size);
-	void		w_size_u8(size_t size);
+	virtual void		w_float_q8(float value, float min = 0, float max = 1.f);
+	virtual void		w_vec3(const fvector3& value);
+	virtual void		w_vec4(const fvector4& value);
+	virtual void		w_quat(const fquaternion& value);
+	virtual void		w_matrix(const fmatrix& value);
+	virtual void		w_size_u32(size_t size);
+	virtual void		w_size_u16(size_t size);
+	virtual void		w_size_u8(size_t size);
 	void		w_dir(const fvector3& value);
 	void		w_sdir(const fvector3& value);
 	void		w_angle16(float value);
 	void		w_angle8(float value);
-	size_t		w_tell() const;
+	virtual size_t		w_tell() const;
 	void		w_seek(size_t pos);
 	void		w_begin(uint16_t id);
 
@@ -104,13 +111,84 @@ public:
 	bool		r_eof() const;
 
 	void		init(const uint8_t* data, size_t size);
-	const uint8_t*	buf() const;
+	virtual const uint8_t*	buf() const;
 
 private:
 	uint8_t		m_buf[BUFFER_SIZE];
 	size_t		m_w_pos;
 	size_t		m_r_pos;
 };
+
+class xr_ini_packet : public xr_packet {
+public:
+			xr_ini_packet();
+			
+	virtual size_t		w_tell() const;
+
+	virtual void		w_raw(const void* data, size_t size);
+	virtual void		w_sz(const std::string& value);
+	virtual void		w_u64(uint64_t value);
+	virtual void		w_u32(uint32_t value);
+	virtual void		w_s32(int32_t value);
+	virtual void		w_u16(uint16_t value);
+	virtual void		w_s16(int16_t value);
+	virtual void		w_u8(uint8_t value);
+	virtual void		w_s8(int8_t value);
+	virtual void		w_bool(bool value);
+	virtual void		w_float(float value);
+	virtual void		w_float_q8(float value, float min = 0, float max = 1.f);
+	virtual void		w_vec3(const fvector3& value);
+	//virtual void		w_matrix(const fmatrix& value);
+	virtual void		w_size_u32(size_t size);
+	virtual void		w_size_u16(size_t size);
+	virtual void		w_size_u8(size_t size);
+
+	virtual void		w_cseq(size_t n, const uint8_t values[]);
+	virtual void		w_seq(std::vector<uint8_t> container);
+	virtual void		w_seq(std::vector<uint16_t> container);
+
+	template<typename T> void write(const T& value);
+	template<typename T> void write_number(const T& value);
+
+	virtual const uint8_t*	buf() const;
+
+private:
+	xr_ini_writer*	 w;
+	uint32_t		m_counter;
+	char			m_key_buffer[128];
+	char			m_temp_buffer[256];
+};
+
+inline void xr_ini_packet::w_cseq(size_t n, const uint8_t values[])
+{
+	for (size_t i = 0; i < n; ++i) { write_number(values[i]); }
+}
+
+inline void xr_ini_packet::w_seq(std::vector<uint8_t> container)
+{
+	std::vector<uint8_t>::const_iterator it = container.begin(), end = container.end();
+	for (; it != end; ++it) { write_number(*it); }
+}
+
+inline void xr_ini_packet::w_seq(std::vector<uint16_t> container)
+{
+	std::vector<uint16_t>::const_iterator it = container.begin(), end = container.end();
+	for (; it != end; ++it) { write_number(*it); }
+}
+
+template<typename T> inline void xr_ini_packet::write(const T& value){
+	int n = xr_snprintf(m_key_buffer, sizeof(m_key_buffer), "%06d", ++m_counter);
+	w->write(m_key_buffer, value);
+}
+
+template<typename T> inline void xr_ini_packet::write_number(const T& value){
+	int n = xr_snprintf(m_key_buffer, sizeof(m_key_buffer), "%06d", ++m_counter);
+	n = xr_snprintf(m_temp_buffer, sizeof(m_temp_buffer), "%d", value);
+	w->write(m_key_buffer, m_temp_buffer, false);
+}
+
+inline const uint8_t* xr_ini_packet::buf() const { return w->data(); }
+inline size_t xr_ini_packet::w_tell() const { return w->tell(); }
 
 inline const uint8_t* xr_packet::buf() const { return &m_buf[0]; }
 inline void xr_packet::clear() { m_w_pos = 0; m_r_pos = 0; }

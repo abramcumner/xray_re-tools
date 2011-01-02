@@ -1,6 +1,10 @@
+#include "xr_scene.h"
 #include "xr_scene_ways.h"
 #include "xr_reader.h"
 #include "xr_writer.h"
+#include "xr_string_utils.h"
+
+#include <map>
 
 using namespace xray_re;
 
@@ -64,6 +68,67 @@ void xr_way_object::save(xr_writer& w) const
 	w.w_chunk<uint32_t>(WAYOBJECT_CHUNK_TYPE, m_type);
 }
 
+struct write_point_ini { void operator()(const way_point_le& point, xr_ini_writer* w, uint32_t id) const {
+	char buffer[128];
+	char* buf = &buffer[0];
+	int n = xr_snprintf(buf, sizeof(buffer), "wp_%d_flags", id);
+	if (n > 0)
+		w->write(buf, point.flags);
+
+	n = xr_snprintf(buf, sizeof(buffer), "wp_%d_name", id);
+	if (n > 0)
+		w->write(buf, point.name);
+
+	n = xr_snprintf(buf, sizeof(buffer), "wp_%d_pos", id);
+	if (n > 0)
+		w->write(buf, point.position);
+
+	n = sprintf_s(buf, sizeof(buffer), "wp_%d_selected", id);
+	if (n > 0)
+		w->write(buf, "off");
+}};
+
+void xr_way_object::save_v12(xr_ini_writer* w) const
+{
+	xr_custom_object::save_v12(w);
+
+	// write links
+	char buffer[128];
+	char* buf = &buffer[0];
+	typedef std::map<uint16_t, uint8_t> dict;
+	typedef std::pair<uint16_t, uint8_t> dict_pair;
+	dict indices;
+	fvector2 link_vector;
+	link_vector.y = 1.0;
+
+	way_link_vec_cit it = m_links.begin(), end = m_links.end();
+	for (uint8_t id = 0; it != end; ++it) {
+		way_link* link = (way_link *)&(*it);
+
+		dict::iterator pair = indices.find(link->from);
+		if (pair != indices.end())
+			id = ++pair->second;
+		else
+			indices.insert(dict_pair(link->from, id = 0));
+
+		int n = xr_snprintf(buf, sizeof(buffer), "link_wp_%d_%d", link->from, id);
+		if (n > 0)
+		{
+			link_vector.x = link->to;
+			link_vector.y = link->weight;
+			w->write(buf, link_vector);
+		}
+	}
+
+	w->write("type", this->m_type);
+	w->write("version", WAYOBJECT_VERSION);
+
+	// write waypoints
+
+	w->w_ini_seq(this->m_points, write_point_ini());
+	w->write("wp_count", this->m_points.size());
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 xr_scene_ways::xr_scene_ways(xr_scene& scene):
@@ -83,4 +148,16 @@ void xr_scene_ways::save(xr_writer& w) const
 {
 	xr_scene_objects::save(w);
 	w.w_chunk<uint16_t>(TOOLS_CHUNK_VERSION, 0);
+}
+
+void xr_scene_ways::save_v12(xr_ini_writer* w) const
+{
+	w->open_section("main");
+	w->write("objects_count", this->objects().size());
+	w->write("version", 0);
+	w->close_section();
+
+	scene().write_revision(w);
+
+	xr_scene_objects::save_v12(w);
 }

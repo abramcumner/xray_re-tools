@@ -26,6 +26,8 @@ void b_params::init()
 	weld_distance = 0.005f;
 	lm_rms_zero = 4;
 	lm_rms = 4;
+	lm_jitter_samples = 9;
+	lm_pixels_per_meter = 10.0;
 
 	convert_progressive = 0;
 	pm_uv = 0;
@@ -48,6 +50,26 @@ void b_params::set_release()
 	lm_pixels_per_meter = 10.f;
 	lm_jitter_samples = 9;
 	convert_progressive = XRLC_QUALITY_HIGH;
+}
+
+void b_params::save_v12(xr_ini_writer *w)
+{
+	w->open_section("build_params");
+	w->write("light_jitter_samples", lm_jitter_samples);
+	w->write("light_pixel_per_meter", lm_pixels_per_meter);
+	w->write("light_quality", 2);			// TEMP
+	w->write("light_quality_reserved", 0);	// TEMP
+	w->write("light_rms", lm_rms);
+	w->write("light_rms_zero", lm_rms_zero);
+	w->write("reserved_0", pm_uv);
+	w->write("reserved_1", pm_pos);
+	w->write("reserved_2", pm_curv);
+	w->write("reserved_3", pm_border_h_angle);
+	w->write("reserved_4", pm_border_h_distance);
+	w->write("reserved_5", pm_heuristic);
+	w->write("smooth_angle", sm_angle);
+	w->write("weld_distance", weld_distance);
+	w->close_section();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -197,6 +219,15 @@ void xr_scene::save_objects(xr_writer& w, uint32_t chunk_id, const xr_custom_obj
 	w.open_chunk(chunk_id);
 	w.w_chunks(objects, write_object());
 	w.close_chunk();
+}
+
+struct ini_write_object { void operator()(xr_custom_object* const& object, xr_ini_writer* w) const {
+	object->save_v12(w);
+}};
+
+void xr_scene::save_objects(xr_ini_writer* w, const std::vector<xr_custom_object*>& objects, const char* prefix) const
+{
+	w->w_sections(objects, ini_write_object(), prefix);
 }
 
 void xr_scene::load_options(xr_reader& r)
@@ -370,4 +401,96 @@ bool xr_scene::save(const char* name)
 	}
 
 	return status;
+}
+
+
+bool xr_scene::save_v12(const char* name)
+{
+	xr_ini_writer *w = new xr_ini_writer();
+
+	m_bparams.save_v12(w);
+
+	w->open_section("camera");
+
+	w->write("hpb", m_camera_orient);
+	w->write("pos", m_camera_pos);
+
+	w->close_section();
+
+	write_guid(w);
+
+	w->open_section("level_options");
+	w->write("bop", "");
+	w->write("game_type", 1);
+	w->write("level_path", m_name, false);
+	w->write("level_prefix", m_name_prefix, false);
+	w->write("light_hemi_quality", m_hemi_quality);
+	w->write("light_sun_quality", m_sun_quality);
+	w->write("map_version", 1.0f);
+	w->write("version", 12);
+	w->write("version_bp", SCENE_LO_BPARAMS_VERSION);
+
+	w->close_section();
+
+	m_revision.save_v12(w);
+
+	w->open_section("version");
+	w->write("value", SCENE_VERSION);
+	w->close_section();
+
+	w->save_to(PA_MAPS, std::string(name) + ".level");
+
+	delete w;
+
+	xr_file_system& fs = xr_file_system::instance();
+	fs.create_folder(PA_MAPS, name);
+
+	std::string parts_path(name);
+	parts_path += '\\';
+	for (xr_scene_part_vec_it it = m_parts.begin(), end = m_parts.end();
+			it != end; ++it) {
+		xr_scene_part* part = *it;
+
+		const type_info& type = typeid(*part);
+
+		w = new xr_ini_writer();
+		if (type == typeid(xr_scene_ai_map) ||
+			type == typeid(xr_scene_details) ||
+			type == typeid(xr_scene_wallmarks))
+		{
+			w->w_chunk(TOOLS_CHUNK_GUID, m_guid);
+			w->open_chunk(part->chunk_id());
+			part->save(*w);
+			w->close_chunk();
+		}
+		else
+		{
+			write_guid(w);
+			part->save_v12(w);
+		}
+
+		if (!w->save_to(PA_MAPS, parts_path + part->file_name()))
+			msg("can't save scene part %s", part->file_name());
+		delete w;
+	}
+
+	return true;
+}
+
+void xr_scene::write_guid(xr_ini_writer* w)
+{
+	//msg("%s", "guid save_v12");
+	w->open_section("guid");
+	uint32_t tmp[4];
+	memcpy(tmp, ((char *)m_guid.g) + 1, sizeof(uint32_t) * 4);
+	xr_guid *guid2 = new xr_guid;
+	memcpy(&guid2->g, tmp, sizeof(uint32_t) * 4);
+	w->write("guid_g0", &m_guid);
+	w->write("guid_g1", guid2);
+	w->close_section();
+}
+
+void xr_scene::write_revision(xr_ini_writer* w, bool scene_part)
+{
+	m_revision.save_v12(w, scene_part);
 }

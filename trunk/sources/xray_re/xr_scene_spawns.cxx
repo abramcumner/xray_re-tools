@@ -147,6 +147,40 @@ void xr_spawn_object::save(xr_writer& w) const
 	}
 }
 
+void xr_spawn_object::save_v12(xr_ini_writer* w) const
+{
+	xr_custom_object::save_v12(w);
+
+	if (m_type == SPAWNPOINT_TYPE_ENTITY) {
+		xr_assert(m_entity);
+	}
+
+	if (this->m_attached_object)
+		w->write("attached_count", 1);
+
+	w->write("type", 2);
+	w->write("version", SPAWNPOINT_VERSION_V12);
+
+	w->open_section("spawndata");
+	
+	xr_ini_packet *ini_packet = new xr_ini_packet();
+	xr_packet* packet = ini_packet;
+	m_entity->spawn_write(*packet, true);
+	w->w_packet(*ini_packet);
+
+	w->write("fl", 0);
+	w->write("name", this->m_entity->name(), false);
+	w->close_section();
+	
+	if (this->m_attached_object)
+	{
+		xr_custom_object_vec objects(1, m_attached_object);
+		scene().save_objects(w, objects, "attached");
+	}
+
+	delete packet;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 xr_scene_spawns::xr_scene_spawns(xr_scene& scene):
@@ -168,4 +202,17 @@ void xr_scene_spawns::save(xr_writer& w) const
 	xr_scene_objects::save(w);
 	w.w_chunk<uint16_t>(TOOLS_CHUNK_VERSION, 0);
 	w.w_chunk<uint32_t>(SPAWNS_CHUNK_COMMON_FLAGS, m_flags);
+}
+
+void xr_scene_spawns::save_v12(xr_ini_writer* w) const
+{
+	w->open_section("main");
+	w->write("flags", 0);
+	w->write("objects_count", this->objects().size());
+	w->write("version", 0);
+	w->close_section();
+
+	scene().write_revision(w);
+
+	xr_scene_objects::save_v12(w);
 }

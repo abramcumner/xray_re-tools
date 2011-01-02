@@ -1,3 +1,4 @@
+#include "xr_scene.h"
 #include "xr_scene_particles.h"
 #include "xr_reader.h"
 #include "xr_writer.h"
@@ -20,6 +21,15 @@ void xr_particle_object::load(xr_reader& r)
 		xr_not_expected();
 	r.r_sz(m_reference);
 	r.debug_find_chunk();
+}
+
+void xr_particle_object::save_v12(xr_ini_writer* w) const
+{
+	xr_custom_object::save_v12(w);
+
+	w->write("game_type", "65535");
+	w->write("ref_name", m_reference, false);
+	w->write("version", CPSOBJECT_VERSION_V12);
 }
 
 void xr_particle_object::save(xr_writer& w) const
@@ -48,4 +58,16 @@ void xr_scene_particles::save(xr_writer& w) const
 {
 	xr_scene_objects::save(w);
 	w.w_chunk<uint16_t>(TOOLS_CHUNK_VERSION, 0);
+}
+
+void xr_scene_particles::save_v12(xr_ini_writer* w) const
+{
+	w->open_section("main");
+	w->write("objects_count", this->objects().size());
+	w->write("version", 0);
+	w->close_section();
+
+	scene().write_revision(w);
+
+	xr_scene_objects::save_v12(w);
 }

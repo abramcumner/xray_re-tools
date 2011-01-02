@@ -22,6 +22,15 @@ class se_physic: public cse_alife_object_physic {};
 class se_restrictor: public cse_alife_space_restrictor {};
 class se_trader: public cse_alife_trader {};
 
+class se_zone_torrid: public cse_alife_torrid_zone {
+public:
+					se_zone_torrid();
+	virtual void	state_read(xr_packet& packet, uint16_t size);
+	virtual void	state_write(xr_packet& packet);
+protected:
+	uint8_t			m_last_spawn_time_present;
+};
+
 class se_invbox: public cse_inventory_box {
 public:
 					se_invbox();
@@ -29,15 +38,6 @@ public:
 	virtual void	state_write(xr_packet& packet);
 protected:
 	std::string		m_tip;
-};
-
-class se_zone_torrid: public cse_alife_torrid_zone
-{
-public:
-	virtual void		state_read(xr_packet& packet, uint16_t size);
-	virtual void		state_write(xr_packet& packet);
-
-	uint8_t last_spawn_time_present;
 };
 
 class se_smart_cover: public cse_smart_cover {
@@ -115,7 +115,7 @@ public:
 	virtual void	state_read(xr_packet& packet, uint16_t size);
 	virtual void	state_write(xr_packet& packet);
 	
-	// ZP
+	// Call of Pripyat
 	uint8_t arriving_npc_count;
 	uint8_t npc_info_count;
 	uint8_t dead_time_count;

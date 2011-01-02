@@ -53,6 +53,8 @@ public:
 	virtual void	load(xr_reader& r);
 	virtual void	save(xr_writer& w) const;
 
+	virtual void		save_v12(xr_ini_writer* w) const;
+
 	uint32_t&	type();
 	fcolor&		color();
 	float&		brightness();
@@ -130,6 +132,8 @@ public:
 	virtual		~xr_scene_lights();
 	virtual void	load(xr_reader& r);
 	virtual void	save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 
 	uint32_t&	flags();
 	xr_token_vec&	controls();

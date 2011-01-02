@@ -112,6 +112,39 @@ private:
 	size_t			m_pos;
 };
 
+struct xr_guid;
+
+class xr_ini_writer: public xr_memory_writer {
+public:
+				xr_ini_writer();
+
+	void			open_section(const char *name);
+	void			open_section(std::string format, ...);
+	void			close_section();
+	void			write(const char *key, const char *value, bool enclose = true);
+	void			write(const char *key, std::string value, bool enclose = true);
+	//void			write(const char *key, std::string& value, bool enclose = true);
+	void			write(const char *key, float value);
+	void			write(const char *key, int8_t value);
+	void			write(const char *key, int16_t value);
+	void			write(const char *key, int32_t value);
+	void			write(const char *key, int64_t value);
+	void			write(const char *key, uint8_t value);
+	void			write(const char *key, uint16_t value);
+	void			write(const char *key, uint32_t value);
+	void			write(const char *key, uint64_t value);
+	void			write(const char *key, fvector2 value);
+	void			write(const char *key, fvector3 value);
+	void			write(const char *key, fcolor value);
+	void			write(const char *key, xr_guid *value);
+	template<typename T, typename F> inline void w_sections(const T& container, F write, const char* prefix = "object");
+	template<typename T> inline void w_ini_seq(const T& container, const char* prefix);
+	template<typename T, typename F> inline void w_ini_seq(const T& container, F write, const char* prefix);
+	template<typename T, typename F> inline void w_ini_seq(const T& container, F write);
+private:
+	std::stack<std::string> m_section_stack;
+};
+
 inline xr_writer::xr_writer() {}
 inline xr_writer::~xr_writer() {}
 template<typename T> inline void xr_writer::w(const T& value) { w_raw(&value, sizeof(T)); }
@@ -197,6 +230,58 @@ template<typename T, typename F> inline void xr_writer::w_chunks(const T& contai
 		open_chunk(id++);
 		write(*it, *this);
 		close_chunk();
+	}
+}
+
+template<typename T> inline void xr_ini_writer::w_ini_seq(const T& container, const char* prefix)
+{
+	char buf[1024];
+
+	typename T::const_iterator it = container.begin(), end = container.end();
+	for (uint32_t id = 0; it != end; ++it) {
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+		int n = sprintf_s(buf, sizeof(buf), "%s_%04d", prefix, id);
+#else
+		int n = snprintf(buf, sizeof(buf), "%s_%04d", prefix, id);
+#endif
+		if (n > 0)
+			write(buf, *it);
+		id++;
+	}
+}
+
+template<typename T, typename F> inline void xr_ini_writer::w_ini_seq(const T& container, F write)
+{
+	uint32_t id = 0;
+	for (typename T::const_iterator it = container.begin(),
+			end = container.end(); it != end; ++it, ++id) {
+		write(*it, this, id);
+	}
+}
+
+template<typename T, typename F> inline void xr_ini_writer::w_ini_seq(const T& container, F write, const char* prefix)
+{
+	char buf[1024];
+
+	for (uint32_t id = 0, typename T::const_iterator it = container.begin(),
+			end = container.end(); it != end; ++it, ++id) {
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+		int n = sprintf_s(buf, sizeof(buf), "%s_%04d", prefix, id);
+#else
+		int n = snprintf(buf, sizeof(buf), "%s_%04d", prefix, id);
+#endif
+		if (n > 0)
+			write(*it, *this, buf);
+	}
+}
+
+template<typename T, typename F> inline void xr_ini_writer::w_sections(const T& container, F write, const char* prefix)
+{
+	typename T::const_iterator it = container.begin(), end = container.end();
+	for (uint32_t id = 0; it != end; ++it) {
+		open_section("%s_%d", prefix, id++);
+		write(*it, this);
+		close_section();
 	}
 }
 

@@ -10,6 +10,7 @@ namespace xray_re {
 
 // CGroupObject
 const uint16_t GROUPOBJ_VERSION = 0x11;
+const uint16_t GROUPOBJ_VERSION_V12 = 0x12;
 
 enum {
 	GROUPOBJ_CHUNK_VERSION		= 0x0000,
@@ -30,6 +31,8 @@ public:
 	virtual		~xr_group_object();
 	virtual void	load(xr_reader& r);
 	virtual void	save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 
 	uint32_t&			flags();
 	std::string&			reference();
@@ -53,6 +56,8 @@ public:
 	virtual			~xr_scene_groups();
 	virtual void		load(xr_reader& r);
 	virtual void		save(xr_writer& w) const;
+
+	virtual void		save_v12(xr_ini_writer* w) const;
 };
 
 } // end of namespace xray_re

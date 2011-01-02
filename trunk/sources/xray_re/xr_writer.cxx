@@ -4,6 +4,7 @@
 #include "xr_writer.h"
 #include "xr_file_system.h"
 #include "xr_packet.h"
+#include "xr_guid.h"
 
 using namespace xray_re;
 
@@ -62,7 +63,7 @@ void xr_writer::w_s(const std::string& value)
 
 void xr_writer::w_sf(const char* format, ...)
 {
-	char buf[256];
+	char buf[1024];
 	va_list ap;
 	va_start(ap, format);
 #if defined(_MSC_VER) && _MSC_VER >= 1400
@@ -71,6 +72,7 @@ void xr_writer::w_sf(const char* format, ...)
 	int n = vsnprintf(buf, sizeof(buf), format, ap);
 #endif
 	va_end(ap);
+
 	if (n > 0)
 		w_raw(buf, n);
 }
@@ -162,4 +164,123 @@ void xr_fake_writer::seek(size_t pos)
 size_t xr_fake_writer::tell()
 {
 	return m_pos;
+}
+
+xr_ini_writer::xr_ini_writer() : m_section_stack() {}
+
+void xr_ini_writer::open_section(std::string format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+
+	char buf[1024];
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+	int n = vsprintf_s(buf, sizeof(buf), format.c_str(), ap);
+#else
+	int n = vsnprintf(buf, sizeof(buf), format, ap);
+#endif
+	va_end(ap);
+	if (n == 0)
+		return;
+
+	std::string prev_section;
+	if (m_section_stack.size() > 0)
+		prev_section = m_section_stack.top() + "_";
+
+	std::string section(prev_section + std::string(buf));
+
+	w_sf(("[" + section + "]\n").c_str(), ap);
+
+	m_section_stack.push(section);
+
+	va_end(ap);
+}
+
+void xr_ini_writer::open_section(const char *name)
+{
+	open_section("%s", name);
+}
+
+void xr_ini_writer::close_section()
+{
+	w_sf("\n");
+	if (m_section_stack.size() > 0)
+		m_section_stack.pop();
+	else
+		msg("couldn't close section, because %s was open", "none");
+}
+
+void xr_ini_writer::write(const char *key, const char *value, bool enclose)
+{
+	write(key, std::string(value), enclose);
+}
+
+void xr_ini_writer::write(const char *key, std::string value, bool enclose)
+{
+	if (enclose)
+		value = "\"" + value + "\"";
+	w_sf("%9s%-34s = %s\n", "",key, value.c_str());
+}
+
+void xr_ini_writer::write(const char *key, float value)
+{
+	w_sf("%9s%-34s = %f\n", "", key, value);
+}
+
+void xr_ini_writer::write(const char *key, int8_t value)
+{
+	w_sf("%9s%-34s = %d\n", "", key, value);
+}
+
+void xr_ini_writer::write(const char *key, int16_t value)
+{
+	w_sf("%9s%-34s = %d\n", "", key, value);
+}
+
+void xr_ini_writer::write(const char *key, int32_t value)
+{
+	w_sf("%9s%-34s = %d\n", "", key, value);
+}
+
+void xr_ini_writer::write(const char *key, uint8_t value)
+{
+	w_sf("%9s%-34s = %d\n", "", key, value);
+}
+
+void xr_ini_writer::write(const char *key, uint16_t value)
+{
+	w_sf("%9s%-34s = %d\n", "", key, value);
+}
+
+void xr_ini_writer::write(const char *key, uint32_t value)
+{
+	w_sf("%9s%-34s = %d\n", "", key, value);
+}
+
+void xr_ini_writer::write(const char *key, uint64_t value)
+{
+	w_sf("%9s%-34s = %d\n", "", key, value);
+}
+
+void xr_ini_writer::write(const char *key, fvector2 value)
+{
+	w_sf("%9s%-34s = %f, %f\n", "", key, value.x, value.y);
+}
+
+void xr_ini_writer::write(const char *key, fvector3 value)
+{
+	w_sf("%9s%-34s = %f, %f, %f\n", "", key, value.x, value.y, value.z);
+}
+
+void xr_ini_writer::write(const char *key, fcolor value)
+{
+	w_sf("%9s%-34s = %f, %f, %f, %f\n", "", key, value.r, value.g, value.b, value.a);
+}
+
+void xr_ini_writer::write(const char *key, xr_guid *value)
+{
+	uint64_t a;
+	memcpy(&a, &value->g, sizeof(uint64_t));
+
+	w_sf("%9s%-34s = %I64u\n", "", key, a);
 }
