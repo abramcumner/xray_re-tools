@@ -151,34 +151,58 @@ void xr_spawn_object::save_v12(xr_ini_writer* w) const
 {
 	xr_custom_object::save_v12(w);
 
-	if (m_type == SPAWNPOINT_TYPE_ENTITY) {
-		xr_assert(m_entity);
-	}
-
 	if (this->m_attached_object)
 		w->write("attached_count", 1);
 
-	w->write("type", 2);
+	w->write("type", this->m_type);
 	w->write("version", SPAWNPOINT_VERSION_V12);
 
-	w->open_section("spawndata");
-	
-	xr_ini_packet *ini_packet = new xr_ini_packet();
-	xr_packet* packet = ini_packet;
-	m_entity->spawn_write(*packet, true);
-	w->w_packet(*ini_packet);
+	if (m_type == SPAWNPOINT_TYPE_ENTITY) {
+		xr_assert(m_entity);
 
-	w->write("fl", 0);
-	w->write("name", this->m_entity->name(), false);
-	w->close_section();
+		w->open_section("spawndata");
+		
+		xr_ini_packet *ini_packet = new xr_ini_packet();
+		xr_packet* packet = ini_packet;
+		m_entity->spawn_write(*packet, true);
+		//w->w_packet(*ini_packet);
+		w->write_packet(ini_packet);
+
+		w->write("fl", 0);
+		w->write("name", this->m_entity->name(), false);
+		w->close_section();
+
+		delete packet;
+	}
+	else if (m_type == SPAWNPOINT_TYPE_RPOINT)
+	{
+		w->write("game_type", m_game);
+		w->write("rp_profile", "", false);
+		w->write("rp_type", m_respawn);
+		w->write("team_id", m_team);
+	} 
+	else if (m_type == SPAWNPOINT_TYPE_ENV_MOD)
+	{
+		w->write("ambient_color", m_ambient_color);
+		w->write("em_flags", 65535); // apparently em_flags don't exist in current code
+		w->write("em_power", m_power);
+		w->write("em_radius", m_radius);
+		w->write("fog_color", m_fog_color);
+		w->write("fog_density", m_fog_density);
+		w->write("hemi_color", m_hemi_color);
+		w->write("sky_color", m_sky_color);
+		w->write("view_dist", m_view_distance);
+	}
+	else
+	{
+		xr_not_expected();
+	}
 	
 	if (this->m_attached_object)
 	{
 		xr_custom_object_vec objects(1, m_attached_object);
 		scene().save_objects(w, objects, "attached");
 	}
-
-	delete packet;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
