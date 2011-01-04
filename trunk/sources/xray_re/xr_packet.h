@@ -123,7 +123,7 @@ class xr_ini_packet : public xr_packet {
 public:
 			xr_ini_packet();
 			
-	virtual size_t		w_tell() const;
+	size_t		tell() const;
 
 	virtual void		w_raw(const void* data, size_t size);
 	virtual void		w_sz(const std::string& value);
@@ -179,16 +179,18 @@ inline void xr_ini_packet::w_seq(std::vector<uint16_t> container)
 template<typename T> inline void xr_ini_packet::write(const T& value){
 	int n = xr_snprintf(m_key_buffer, sizeof(m_key_buffer), "%06d", ++m_counter);
 	w->write(m_key_buffer, value);
+	w_seek(w_tell() + sizeof(T));
 }
 
 template<typename T> inline void xr_ini_packet::write_number(const T& value){
 	int n = xr_snprintf(m_key_buffer, sizeof(m_key_buffer), "%06d", ++m_counter);
 	n = xr_snprintf(m_temp_buffer, sizeof(m_temp_buffer), "%d", value);
 	w->write(m_key_buffer, m_temp_buffer, false);
+	w_seek(w_tell() + sizeof(T));
 }
 
 inline const uint8_t* xr_ini_packet::buf() const { return w->data(); }
-inline size_t xr_ini_packet::w_tell() const { return w->tell(); }
+inline size_t xr_ini_packet::tell() const { return w->tell(); }
 
 inline const uint8_t* xr_packet::buf() const { return &m_buf[0]; }
 inline void xr_packet::clear() { m_w_pos = 0; m_r_pos = 0; }

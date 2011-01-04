@@ -15,6 +15,7 @@
 namespace xray_re {
 
 class xr_packet;
+class xr_ini_packet;
 
 class xr_writer {
 public:
@@ -141,6 +142,9 @@ public:
 	template<typename T> inline void w_ini_seq(const T& container, const char* prefix);
 	template<typename T, typename F> inline void w_ini_seq(const T& container, F write, const char* prefix);
 	template<typename T, typename F> inline void w_ini_seq(const T& container, F write);
+
+	
+	void		write_packet(xr_ini_packet* packet);
 private:
 	std::stack<std::string> m_section_stack;
 };

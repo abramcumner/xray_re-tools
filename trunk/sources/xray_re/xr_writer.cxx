@@ -284,3 +284,8 @@ void xr_ini_writer::write(const char *key, xr_guid *value)
 
 	w_sf("%9s%-34s = %I64u\n", "", key, a);
 }
+
+void xr_ini_writer::write_packet(xr_ini_packet* packet)
+{
+	w_raw(packet->buf(), packet->tell());
+}

@@ -191,11 +191,12 @@ bool xr_file_system::initialize(const char* fs_spec, unsigned flags)
 		xr_reader* r = r_open(fs_spec);
 		if (r == 0)
 			return false;
-		if (parse_fs_spec(*r)) {
-			std::string folder;
-			split_path(fs_spec, &folder);
-			add_path_alias(PA_FS_ROOT, folder, "");
-		}
+			
+		std::string folder;
+		split_path(fs_spec, &folder);
+		add_path_alias(PA_FS_ROOT, folder, "");
+		if (!parse_fs_spec(*r))
+			this->m_aliases.clear();
 		r_close(r);
 	} else {
 #if 0
