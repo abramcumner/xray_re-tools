@@ -1,0 +1,3 @@
+[Introduction]
+This plugin implements support import files in formats .ogf, .dm,
+.object, .omf, .skl, .skls, export .object and .skl, 
