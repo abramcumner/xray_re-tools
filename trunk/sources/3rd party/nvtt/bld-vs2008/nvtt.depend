@@ -1,0 +1,444 @@
+# depslib dependency file v1.0
+1288702094 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\debug.cpp
+	<nvcore/Debug.h>
+	<nvcore/StrLib.h>
+	<windows.h>
+	<direct.h>
+	<crtdbg.h>
+	<dbghelp.h>
+	<dbghelp.h>
+	<signal.h>
+	<execinfo.h>
+	<cxxabi.h>
+	<unistd.h>
+	<sys/types.h>
+	<sys/sysctl.h>
+	<ucontext.h>
+	<stdexcept>
+
+1288702094 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\debug.h
+	<nvcore/nvcore.h>
+	<stdarg.h>
+	<signal.h>
+
+1288702094 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\nvcore.h
+	<nvconfig.h>
+	"poshlib/posh.h"
+	"DefsVcWin32.h"
+	"DefsGnucLinux.h"
+	"DefsGnucDarwin.h"
+	"DefsGnucWin32.h"
+
+1288702103 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvconfig.h
+
+1288702093 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\poshlib\posh.h
+	<limits.h>
+
+1288702094 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\defsvcwin32.h
+
+1288702094 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\defsgnuclinux.h
+
+1288702094 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\defsgnucdarwin.h
+	<stdlib.h>
+
+1288702094 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\defsgnucwin32.h
+
+1288702094 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\strlib.h
+	<nvcore/nvcore.h>
+	<nvcore/Containers.h>
+	<string.h>
+
+1288702094 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\containers.h
+	<nvcore/nvcore.h>
+	<nvcore/Memory.h>
+	<nvcore/Debug.h>
+	<string.h>
+	<new>
+
+1288702094 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\memory.h
+	<nvcore/nvcore.h>
+	<stdlib.h>
+	<stddef.h>
+	<new>
+	<new>
+	<iostream>
+	<cstdlib>
+	<stdexcept>
+	<locale>
+
+1288702094 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\memory.cpp
+	"Memory.h"
+	"Debug.h"
+	<stdlib.h>
+
+1288702094 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\strlib.cpp
+	<nvcore/StrLib.h>
+	<math.h>
+	<stdio.h>
+	<stdarg.h>
+
+1288702094 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\textreader.cpp
+	<nvcore/TextReader.h>
+
+1288702094 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\textreader.h
+	<nvcore/nvcore.h>
+	<nvcore/Stream.h>
+	<nvcore/Containers.h>
+
+1288702094 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\stream.h
+	<nvcore/nvcore.h>
+	<nvcore/Debug.h>
+
+1288702094 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\textwriter.cpp
+	<nvcore/TextWriter.h>
+
+1288702094 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\textwriter.h
+	<nvcore/nvcore.h>
+	<nvcore/Stream.h>
+	<nvcore/StrLib.h>
+
+1288702095 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\blockdxt.cpp
+	<nvcore/Stream.h>
+	"ColorBlock.h"
+	"BlockDXT.h"
+
+1288702095 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\colorblock.h
+	<nvmath/Color.h>
+
+1288702097 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvmath\color.h
+	<nvcore/Debug.h>
+	<nvmath/Vector.h>
+
+1288702097 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvmath\vector.h
+	<nvmath/nvmath.h>
+	<nvcore/Containers.h>
+
+1288702097 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvmath\nvmath.h
+	<nvcore/nvcore.h>
+	<nvcore/Debug.h>
+	<math.h>
+	<float.h>
+
+1288702095 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\blockdxt.h
+	<nvmath/Color.h>
+	<nvimage/nvimage.h>
+
+1288702096 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\nvimage.h
+	<nvcore/nvcore.h>
+
+1288702095 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\colorblock.cpp
+	<nvmath/Box.h>
+	<nvimage/ColorBlock.h>
+	<nvimage/Image.h>
+
+1288702096 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvmath\box.h
+	<nvmath/Vector.h>
+	<float.h>
+
+1288702096 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\image.h
+	<nvcore/Debug.h>
+	<nvimage/nvimage.h>
+
+1288702095 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\directdrawsurface.cpp
+	<nvcore/Debug.h>
+	<nvcore/Containers.h>
+	<nvcore/StdStream.h>
+	<nvimage/DirectDrawSurface.h>
+	<nvimage/ColorBlock.h>
+	<nvimage/Image.h>
+	<nvimage/BlockDXT.h>
+	<nvimage/PixelFormat.h>
+	<string.h>
+
+1288702094 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\stdstream.h
+	<nvcore/Stream.h>
+	<stdio.h>
+	<string.h>
+	<exception>
+
+1288702095 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\directdrawsurface.h
+	<nvimage/nvimage.h>
+
+1288702096 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\pixelformat.h
+	<nvimage/nvimage.h>
+
+1288702096 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\filter.cpp
+	<nvcore/Containers.h>
+	<nvmath/nvmath.h>
+	<nvmath/Vector.h>
+	<nvimage/Filter.h>
+
+1288702096 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\filter.h
+	<nvimage/nvimage.h>
+	<nvcore/Debug.h>
+
+1288702096 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\floatimage.cpp
+	<nvcore/Containers.h>
+	<nvcore/Ptr.h>
+	<nvmath/Color.h>
+	"FloatImage.h"
+	"Filter.h"
+	"Image.h"
+	<math.h>
+
+1288702094 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvcore\ptr.h
+	<nvcore/nvcore.h>
+	<nvcore/Debug.h>
+	<stdio.h>
+
+1288702096 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\floatimage.h
+	<nvcore/Debug.h>
+	<nvcore/Containers.h>
+	<nvimage/nvimage.h>
+
+1288702096 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\image.cpp
+	<nvcore/Debug.h>
+	<nvcore/Ptr.h>
+	<nvmath/Color.h>
+	<nvimage/Image.h>
+	<nvimage/ImageIO.h>
+
+1288702096 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\imageio.h
+	<nvimage/nvimage.h>
+
+1288702096 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\imageio.cpp
+	<nvcore/Ptr.h>
+	<nvcore/Containers.h>
+	<nvcore/StrLib.h>
+	<nvcore/StdStream.h>
+	<nvcore/TextWriter.h>
+	<nvmath/Color.h>
+	"ImageIO.h"
+	"Image.h"
+	"FloatImage.h"
+	"TgaFile.h"
+	"PsdFile.h"
+	<jpeglib.h>
+	<png.h>
+	<tiffio.h>
+	<ImfIO.h>
+	<ImathBox.h>
+	<ImfChannelList.h>
+	<ImfInputFile.h>
+	<ImfOutputFile.h>
+	<ImfArray.h>
+
+1288702096 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\tgafile.h
+	<nvcore/Stream.h>
+
+1288702096 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\psdfile.h
+	<nvcore/Stream.h>
+
+1288702096 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\normalmap.cpp
+	<nvcore/Ptr.h>
+	<nvmath/Color.h>
+	<nvimage/NormalMap.h>
+	<nvimage/Filter.h>
+	<nvimage/FloatImage.h>
+	<nvimage/Image.h>
+
+1288702096 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\normalmap.h
+	<nvmath/Vector.h>
+	<nvimage/nvimage.h>
+	<nvimage/FloatImage.h>
+
+1288702096 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\quantize.cpp
+	<nvmath/Color.h>
+	<nvimage/Image.h>
+	<nvimage/Quantize.h>
+
+1288702096 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvimage\quantize.h
+
+1288702097 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvmath\montecarlo.cpp
+	<nvmath/Montecarlo.h>
+
+1288702097 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvmath\montecarlo.h
+	<nvmath/Vector.h>
+	<nvmath/Random.h>
+
+1288702097 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvmath\random.h
+	<nvcore/Containers.h>
+	<nvmath/nvmath.h>
+
+1288702097 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvmath\plane.cpp
+	"Plane.h"
+	"Matrix.h"
+
+1288702097 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvmath\plane.h
+	<nvmath/nvmath.h>
+	<nvmath/Vector.h>
+
+1288702097 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvmath\matrix.h
+	<nvmath/nvmath.h>
+	<nvmath/Vector.h>
+
+1288702097 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvmath\random.cpp
+	<nvmath/Random.h>
+	<time.h>
+
+1288702097 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvmath\sphericalharmonic.cpp
+	<nvmath/SphericalHarmonic.h>
+
+1288702097 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvmath\sphericalharmonic.h
+	<nvmath/Vector.h>
+
+1288702097 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvmath\tribox.cpp
+	<nvmath/Vector.h>
+	<nvmath/Triangle.h>
+
+1288702097 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvmath\triangle.h
+	<nvmath/nvmath.h>
+	<nvmath/Vector.h>
+	<nvmath/Box.h>
+
+1288702097 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvmath\triangle.cpp
+	<nvmath/Triangle.h>
+
+1288702103 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\compressrgb.cpp
+	<nvcore/Debug.h>
+	<nvimage/Image.h>
+	<nvimage/PixelFormat.h>
+	<nvmath/Color.h>
+	"CompressRGB.h"
+	"CompressionOptions.h"
+	"OutputOptions.h"
+
+1288702103 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\compressrgb.h
+	"nvtt.h"
+
+1288702103 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\nvtt.h
+
+1288702103 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\compressionoptions.h
+	<nvcore/StrLib.h>
+	<nvmath/Vector.h>
+	"nvtt.h"
+
+1288702103 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\outputoptions.h
+	<nvcore/StrLib.h>
+	<nvcore/StdStream.h>
+	"nvtt.h"
+
+1288702103 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\compressionoptions.cpp
+	"nvtt.h"
+	"CompressionOptions.h"
+
+1288702103 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\compressor.cpp
+	<nvtt/nvtt.h>
+	<nvcore/Memory.h>
+	<nvcore/Ptr.h>
+	<nvimage/DirectDrawSurface.h>
+	<nvimage/ColorBlock.h>
+	<nvimage/BlockDXT.h>
+	<nvimage/Image.h>
+	<nvimage/FloatImage.h>
+	<nvimage/Filter.h>
+	<nvimage/Quantize.h>
+	<nvimage/NormalMap.h>
+	"Compressor.h"
+	"InputOptions.h"
+	"CompressionOptions.h"
+	"OutputOptions.h"
+	"CompressDXT.h"
+	"CompressRGB.h"
+	"cuda/CudaUtils.h"
+	"cuda/CudaCompressDXT.h"
+
+1288702103 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\compressor.h
+	<nvcore/Ptr.h>
+	<nvtt/cuda/CudaCompressDXT.h>
+	"nvtt.h"
+
+1288702097 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\cuda\cudacompressdxt.h
+	<nvimage/nvimage.h>
+	<nvtt/nvtt.h>
+
+1288702103 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\inputoptions.h
+	<nvcore/Ptr.h>
+	<nvmath/Vector.h>
+	<nvmath/Matrix.h>
+	<nvimage/Image.h>
+	"nvtt.h"
+
+1288702103 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\compressdxt.h
+	<nvimage/nvimage.h>
+	"nvtt.h"
+
+1288702097 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\cuda\cudautils.h
+
+1288702103 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\inputoptions.cpp
+	<string.h>
+	<nvcore/Memory.h>
+	"nvtt.h"
+	"InputOptions.h"
+
+1288702103 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\optimalcompressdxt.cpp
+	<nvcore/Containers.h>
+	<nvmath/Color.h>
+	<nvimage/ColorBlock.h>
+	<nvimage/BlockDXT.h>
+	"OptimalCompressDXT.h"
+	"SingleColorLookup.h"
+
+1288702103 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\optimalcompressdxt.h
+	<nvimage/nvimage.h>
+
+1288702103 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\singlecolorlookup.h
+
+1288702103 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\outputoptions.cpp
+	"OutputOptions.h"
+
+1288702103 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\quickcompressdxt.cpp
+	<nvmath/Color.h>
+	<nvimage/ColorBlock.h>
+	<nvimage/BlockDXT.h>
+	"QuickCompressDXT.h"
+	"OptimalCompressDXT.h"
+
+1288702103 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\quickcompressdxt.h
+	<nvimage/nvimage.h>
+
+1288702097 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\cuda\cudacompressdxt.cpp
+	<nvcore/Debug.h>
+	<nvcore/Containers.h>
+	<nvmath/Color.h>
+	<nvimage/Image.h>
+	<nvimage/ColorBlock.h>
+	<nvimage/BlockDXT.h>
+	<nvtt/CompressionOptions.h>
+	<nvtt/OutputOptions.h>
+	<nvtt/QuickCompressDXT.h>
+	<nvtt/OptimalCompressDXT.h>
+	"CudaCompressDXT.h"
+	"CudaUtils.h"
+	<cuda_runtime.h>
+	<time.h>
+	<stdio.h>
+	"Bitmaps.h"
+
+1288702097 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\cuda\bitmaps.h
+
+1288702097 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\cuda\cudautils.cpp
+	<nvcore/Debug.h>
+	"CudaUtils.h"
+	<cuda_runtime.h>
+	<windows.h>
+
+1288702103 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\nvtt.cpp
+	"nvtt.h"
+
+1288702101 source:c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\squish\colourblock.cpp
+	"colourblock.h"
+
+1288702101 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\squish\colourblock.h
+	"squish.h"
+	"maths.h"
+
+1288702102 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\squish\squish.h
+
+1288702102 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\squish\maths.h
+	<cmath>
+	<algorithm>
+	"config.h"
+
+1288702101 c:\games\x-ray-tools\trunk\sources\3rd party\nvtt\nvtt\squish\config.h
+
