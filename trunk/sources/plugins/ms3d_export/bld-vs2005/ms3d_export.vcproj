@@ -17,8 +17,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\binaries\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="2"
 			CharacterSet="0"
 			>
@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\xray_re;&quot;$(MS3D_SDK)\msLib&quot;"
+				AdditionalIncludeDirectories="..\..\..\xray_re;&quot;..\..\..\3rd party\milkshape_sdk\msLib&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;MS3D_EXPORT_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -64,7 +64,7 @@
 				AdditionalDependencies="shlwapi.lib xray_re.lib msModelLib.lib"
 				OutputFile="$(OutDir)\msXRayExport.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\bld-vs2005\debug;&quot;$(MS3D_SDK)\msLib\lib&quot;"
+				AdditionalLibraryDirectories="&quot;..\..\..\3rd party\milkshape_sdk\msLib\lib&quot;;&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries&quot;"
 				ModuleDefinitionFile="..\ms3d_xray_export.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -97,8 +97,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\binaries\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="2"
 			CharacterSet="0"
 			WholeProgramOptimization="1"

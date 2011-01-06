@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="make_ogf"
+	Name="makeogf"
 	ProjectGUID="{C561C1B1-A211-4CEC-BBC2-BC85D81DA119}"
 	RootNamespace="ogfsmda2005"
 	Keyword="Win32Proj"
@@ -64,7 +64,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="xrcore.lib d3dx8.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\3rd party\dx8sdk\libraries"
+				AdditionalLibraryDirectories="..\ogfsmda;..\..\3rd party\dx8sdk\libraries"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				RandomizedBaseAddress="1"

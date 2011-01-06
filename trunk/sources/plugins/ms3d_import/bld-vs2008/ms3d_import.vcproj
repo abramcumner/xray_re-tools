@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\xray_re;&quot;$(MS3D_SDK)\msLib&quot;"
+				AdditionalIncludeDirectories="..\..\..\xray_re;&quot;..\..\..\3rd party\milkshape_sdk\msLib&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;MS3D_IMPORT_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -64,7 +64,7 @@
 				AdditionalDependencies="shlwapi.lib xray_re.lib msModelLib.lib"
 				OutputFile="$(OutDir)\msXRayImport.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\bld-vs2008\debug;&quot;$(MS3D_SDK)\msLib\lib&quot;"
+				AdditionalLibraryDirectories="&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries&quot;;&quot;..\..\..\3rd party\milkshape_sdk\msLib\lib&quot;"
 				ModuleDefinitionFile="..\ms3d_xray_import.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"

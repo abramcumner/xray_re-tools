@@ -21,8 +21,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\binaries\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="2"
 			CharacterSet="0"
 			>
@@ -44,14 +44,14 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\xray_re;&quot;$(MAYA_SDK)\include&quot;"
+				AdditionalIncludeDirectories="..\..\..\xray_re;&quot;..\..\..\3rd party\maya_sdk\8.5\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;MAYA_TOOLS_EXPORTS;NT_PLUGIN;REQUIRE_IOSTREAM"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -69,7 +69,7 @@
 				AdditionalDependencies="xray_re.lib Foundation.lib OpenMaya.lib OpenMayaAnim.lib OpenMayaUI.lib"
 				OutputFile="$(OutDir)\xrayMayaTools.mll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\bld-vs2005\debug;&quot;$(MAYA_SDK)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;..\..\..\3rd party\maya_sdk\8.5\lib&quot;;&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
@@ -100,8 +100,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\binaries\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="2"
 			CharacterSet="0"
 			WholeProgramOptimization="1"

@@ -47,7 +47,7 @@
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="2"
-				Detect64BitPortabilityProblems="false"
+				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -63,7 +63,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="xrcore.lib d3dx8.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\3rd party\dx8sdk\libraries"
+				AdditionalLibraryDirectories="..\ogfsmda;..\..\3rd party\dx8sdk\libraries"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
