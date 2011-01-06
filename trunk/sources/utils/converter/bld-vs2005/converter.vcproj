@@ -223,7 +223,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/LARGEADDRESSAWARE"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="$(OutDir)\libraries"
 				GenerateManifest="true"
 				GenerateDebugInformation="false"
 				SubSystem="1"

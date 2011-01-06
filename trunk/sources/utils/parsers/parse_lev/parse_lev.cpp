@@ -1,11 +1,9 @@
-#include "windows.h"
 #include <math.h>
 #include <conio.h>
 #include <stdio.h>
 #include <memory.h>
 #include <string.h>
 #include <stdlib.h>
-
 
 unsigned int numtextures,numiblocks,numiblocks2,numvblocks, numobjblocks;
 char destFlag=0, parseFlag=0;
@@ -18,11 +16,6 @@ struct vector3f
 struct vector2f
 {
 	float tx,ty; 
-};
-
-struct face
-{
-	unsigned short f0,f1,f2; 
 };
 
 struct lev_blk
@@ -73,24 +66,42 @@ struct cform_blk
   ogf_bbox bb;
 };
 
+/*
 struct tris_blk
 {
  unsigned int tris[3];
  unsigned short matid; 
  unsigned short sec_num;
 };
+*/
 
-struct vformat_blk
+struct VERTEXELEMENT9 // D3DVERTEXELEMENT9
 {
-	unsigned short v_offset; 
-	unsigned short v_type; // 1(shortsingle*2),4(single*3),6(???),7(single*2)
-
-// 1	DWord(4) + DWord(4) , float?
-// 4	Byte(1) + Byte(1) + Byte(1) + Byte(1)
-// 6	Word(2)/32768 + Word(2)/32768
-// 7	(Byte(1)-128)/128 + (Byte(1)-128)/128 + (Byte(1)-128)/128 + (Byte(1)-128)/128 + pad(4)
-
-	unsigned short v_class; 
+	unsigned short Stream; 
+	unsigned short Offset; 
+	unsigned char Type;
+/*
+  D3DDECLTYPE_FLOAT1      = 0,
+  D3DDECLTYPE_FLOAT2      = 1,
+  D3DDECLTYPE_FLOAT3      = 2,
+  D3DDECLTYPE_FLOAT4      = 3,
+  D3DDECLTYPE_D3DCOLOR    = 4,
+  D3DDECLTYPE_UBYTE4      = 5,
+  D3DDECLTYPE_SHORT2      = 6,
+  D3DDECLTYPE_SHORT4      = 7,
+  D3DDECLTYPE_UBYTE4N     = 8,
+  D3DDECLTYPE_SHORT2N     = 9,
+  D3DDECLTYPE_SHORT4N     = 10,
+  D3DDECLTYPE_USHORT2N    = 11,
+  D3DDECLTYPE_USHORT4N    = 12,
+  D3DDECLTYPE_UDEC3       = 13,
+  D3DDECLTYPE_DEC3N       = 14,
+  D3DDECLTYPE_FLOAT16_2   = 15,
+  D3DDECLTYPE_FLOAT16_4   = 16,
+  D3DDECLTYPE_UNUSED      = 17 
+*/
+	unsigned char Method;
+	unsigned char Usage; 
 
 // 0.12 - vertices (4*float) - X/Z/Y
 // 3.4 - normales (4*(char-128)/128)
@@ -100,16 +111,8 @@ struct vformat_blk
 // 5.1 texcoords : (2*float)
 // 5.6 texcoords : (2*short/1024)
 // 5.7 texcoords : (2*short/2048) + dummy (4)
-// 261.6 - lightmaps (2*short/32768)
-
-};
-
-struct blk_01
-{
- unsigned short code;
- unsigned short texture;
- struct ogf_bbox		bb;
- struct ogf_bsphere	bs;
+// 5.1.6 - lightmaps (2*short/32768)
+	unsigned char UsageIndex; 
 };
 
 struct blk_12
@@ -143,6 +146,7 @@ struct OGFVertex_v0 // x-ray actor_editor (0x00000112)
 	struct vector3f p;
 	struct vector3f n;
 	float u,v;
+	float lu,lv;
 };
 
 struct OGFHeader_v4 // 0x2C (44)
@@ -162,7 +166,7 @@ struct OGFHeader_v4 // 0x2C (44)
 struct obj_blk // for ogf export
 {
  unsigned short rangecount;
- unsigned short code;
+ unsigned char code;
  unsigned short texture;
  blk_21 range[2];
  OGFVertex_v0 * geom_vBlk;
@@ -173,9 +177,12 @@ struct obj_blk // for ogf export
 */
  char * m_dds;
  char * m_shd;
+ char * m_lm_dds;
  float xform[16];
  struct ogf_bbox		bb;
  struct ogf_bsphere	bs;
+ unsigned char dds_type;
+ unsigned short swi;
 };
 
 obj_blk * o;
@@ -183,27 +190,48 @@ unsigned short ocount = 0;
 unsigned short orange = 0;
 char * tmp_m_dds[MAX_TXT_COUNT];
 char * tmp_m_shd[MAX_TXT_COUNT];
+char * tmp_m_lm_dds[MAX_TXT_COUNT];
 
-///////////////////////////////
-
-
-#define VEC_Cross(a, b, c)((c).x = (a).y * (b).z - (a).z * (b).y, (c).y = (a).z * (b).x - (a).x * (b).z, (c).z = (a).x * (b).y - (a).y * (b).x)
-#define VEC_Subtract(a, b, c)((c).x = (a).x - (b).x, (c).y = (a).y - (b).y, (c).z = (a).z - (b).z)
-#define VEC_Magnitude(v)(sqrt((v).x * (v).x + (v).y * (v).y + (v).z * (v).z))
-#define VEC_Normalizef(v)        { float __mag = 1.0f / (float)VEC_Magnitude(v); \
-(v).x *= __mag; (v).y *= __mag; (v).z *= __mag; }
-void Make_Normal(vector3f a, vector3f b, vector3f c, vector3f * n)
+struct merged_blk
 {
-	vector3f v1 = {0,0,0},v2 = {0,0,0};
-	VEC_Subtract(b, a, v1);
-	VEC_Subtract(c, a, v2);
-	VEC_Cross(v1, v2, *n);
-	VEC_Normalizef(*n);
-}
+ OGFVertex_v0 * geom_vBlk;
+ unsigned short * geom_iBlk;
+ unsigned int iCount;
+ unsigned int vCount;
+ char * m_dds;
+ char * m_shd;
+ unsigned short texture;
+};
+
+struct swidata {
+  unsigned int m_reserved[4];
+  unsigned int swicout;
+
+  unsigned int offset;  // repeat swicount times
+  unsigned short num_tris;
+  unsigned short num_verts;
+};
+
+struct slide_window {
+	unsigned int		offset;
+	unsigned short		num_tris;
+	unsigned short		num_verts;
+};
+
+slide_window * swiblk;
+
+#ifdef LINE_COMPACT
+	 merged_blk mix[MAX_TXT_COUNT];
+#else
+	 merged_blk mix[MAX_TXT_COUNT*2];
+#endif
+///////////////////////////////
 
 int DecodeChunk(lev_blk h,FILE *inputFile)
 {
 	printf(" DecodeChunk(0x%04X, 0x%08X)\n",h.type,h.size);
+
+	if (h.fcomp == 0x8000) h.type = 0xFF; // force_end
 
 	switch (h.type)
 	{
@@ -212,6 +240,9 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
 	int version;
 	fread(&version,h.size,1,inputFile);
 	printf("  level version = 0x%08X\n",version);
+	// only XRLC_0x0D, XRLC_0x0E (level+.cform+.geom)
+	if (version < 0x0D) printf("unsupported version :(\n"), _getch();
+	// 0x08 - bld 11xx, 0x0A - bld 15xx, 0x0C - bld 18xx, 2218
 	return 1;
 	}
 
@@ -263,6 +294,7 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
 	{
   tmp_m_dds[i] = new char[_MAX_PATH];
   tmp_m_shd[i] = new char[_MAX_PATH];
+  tmp_m_lm_dds[i] = new char[_MAX_PATH];
   if (!destFlag) printf("   [%d]: s,t,lmap0,lmap1 '%s'\n",i,&tmpdata[p]);
 
   plen = 0;
@@ -273,9 +305,18 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
   plen = 0;
   while((tmpdata[p+plen]) && (tmpdata[p+plen] != 0x2C)) plen++; //  != 0x00
   memcpy(tmp_m_dds[i],&tmpdata[p],plen); tmp_m_dds[i][plen] = 0;
+  p += plen; 
+
+  if (tmpdata[p] != 0x2C) goto no_lmap;
+  p++; 
+
+  plen = 0;
+  while((tmpdata[p+plen]) && (tmpdata[p+plen] != 0x2C)) plen++; //  != 0x00
+  memcpy(tmp_m_lm_dds[i],&tmpdata[p],plen); tmp_m_lm_dds[i][plen] = 0;
   p += plen;
 
-  //printf("DDS:%s\nSHD:%s\n",tmp_m_dds[i],tmp_m_shd[i]);
+no_lmap:
+  //printf("DDS:%s\nSHD:%s\nLM_DDS:%s\n",tmp_m_dds[i],tmp_m_shd[i],tmp_m_lm_dds[i]);
 
   while(tmpdata[p]) p++; //  != 0x00
   p++;
@@ -302,22 +343,22 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
 	{
 	fread(&j,4,1,inputFile);
 	fread(&szBlk,4,1,inputFile);  // size
-  if (!destFlag) printf("   block = %d, size = %u\n",j,szBlk);
+  if (!destFlag) printf("   chunk = 0x%02X, size = %u\n",j,szBlk);
 
-  if (j > 255) printf("!!! incorrect block, it is an object start\n"), _getch();
+  if (j > 255) printf("!!! incorrect block (%u), it is an object start\n",j), _getch();
   if (ocount > MAX_OBJ_COUNT) printf("!!! too many objects, maximum is %u\n",MAX_OBJ_COUNT), _getch();
 
   switch(j)
   {
 
 /*
-  code = 
-   4 - 21,22,1 or 21,1 or 21,22,21,1 // brush
- 104 - 1,10 // brush+entity
- 204 - 21,6,22,1 or 21,6,1 or 21,6,22,21,6,1 // entity
- 604 - 1,10,11 // greens joined
- 704 - 21,12,1 // greens
- B04 - 21,1,12,6 or 21,12,1,20 // greens scaled
+  code = // OGF4 based
+   0 - 21,22,1 or 21,1 or 21,22,21,1 // MT4_NORMAL, brush
+   1 - 1,10 // MT4_HIERRARHY, brush+entity
+   2 - 21,6,22,1 or 21,6,1 or 21,6,22,21,6,1 // MT4_PROGRESSIVE, entity
+   6 - 1,10,11 // MT4_LOD, greens joined
+   7 - 21,12,1 // MT4_TREE_ST, greens
+   B - 21,1,12,6 or 21,12,1,20 // MT4_TREE_PM, greens scaled
 
  subcode
 
@@ -329,34 +370,33 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
  20 - swidata
 */
 
-
   case 1: 
   {
-  blk_01 ft;
-	fread(&ft,sizeof(blk_01),1,inputFile);
-  if (!destFlag) printf("    blk_#%02d: type 0x%03X texture %d bs.c(%f,%f,%f), size = %u\n",
-    j,ft.code,ft.texture,ft.bs.c.x,ft.bs.c.y,ft.bs.c.z,szBlk);
+  OGFHeader_v4 hdr;
+	fread(&hdr,sizeof(OGFHeader_v4),1,inputFile);
+  if (!destFlag) printf("    MT4_HEAD: type 0x%02X sh_id %d bs.c(%f,%f,%f), size = %u\n",
+    hdr.type,hdr.shader_id,hdr.bs.c.x,hdr.bs.c.y,hdr.bs.c.z,szBlk);
    if (destFlag) 
    if (orange) // we don't need 'no i/v objects!'
    {
-   o[ocount].code = ft.code;
-   o[ocount].texture = ft.texture;
-   o[ocount].bb = ft.bb;
-   o[ocount].bs = ft.bs;
+   o[ocount].code = hdr.type;
+   o[ocount].texture = hdr.shader_id;
+   o[ocount].bb = hdr.bb;
+   o[ocount].bs = hdr.bs;
    }
-   if (ft.code == 4) bdone = 1;
+   if (hdr.type == 0x00) bdone = 1;
    else
-   if (ft.code == 0x104) bdone = 10;
+   if (hdr.type == 0x01) bdone = 10;
    else
-   if (ft.code == 0x204) bdone = 1;
+   if (hdr.type == 0x02) bdone = 1;
    else
-   if (ft.code == 0x604) bdone = 11;
+   if (hdr.type == 0x06) bdone = 11;
    else
-   if (ft.code == 0x704) bdone = 1;
+   if (hdr.type == 0x07) bdone = 1;
    else
-   if (ft.code == 0xB04) bdone = 20;
+   if (hdr.type == 0x0B) bdone = 20;
    else
-   printf("!!!!!!!!!!!! unknown object !!!!!!!!!!!!!!!!!!!!!\n"), _getch();
+   printf("!!! unknown object (0x%02X) !!!\n",hdr.type), _getch();
 
   i += szBlk;
 	break;
@@ -366,7 +406,8 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
   {
   unsigned int swi;
 	fread(&swi,4,1,inputFile);
-  if (!destFlag) printf("    blk_#%02d, swi = %u, size = %u\n",j,swi,szBlk);
+  if (!destFlag) printf("    MT4_SWICNTR = %u, size = %u\n",swi,szBlk);
+  else o[ocount].swi = swi;
   i += szBlk;
 	break;
   }
@@ -375,8 +416,8 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
   {
   blk_21 iv;
 	fread(&iv,sizeof(blk_21),1,inputFile);
-   if (!destFlag)  printf("    blk_#%02d: (v:#%d,%d,%d) (i:#%d,%d,%d), size = %u\n",
-    j,iv.vBlk,iv.vFirst,iv.vCount,iv.iBlk,iv.iFirst,iv.iCount,szBlk);
+   if (!destFlag)  printf("    OGF4_GCONTAINER: (v:#%d,%d,%d) (i:#%d,%d,%d), size = %u\n",
+    iv.vBlk,iv.vFirst,iv.vCount,iv.iBlk,iv.iFirst,iv.iCount,szBlk);
   else
   {
   o[ocount].range[orange].vBlk = iv.vBlk;
@@ -385,6 +426,7 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
   o[ocount].range[orange].iBlk = iv.iBlk;
   o[ocount].range[orange].iFirst = iv.iFirst;
   o[ocount].range[orange].iCount = iv.iCount;
+  o[ocount].swi = 65535; // hack
   orange++;
   }
   i += szBlk;
@@ -393,15 +435,25 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
 
   case 22: 
   {
-  if (!destFlag) printf("    blk_cform_header: %u\n",szBlk);
+  if (!destFlag) printf("    OGF4_FASTPATH: %u\n",szBlk); // cform_header
   i += szBlk;
 	break;
   }
 
   case 6: 
   {
-  if (!destFlag) printf("    blk_unknown#%02d, len: %d\n",j,szBlk);
-  for (unsigned int m = 0; m < szBlk; m++) fread(&k,1,1,inputFile); // dummy read szBlk times
+  if (!destFlag) printf("    OGF4_SWIDATA, len: %d\n",szBlk);
+  swidata s;
+	fread(&s,sizeof(swidata),1,inputFile);
+	s.num_tris *= 3; // tris to idx
+  if (!destFlag) printf("    swi[%u] = sz %u / off %u, swicnt = %u\n",0,s.num_tris,s.offset,s.swicout);
+  else
+  {
+  printf("    swi[0] = sz %u (was %u) / off %u\n",s.num_tris,o[ocount].range[orange-1].iCount,s.offset);
+	o[ocount].range[orange-1].iFirst += s.offset;
+  o[ocount].range[orange-1].iCount = s.num_tris;
+  }
+  for (unsigned int m = 0; m < (szBlk-sizeof(swidata)); m++) fread(&k,1,1,inputFile); // dummy read szBlk times
   if ((i + szBlk) > szObj) szBlk = 8; // , printf("!!! blk#6: overflow fixed\n");
   i += szBlk;
 	break;
@@ -409,10 +461,12 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
 
   case 10: 
   {
-  if (!destFlag) printf("    blk_unknown#%02d, len: %d\n",j,szBlk);
-  for (unsigned int m = 0; m < szBlk; m++) fread(&k,1,1,inputFile); // dummy read szBlk times
+  unsigned int cnt, ob;
+	fread(&cnt,4,1,inputFile);
+  if (!destFlag) printf("    OGF4_CHILDREN_L, size = %d, objcnt = %u\n",szBlk,cnt);
+  for (unsigned int m = 0; m < cnt; m++) { fread(&ob,4,1,inputFile);  } // printf(" %u",ob);
   i += (szBlk + 16);
-  // printf("!!! blk#10: advance 16 bytes\n");
+  //printf("!!! blk#10: advance 16 bytes, rest = %u\n",szBlk-4-(cnt*4));
 	break;
   }
 
@@ -420,7 +474,7 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
   {
   blk_12 iv;
 	fread(&iv,sizeof(blk_12),1,inputFile);
-  if (!destFlag)  printf("    blk_#%02d: xform[16] matrix, size = %u\n", j, szBlk); 
+  if (!destFlag)  printf("    OGF4_TREEDEF2: xform[16] matrix, size = %u\n", szBlk); 
   else memcpy(&o[ocount].xform,&iv,16*sizeof(float));
   i += szBlk;
 	break;
@@ -430,13 +484,15 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
   case 24: 
   default:
   {
-  if (!destFlag)  printf("    blk_unknown#%02d, len: %d\n",j,szBlk);
+  if (!destFlag)  printf("    undef_chunk[0x#%02X], len: %d\n",j,szBlk);
   for (unsigned int m = 0; m < szBlk; m++) fread(&k,1,1,inputFile); // dummy read szBlk times
   i += szBlk;
 	break;
   }
 
   } // end of switch
+
+  // printf("    size check (i=%u ? szObj=%u)\n", i, szObj);
 
   if (i == szObj)
   {
@@ -446,10 +502,16 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
 
   if ((bdone == j) && (i < szObj) && ((szObj - i) <= 32)) // read all the rest and break
   {
-  if (!destFlag) printf("    object completed (forced EOO)\n");
+  if (!destFlag) printf("    object completed (forced EOO [%u - %u = %u])\n",szObj,i,szObj - i);
   break;
   }
-	
+
+  if (j == 0x14) // read all the rest and break after chunk(0x14)
+  {
+  if (!destFlag) printf("    null_object completed (forced EOO [%u - %u = %u])\n",szObj,i,szObj - i);
+  break;
+  }
+
   if (i > szObj) { printf("obj ended beyond limit (i %d szobj %d).\n",i,szObj); break;  }
 
 	}
@@ -457,7 +519,7 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
   if (destFlag) 
   {
   o[ocount].rangecount = orange;
-  if ((orange) && ((o[ocount].code == 4) || (o[ocount].code == 0x704) || (o[ocount].code == 0xB04) || (o[ocount].code == 0x204))) //  || (o[ocount].code == 0x704)
+  if ((orange) && ((o[ocount].code == 0x00) || (o[ocount].code == 0x07) || (o[ocount].code == 0x0B) || (o[ocount].code == 0x02)))
   {
   ocount++; 
   }
@@ -479,7 +541,7 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
   {
   short dummy16;
   int dummy32, tot_vblks = 0;
-  vformat_blk v_b;
+  VERTEXELEMENT9 v_e[10];
 
 	fread(&numvblocks,4,1,inputFile);
 	printf("  numvblocks = %d\n",numvblocks);
@@ -487,135 +549,187 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
 
 	for (unsigned int cnt=0;cnt<numvblocks;cnt++) // base header
 	{
-
-	fread(&dummy32,4,1,inputFile); // = 0
-	fread(&dummy32,4,1,inputFile); // = ?
-  if (dummy32 == 2) { printf("    vBlock[%u]\n",cnt); } // start
-
-  unsigned short coordtype[10], coordclass[10], ccnt = 0;
-  unsigned int szData = 12; // x,y,z at 0 = (4 * 3 = 12)
+  printf("    vBlock[%u]\n",cnt); // start
+  unsigned short ccnt = 0;
 	for (;;) // header of vblock
 	{
-	fread(&dummy16,2,1,inputFile); //	padding #1
-	if (dummy16 == 255) break; // end
-	fread(&v_b,sizeof(vformat_blk),1,inputFile);
-	/// printf("     offset:%d v_type:%d v_class:%d\n",v_b.v_offset,v_b.v_type,v_b.v_class);
-  coordclass[ccnt] = v_b.v_class;
-  coordtype[ccnt++] = v_b.v_type;
-
-	if (v_b.v_type == 1) szData += 8; // f32,f32
-	else if (v_b.v_type == 4) szData += 4; // u8,u8,u8,u8
-	else if (v_b.v_type == 6) szData += 4; // u16,u16
-	else if (v_b.v_type == 7) szData += 8; // u8,u8,u8,u8 + pad(4)
+  if (ccnt >= 10) { printf("!!!! max sz = 10 reached\n"); _getch(); }
+	fread(&v_e[ccnt],2,1,inputFile); //	stream #
+	if (v_e[ccnt].Stream == 255) break; // end
+	fread(&v_e[ccnt].Offset,sizeof(VERTEXELEMENT9)-2,1,inputFile);
+	/// printf("     Offset:%d Type:%d Usage:%d\n",v_e[ccnt].v_offset,v_e[ccnt].Type,v_e[ccnt].Usage);
+	ccnt++;
 	}
+
 	fread(&dummy16,2,1,inputFile); //	padding #2
 	fread(&dummy32,4,1,inputFile);
-	/// if (dummy32 == 17) printf("      [+] vert_blk_start\n"); 
-	fread(&dummy32,4,1,inputFile); // printf("       vert_blks: %d [ ... ]\n", dummy32 ); 
+	/// if (dummy32 == 17) printf("      [+] vert_blk_start\n");
+	fread(&dummy32,4,1,inputFile); // printf("       vert_blks: %d [ ... ]\n", dummy32 );
   tot_vblks += dummy32;
 
    OGFVertex_v0 * v_tmp = new OGFVertex_v0[dummy32];
+   char * v_tmp_type = new char[dummy32];
 
    for (int  i = 0;i < dummy32;i++)
    {
-   vector3f v0;
    vector2f v5;
+   short s16;
    unsigned char u8;
-   unsigned short u16;
-   short d16;
-   float nx1,ny1,nz1,nn1;
- 	 fread(&v0,12,1,inputFile);
- 	 // if (!destFlag) printf("       class 0, type 0 = vertex[%d](X,Z,Y) = %f,%f,%f\n",i,v0.x,v0.y,v0.z);
+   float f4[4];
 
- 	 v_tmp[i].p = v0;
+ 	 v_tmp_type[i] = 0; // i.e. texture.dds
 
    for (int dcnt = 0;dcnt < ccnt;dcnt++)
    {
-   // if (!destFlag)  printf("       class %u, ",coordclass[dcnt]);
-   switch(coordclass[dcnt])
+/*
+   if (!destFlag)
+		if (v_e[dcnt].Usage != 0) // p
+		if (v_e[dcnt].Usage != 3) // n
+		if (v_e[dcnt].Usage != 6) // t
+		if (v_e[dcnt].Usage != 7) // b
+    if (v_e[dcnt].UsageIndex != 1) // lm
+	  printf("* t/m/u/i %u:%u:%u:%u = ",
+		v_e[dcnt].Type,v_e[dcnt].Method,v_e[dcnt].Usage,
+	  v_e[dcnt].UsageIndex);
+*/
+   switch(v_e[dcnt].Type) // D3DDECLTYPE
    {
-   case 3: 
+   case 2: // D3DDECLTYPE_FLOAT3
    {
- 	 fread(&u8,1,1,inputFile); nx1 = ((float(u8)-128) / 128);
- 	 fread(&u8,1,1,inputFile); ny1 = ((float(u8)-128) / 128);
- 	 fread(&u8,1,1,inputFile); nz1 = ((float(u8)-128) / 128);
- 	 fread(&u8,1,1,inputFile); nn1 = ((float(u8)-128) / 128);
-	 // if (!destFlag) printf("type %u = normal[%d](X,Z,Y) = %f,%f,%f\n",coordtype[dcnt],i,nx1,ny1,nz1,nn1);
-   v_tmp[i].n.x = nx1;
-   v_tmp[i].n.y = ny1;
-   v_tmp[i].n.z = nz1;
+ 	 fread(&f4,sizeof(float)*3,1,inputFile); 
+ 	 f4[3] = 1.0f;
+ 	 break;
+ 	 }
+   case 4: // D3DDECLTYPE_D3DCOLOR
+   {
+ 	 fread(&u8,1,1,inputFile); f4[0] = (float)u8;
+ 	 fread(&u8,1,1,inputFile); f4[1] = (float)u8;
+ 	 fread(&u8,1,1,inputFile); f4[2] = (float)u8;
+ 	 fread(&u8,1,1,inputFile); f4[3] = (float)u8;
+ 	 break;
+ 	 }
+   case 6: // D3DDECLTYPE_SHORT2
+   {
+ 	 fread(&s16,2,1,inputFile); f4[0] = (float)s16;
+ 	 fread(&s16,2,1,inputFile); f4[1] = (float)s16; 
+ 	 break;
+ 	 }
+   case 7: // D3DDECLTYPE_SHORT4
+   {
+ 	 fread(&s16,2,1,inputFile); f4[0] = (float)s16;
+ 	 fread(&s16,2,1,inputFile); f4[1] = (float)s16;
+ 	 fread(&s16,2,1,inputFile); f4[2] = (float)s16;
+ 	 fread(&s16,2,1,inputFile); f4[3] = (float)s16;
+ 	 break;
+ 	 }
+   default: printf("should not get here, D3D9VE.Type: %u\n",v_e[dcnt].Type); _getch(); break;
+ 	 }
+
+   switch(v_e[dcnt].Method) // D3DDECLMETHOD
+   {
+   case 0: break; // D3DDECLMETHOD_DEFAULT
+   default: printf("should not get here, D3D9VE.Method: %u\n",v_e[dcnt].Method); _getch(); break;
+ 	 }
+
+   switch(v_e[dcnt].Usage) // D3DDECLTYPE
+   {
+   case 0: // D3DDECLUSAGE_POSITION
+   {
+ 	 //if (!destFlag) printf("position[%d](X,Y,Z) = %f,%f,%f\n",i,f4[0],f4[1],f4[2]);
+   v_tmp[i].p.x = f4[0]; v_tmp[i].p.y = f4[1]; v_tmp[i].p.z = f4[2];
    break;
    }
-   case 6: 
+   case 3: // D3DDECLUSAGE_NORMAL
    {
- 	 fread(&u8,1,1,inputFile); nx1 = ((float(u8)-128) / 128);
- 	 fread(&u8,1,1,inputFile); ny1 = ((float(u8)-128) / 128);
- 	 fread(&u8,1,1,inputFile); nz1 = ((float(u8)-128) / 128);
- 	 fread(&u8,1,1,inputFile); nn1 = ((float(u8)-128) / 128);
-	 // if (!destFlag) printf("type %u = binormal[%d](X,Z,Y) = %f,%f,%f\n",coordtype[dcnt],i,nx1,ny1,nz1,nn1);
+   v_tmp[i].n.x = (f4[0] - 128.0f) / 128.0f; 
+	 v_tmp[i].n.y = (f4[1] - 128.0f) / 128.0f; 
+   v_tmp[i].n.z = (f4[2] - 128.0f) / 128.0f;
+	 //if (!destFlag) printf("normal[%d](X,Y,Z,W) = %f,%f,%f,%f\n",i,f4[0],f4[1],f4[2],f4[3]);
    break;
    }
-   case 7: 
+   case 6: // D3DDECLUSAGE_TANGENT
    {
- 	 fread(&u8,1,1,inputFile); nx1 = ((float(u8)-128) / 128);
- 	 fread(&u8,1,1,inputFile); ny1 = ((float(u8)-128) / 128);
- 	 fread(&u8,1,1,inputFile); nz1 = ((float(u8)-128) / 128);
- 	 fread(&u8,1,1,inputFile); nn1 = ((float(u8)-128) / 128);
-	 // if (!destFlag) printf("type %u = tangentnormal[%d](X,Z,Y) = %f,%f,%f\n",coordtype[dcnt],i,nx1,ny1,nz1,nn1);
+	 //if (!destFlag) printf("tangent[%d](X,Y,Z,W) = %f,%f,%f,%f\n",i,f4[0],f4[1],f4[2],f4[3]);
    break;
    }
-   case 10: 
+   case 7: // D3DDECLUSAGE_BINORMAL
    {
- 	 fread(&u8,1,1,inputFile); 
- 	 fread(&u8,1,1,inputFile); 
- 	 fread(&u8,1,1,inputFile); 
- 	 fread(&u8,1,1,inputFile); 
-	 // if (!destFlag) printf("type %u = ???\n",coordtype[dcnt]);
+	 //if (!destFlag) printf("binormal[%d](X,Y,Z,W) = %f,%f,%f,%f\n",i,f4[0],f4[1],f4[2],f4[3]);
    break;
    }
-   case 5: 
+   case 10: // D3DDECLUSAGE_COLOR
    {
-   if (coordtype[dcnt] == 1)
+	 //if (!destFlag) printf("color[%d](X,Y,Z,W) = %f,%f,%f,%f\n",i,f4[0],f4[1],f4[2],f4[3]);
+   break;
+   }
+   case 5: // D3DDECLUSAGE_TEXCOORD
    {
- 	 fread(&v5,8,1,inputFile);
- 	 // if (!destFlag) printf("type %d = uvcoord[%d](U,V) = %f,%f\n",coordtype[dcnt],i,v5.tx,v5.ty);
+
+	 if (v_e[dcnt].UsageIndex == 0)
+	 {
+   if (v_e[dcnt].Type == 1)
+   {
+ 	 //if (!destFlag) printf("texcoord[%d](U,V) = %f,%f\n",i,f4[0],f4[1]);
+   v_tmp[i].u = f4[0];
+   v_tmp[i].v = f4[1];
+   }
+   else if (v_e[dcnt].Type == 6)
+	// #6 used for statics, i.e. non 0x07, 0x0B objects
+   {
+ 	 v5.tx = f4[0] / 1024.0f; // ????
+ 	 v5.ty = f4[1] / 1024.0f; // ????
+	 //if (!destFlag) printf("texcoord[%d](U,V) = %f,%f\n",i,v5.tx,v5.ty);
    v_tmp[i].u = v5.tx;
    v_tmp[i].v = v5.ty;
+   }
+   else if (v_e[dcnt].Type == 7) 
+	// #7 used for "placeable" statics, i.e. 0x07, 0x0B objects
+   {
+ 	 v5.tx = f4[0] / 2048.0f; // ????
+ 	 v5.ty = f4[1] / 2048.0f; // ????
+	 //if (!destFlag) printf("texcoord[%d](U,V) = %f,%f\n",i,v5.tx,v5.ty);
+   v_tmp[i].u = v5.tx;
+   v_tmp[i].v = v5.ty;
+   }
+   }
+   else if (v_e[dcnt].UsageIndex == 1) // _lmap_
+	 {
+   if (v_e[dcnt].Type == 1)
+   {
+ 	 //if (!destFlag) printf("lmapcoord[%d](U,V) = %f,%f\n",i,f4[0],f4[1]);
+   v_tmp[i].lu = f4[0];
+   v_tmp[i].lv = f4[1];
+// 	 v_tmp_type[i] = 1; // i.e. texture_lm.dds, uncomment to enable lmaps :)
    }
    else
-   if (coordtype[dcnt] == 6)
+   if (v_e[dcnt].Type == 6) // used for statics, i.e. non 0x07, 0x0B objects
    {
- 	 fread(&d16,2,1,inputFile); v5.tx = (float(d16) / 1024);
- 	 fread(&d16,2,1,inputFile); v5.ty = (float(d16) / 1024);
- 	 // if (!destFlag) printf("type %d = uvcoord[%d](U,V) = %f,%f\n",coordtype[dcnt],i,v5.tx,v5.ty);
-   v_tmp[i].u = v5.tx;
-   v_tmp[i].v = v5.ty;
+ 	 v5.tx = f4[0] / 32768.0f;
+ 	 v5.ty = f4[1] / 32768.0f;
+	 //if (!destFlag) printf("lmapcoord[%d](U,V) = %f,%f\n",i,v5.tx,v5.ty);
+   v_tmp[i].lu = v5.tx;
+   v_tmp[i].lv = v5.ty;
+// 	 v_tmp_type[i] = 1; // i.e. texture_lm.dds, uncomment to enable lmaps :)
    }
    else
-   if (coordtype[dcnt] == 7)
+   if (v_e[dcnt].Type == 7) // used for "placeable" statics, i.e. 0x07, 0x0B objects
    {
- 	 fread(&d16,2,1,inputFile); v5.tx = (float(d16) / 2048);
- 	 fread(&d16,2,1,inputFile); v5.ty = (float(d16) / 2048);
-   fread(&d16,2,1,inputFile); 
-   fread(&d16,2,1,inputFile); 
- 	 // if (!destFlag) printf("type %d = uvcoord[%d](U,V) = %f,%f\n",coordtype[dcnt],i,v5.tx,v5.ty);
-   v_tmp[i].u = v5.tx;
-   v_tmp[i].v = v5.ty;
+ 	 v5.tx = f4[0] / 32768.0f;
+ 	 v5.ty = f4[1] / 32768.0f;
+	 //if (!destFlag) printf("lmapcoord[%d](U,V) = %f,%f\n",i,v5.tx,v5.ty);
+   v_tmp[i].lu = v5.tx;
+   v_tmp[i].lv = v5.ty;
+// 	 v_tmp_type[i] = 1; // i.e. texture_lm.dds, uncomment to enable lmaps :)
    }
-   break;
-   }
-   case 261: 
-   {
- 	 fread(&u16,2,1,inputFile); v5.tx = (float(u16) / 32768);
- 	 fread(&u16,2,1,inputFile); v5.ty = (float(u16) / 32768);
- 	 // if (!destFlag) printf("type %d = lmapcoord[%d](U,V) = %f,%f\n",coordtype[dcnt],i,v5.tx,v5.ty);
+   } // lmap end
+
    break;
    }
 
-   default: printf("should not get here\n"); _getch(); break;
+   default: printf("should not get here, D3D9VE.Usage: %u\n",v_e[dcnt].Usage); _getch(); break;
    }
    }
-   //printf("press a key to break\n"); _getch();
+   // printf("press a key to break\n"); _getch();
    }
 /////////////////////////
    if (destFlag) for (unsigned int obj = 0; obj < ocount; obj++)
@@ -623,9 +737,10 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
    {
    unsigned int bsz = o[obj].range[0].vCount;
    unsigned int bst = o[obj].range[0].vFirst;
+   o[obj].dds_type = v_tmp_type[bst]; // differ lmap - dds
    o[obj].geom_vBlk = new OGFVertex_v0[bsz];
    memcpy(o[obj].geom_vBlk,&v_tmp[bst],sizeof(OGFVertex_v0)*bsz);
-  if ((o[obj].code == 0xB04) || (o[obj].code == 0x704))
+  if ((o[obj].code == 0x0B) || (o[obj].code == 0x07))
    for (unsigned int q = 0; q < bsz; q++)
    {
    float x,y,z;
@@ -643,6 +758,7 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
 /////////////////////////
 
   delete [] v_tmp;
+  delete [] v_tmp_type;
 	//printf("press a key to break\n"); _getch();
 	}
   printf("    tot_vert_blks: %d\n", tot_vblks );
@@ -680,12 +796,44 @@ int DecodeChunk(lev_blk h,FILE *inputFile)
 	return 1;
 	}
 
+	case 0x0B: // level.geom, SWIDATA
+  {
+    unsigned short ii; 
+	  unsigned int swcnt;
+    swidata d;
+		fread(&swcnt,4,1,inputFile);
+		printf("  numswiblocks = %d\n",swcnt);
+    swiblk = new slide_window[swcnt];
+		for (unsigned int i = 0;i < swcnt; i++)
+		{
+		fread(&d,sizeof(swidata),1,inputFile);
+    swiblk[i].num_tris = d.num_tris*3;
+    swiblk[i].offset = d.offset;
+    printf("    swi[%u] = sz %u / off %u, swicnt = %u\n",i,swiblk[i].num_tris,swiblk[i].offset,d.swicout);
+		for (unsigned int j = 0;j < (d.swicout-1); j++) 
+			fread(&d.offset,sizeof(slide_window),1,inputFile); // read rest
+		}
+
+   if (destFlag) 
+   for (ii = 0; ii < ocount; ii++) 
+   {
+   if (o[ii].swi != 65535) // .swi filled
+   printf("    *obj[0x%02X].iCnt: reducing[%u] from %u to %u\n",o[ii].code, ii,o[ii].range[0].iCount,swiblk[o[ii].swi].num_tris),
+   o[ii].range[0].iCount = swiblk[o[ii].swi].num_tris,
+	 memcpy(o[ii].geom_iBlk,
+   &o[ii].geom_iBlk[swiblk[o[ii].swi].offset],swiblk[o[ii].swi].num_tris*sizeof(unsigned short)); // hack
+   }
+
+   delete [] swiblk;
+		return 1;}
+
 	case 0x05: // level
 	case 0x08: // level, LEV_SECTORS
-	case 0x0B: // level.geom
 	case 0x0E: // ??????????
   case 0x04: // level, LEV_PORTALS
+  case 0xFF: // forced_end
   {
+		//printf("  UNKNOWN LEV_BLK = %d\n",h.type); 
     //_getch();
 		char *tmpdata = new char[h.size];
 		fread(tmpdata,h.size,1,inputFile);
@@ -703,11 +851,11 @@ int main(int argc, char* argv[])
 	char fileName[256];
   FILE *inputFile, *outputFile;
 
- 	printf("X-Ray level (2xxx+) parser-converter [201008xx]\n");
+ 	printf("X-Ray level (2xxx+) parser-converter [201012xx]\n");
 
 	if (argc < 2) 
   {
-  	printf("usage: parse_lev < mode > [ destfile.ogf ]\n\twhere mode is: 0 - dump only, 1 - convert to ogf, 2 - convert to ogf (optimized)\n\tdestfile.ogf - destination file (modes 1, 2 only)\n\n");
+  	printf("usage: parse_lev < mode > [ destfile.ogf ]\n\tmode: 0 - dump only, 1 - convert to ogf, 2 - convert to ogf (optimized)\n\tdestfile.ogf: destination file (modes 1, 2 only)\n\n");
 		return 1;
 	}
 
@@ -715,7 +863,7 @@ int main(int argc, char* argv[])
 
 	if (parseFlag) 
 	{
-  if (lstrcpy((char*)fileName,argv[2]) == 0) 
+  if (strcpy((char*)fileName,argv[2]) == 0) 
   {
 		printf("X-Ray PARSE_LEV: no arguments given in mode(s) 1, 2.\n"); return 1;
   }
@@ -737,7 +885,7 @@ int main(int argc, char* argv[])
   while(fullsize)
   {
   fread( &hdr, sizeof(lev_blk), 1, inputFile );
-  printf("Type 0x%04X, size %d\n",hdr.type,hdr.size);
+  printf("Type 0x%04X, compress 0x%04X, size %d\n",hdr.type,hdr.fcomp,hdr.size);
   DecodeChunk(hdr,inputFile);
   fullsize -= hdr.size; fullsize -= 8;
 	}
@@ -757,7 +905,7 @@ int main(int argc, char* argv[])
   while(fullsize)
   {
   fread( &hdr, sizeof(lev_blk), 1, inputFile );
-  printf("Type 0x%04X, size %d\n",hdr.type,hdr.size);
+  printf("Type 0x%04X, compress 0x%04X, size %d\n",hdr.type,hdr.fcomp,hdr.size);
   DecodeChunk(hdr,inputFile);
   fullsize -= hdr.size; fullsize -= 8;
 	}
@@ -830,11 +978,12 @@ if (parseFlag == 1)
    {
    if (o[obj].texture == i) 
    o[obj].m_dds = new char[_MAX_PATH], o[obj].m_shd = new char[_MAX_PATH],
-   lstrcpy(o[obj].m_dds,tmp_m_dds[i]),lstrcpy(o[obj].m_shd,tmp_m_shd[i]);
+   strcpy(o[obj].m_dds,tmp_m_dds[i]),strcpy(o[obj].m_shd,tmp_m_shd[i]);
+   if (o[obj].dds_type) o[obj].m_lm_dds = new char[_MAX_PATH], strcpy(o[obj].m_lm_dds,tmp_m_lm_dds[i]); 
    }
    }
    for (i = 0; i < numtextures; i++)
-    delete tmp_m_dds[i], delete tmp_m_shd[i];
+    delete tmp_m_dds[i], delete tmp_m_lm_dds[i], delete tmp_m_shd[i];
 /////////////////////////
 //////////////////////////////////////////////////////////////////
 
@@ -843,13 +992,13 @@ if (parseFlag == 1)
   unsigned short numblocks = 0;
   unsigned int tot_i = 0, tot_v = 0;
 
-  //   for (obj = 0; obj < ocount; obj++) -- nattefrost.. wtf :)
+ //for (obj = 0; obj < ocount; obj++)  -- nattefrost.. wtf :)
 
-   for (unsigned int obj = 0; obj < ocount; obj++)
+   for (unsigned int obj = 0; obj < ocount; obj++)  
   {
   if (o[obj].texture)
-  printf("o%05u - m,t,s, 0x%03X, '%s', '%s'\n",
-  obj,o[obj].code, o[obj].m_dds,o[obj].m_shd), numblocks++;
+  printf("o%05u - c,t,s 0x%02X, '%s', '%s', %u, %u\n",
+  obj,o[obj].code, o[obj].m_dds,o[obj].m_shd,o[obj].range[0].vCount,o[obj].range[0].iCount), numblocks++;
   else
   printf("o%05u - no texture\n",obj);
   }
@@ -888,18 +1037,18 @@ if (parseFlag == 1)
 
 
   ih->type = 0x09; // childrens
-  ih->size = 8 + (8+sizeof(OGFHeader_v4))+(0x14+8)+(8+((o[0].range[0].vCount*sizeof(OGFVertex_v0))+8))+(8+((o[0].range[0].iCount*2)+4));
+  ih->size = 8 + (8+sizeof(OGFHeader_v4))+(0x14+8)+(8+((o[0].range[0].vCount*(sizeof(OGFVertex_v0)-8))+8))+(8+((o[0].range[0].iCount*2)+4));
 	fwrite(ih,sizeof(ChunkIFF),1,outputFile);
 
   printf("making %u blocks\n",numblocks);
 
+  unsigned int k = 0;
 	for (unsigned int j = 0;j < numblocks; j++)
 	{
-	printf("child %u\n",j);
 	// child start
 
-  ih->type = j; // children #j
-  ih->size = (8+sizeof(OGFHeader_v4))+((lstrlen(o[j].m_dds) + lstrlen(o[j].m_shd) + 0x02)+8)+(8+((o[j].range[0].vCount*sizeof(OGFVertex_v0))+8))+(8+((o[j].range[0].iCount*2)+4));
+  ih->type = k; // children #j
+  ih->size = (8+sizeof(OGFHeader_v4))+((strlen(o[j].m_dds) + strlen(o[j].m_shd) + 0x02)+8)+(8+((o[j].range[0].vCount*(sizeof(OGFVertex_v0)-8))+8))+(8+((o[j].range[0].iCount*2)+4));
 	fwrite(ih,sizeof(ChunkIFF),1,outputFile);
 
 	// .... 1.2.3.4
@@ -914,25 +1063,25 @@ if (parseFlag == 1)
   hdr4->bs = o[j].bs;
 	fwrite(hdr4,sizeof(OGFHeader_v4),1,outputFile);
 
-	printf(" blks: '%s'",o[j].m_dds);
   ih->type = 0x02; // texture
-  ih->size = lstrlen(o[j].m_dds) + lstrlen(o[j].m_shd) + 0x02; 
+  ih->size = strlen(o[j].m_dds) + strlen(o[j].m_shd) + 0x02; 
 	fwrite(ih,sizeof(ChunkIFF),1,outputFile);
 	i = 0;
   fputs(o[j].m_dds,outputFile); fwrite(&i,1,1,outputFile); 
   fputs(o[j].m_shd,outputFile); fwrite(&i,1,1,outputFile); 
 
-	printf(" v %u",o[j].range[0].vCount); tot_v += o[j].range[0].vCount;
+	tot_v += o[j].range[0].vCount;
   ih->type = 0x03; // verts
-  ih->size = (o[j].range[0].vCount*sizeof(OGFVertex_v0))+8;
+  ih->size = (o[j].range[0].vCount*(sizeof(OGFVertex_v0)-8))+8;
 	fwrite(ih,sizeof(ChunkIFF),1,outputFile);
 	i = 0x00000112; // D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1
   fwrite(&i,4,1,outputFile);
 	i = o[j].range[0].vCount; 
   fwrite(&i,4,1,outputFile);
-	fwrite(o[j].geom_vBlk,sizeof(OGFVertex_v0)*i,1,outputFile);
+  for (unsigned int s = 0; s < i ; s++)
+	fwrite(&o[j].geom_vBlk[s],sizeof(OGFVertex_v0)-8,1,outputFile);
 	
-	printf(" i %u\n",o[j].range[0].iCount); tot_i += o[j].range[0].iCount;
+	tot_i += o[j].range[0].iCount;
   ih->type = 0x04; // idx
   ih->size = (o[j].range[0].iCount*2)+4;
 	fwrite(ih,sizeof(ChunkIFF),1,outputFile);
@@ -940,7 +1089,61 @@ if (parseFlag == 1)
   fwrite(&i,4,1,outputFile);
 	fwrite(o[j].geom_iBlk,sizeof(unsigned short)*i,1,outputFile);
 
+	printf("."); if ((k % 50)==0) printf("\n");
+	k++;
 	// child end 
+
+	if (o[j].dds_type) {
+	// child start
+
+  ih->type = k; // children #j
+  ih->size = (8+sizeof(OGFHeader_v4))+((strlen(o[j].m_lm_dds) + strlen(o[j].m_shd) + 0x02)+8)+(8+((o[j].range[0].vCount*(sizeof(OGFVertex_v0)-8))+8))+(8+((o[j].range[0].iCount*2)+4));
+	fwrite(ih,sizeof(ChunkIFF),1,outputFile);
+
+	// .... 1.2.3.4
+
+  ih->type = 0x01; // header
+  ih->size = sizeof(OGFHeader_v4);
+	fwrite(ih,sizeof(ChunkIFF),1,outputFile);
+  hdr4->format_version = 4;
+  hdr4->type = 0;
+  hdr4->shader_id = 0;
+  hdr4->bb = o[j].bb;
+  hdr4->bs = o[j].bs;
+	fwrite(hdr4,sizeof(OGFHeader_v4),1,outputFile);
+
+  ih->type = 0x02; // texture
+  ih->size = strlen(o[j].m_lm_dds) + strlen(o[j].m_shd) + 0x02; 
+	fwrite(ih,sizeof(ChunkIFF),1,outputFile);
+	i = 0;
+  fputs(o[j].m_lm_dds,outputFile); fwrite(&i,1,1,outputFile);
+  fputs(o[j].m_shd,outputFile); fwrite(&i,1,1,outputFile);
+
+	tot_v += o[j].range[0].vCount;
+  ih->type = 0x03; // verts
+  ih->size = (o[j].range[0].vCount*(sizeof(OGFVertex_v0)-8))+8;
+	fwrite(ih,sizeof(ChunkIFF),1,outputFile);
+	i = 0x00000112; // D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1
+  fwrite(&i,4,1,outputFile);
+	i = o[j].range[0].vCount;
+  fwrite(&i,4,1,outputFile);
+  for (unsigned int s = 0; s < i ; s++)
+  //o[j].geom_vBlk[s].u = o[j].geom_vBlk[s].lu, o[j].geom_vBlk[s].v = o[j].geom_vBlk[s].lv,
+  o[j].geom_vBlk[s].p.y+=0.1,
+	fwrite(&o[j].geom_vBlk[s],sizeof(OGFVertex_v0)-8,1,outputFile);
+	
+	tot_i += o[j].range[0].iCount;
+  ih->type = 0x04; // idx
+  ih->size = (o[j].range[0].iCount*2)+4;
+	fwrite(ih,sizeof(ChunkIFF),1,outputFile);
+	i = o[j].range[0].iCount;
+  fwrite(&i,4,1,outputFile);
+	fwrite(o[j].geom_iBlk,sizeof(unsigned short)*i,1,outputFile);
+
+	printf("*"); if ((j % 50)==0) printf("\n");
+	k++;
+	// child end (lmap)
+	}
 	}
 
   delete [] o;
@@ -949,7 +1152,7 @@ if (parseFlag == 1)
   delete ih;
 
   fclose(outputFile);
-  printf("writing '%s' [%u,%u] OK\n",fileName,tot_v,tot_i);
+  printf("\nwriting '%s' [v %u, i %u] OK\n",fileName,tot_v,tot_i);
 ///////////////////////////////////////
 } // parseFlag == 1
 else if (parseFlag == 2) 
@@ -963,34 +1166,24 @@ else if (parseFlag == 2)
    for (i = 1; i < numtextures; i++) // from 1 !!!
    {
    if (o[obj].texture == i) 
+   {
    o[obj].m_dds = new char[_MAX_PATH], o[obj].m_shd = new char[_MAX_PATH],
-   lstrcpy(o[obj].m_dds,tmp_m_dds[i]),lstrcpy(o[obj].m_shd,tmp_m_shd[i]);
+   strcpy(o[obj].m_shd,tmp_m_shd[i]);
+	 strcpy(o[obj].m_dds,tmp_m_dds[i]);
+   if (o[obj].dds_type) o[obj].m_lm_dds = new char[_MAX_PATH], strcpy(o[obj].m_lm_dds,tmp_m_lm_dds[i]); 
+   }
    }
    }
 
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
    
-struct merged_blk
-{
- OGFVertex_v0 * geom_vBlk;
- unsigned short * geom_iBlk;
- unsigned int iCount;
- unsigned int vCount;
- unsigned short start_obj_num;
- char * m_dds;
- char * m_shd;
- unsigned short texture;
-};
-
 #define LINE_COMPACT
 //////////////////////////////////////////
 #ifdef LINE_COMPACT
 
    unsigned short mix_numt=0;
  
-	 merged_blk mix[MAX_TXT_COUNT];
-
    printf(" compacting (full): first pass\n");
    for (unsigned short t = 1; t < numtextures; t++) // from 1 !!!
    {
@@ -1009,7 +1202,7 @@ struct merged_blk
    printf("%05i: *texture='%s', max_v=%u, max_i=%u\n",t,tmp_m_dds[t],max_v,max_i);
    mix[mix_numt].texture = t;
    mix[mix_numt].m_dds = new char[strlen(tmp_m_dds[t])], mix[mix_numt].m_shd = new char[strlen(tmp_m_shd[t])],
-   lstrcpy(mix[mix_numt].m_dds,tmp_m_dds[t]),lstrcpy(mix[mix_numt].m_shd,tmp_m_shd[t]);
+   strcpy(mix[mix_numt].m_dds,tmp_m_dds[t]),strcpy(mix[mix_numt].m_shd,tmp_m_shd[t]);
    mix[mix_numt].vCount = max_v;
    mix[mix_numt].iCount = max_i;
    //printf(" [%u]:create of vblk[%u],iblk[%u]\n",mix_numt,max_v,max_i);
@@ -1027,7 +1220,7 @@ struct merged_blk
    printf("%05i: +texture='%s', max_v=%u, max_i=%u\n",t,tmp_m_dds[t],max_v,max_i);
    mix[mix_numt].texture = t;
    mix[mix_numt].m_dds = new char[strlen(tmp_m_dds[t])], mix[mix_numt].m_shd = new char[strlen(tmp_m_shd[t])],
-   lstrcpy(mix[mix_numt].m_dds,tmp_m_dds[t]),lstrcpy(mix[mix_numt].m_shd,tmp_m_shd[t]);
+   strcpy(mix[mix_numt].m_dds,tmp_m_dds[t]),strcpy(mix[mix_numt].m_shd,tmp_m_shd[t]);
    mix[mix_numt].vCount = max_v;
    mix[mix_numt].iCount = max_i;
    //printf(" [%u]:create of vblk[%u],iblk[%u]\n",mix_numt,max_v,max_i);
@@ -1082,8 +1275,6 @@ struct merged_blk
    unsigned short mix_numt=0, m_first = 0, m_last = 0;
    unsigned int max_v = 0, max_i = 0;
 
-   merged_blk mix[MAX_TXT_COUNT*2];
-
    printf(" compacting (partial,line): first pass\n");
 
    for (obj = 0; obj < ocount; obj++) // from 1
@@ -1106,8 +1297,8 @@ struct merged_blk
    mix[mix_numt].texture = o[m_first].texture;
    mix[mix_numt].m_dds = new char[strlen(tmp_m_dds[o[m_first].texture])];
    mix[mix_numt].m_shd = new char[strlen(tmp_m_shd[o[m_first].texture])];
-   lstrcpy(mix[mix_numt].m_dds,tmp_m_dds[o[m_first].texture]);
-   lstrcpy(mix[mix_numt].m_shd,tmp_m_shd[o[m_first].texture]);
+   strcpy(mix[mix_numt].m_dds,tmp_m_dds[o[m_first].texture]);
+   strcpy(mix[mix_numt].m_shd,tmp_m_shd[o[m_first].texture]);
    mix[mix_numt].vCount = max_v;
    mix[mix_numt].iCount = max_i;
    mix[mix_numt].geom_vBlk = new OGFVertex_v0[max_v];
@@ -1140,8 +1331,8 @@ struct merged_blk
    mix[mix_numt].texture = o[m_first].texture;
    mix[mix_numt].m_dds = new char[strlen(tmp_m_dds[o[m_first].texture])];
    mix[mix_numt].m_shd = new char[strlen(tmp_m_shd[o[m_first].texture])];
-   lstrcpy(mix[mix_numt].m_dds,tmp_m_dds[o[m_first].texture]);
-   lstrcpy(mix[mix_numt].m_shd,tmp_m_shd[o[m_first].texture]);
+   strcpy(mix[mix_numt].m_dds,tmp_m_dds[o[m_first].texture]);
+   strcpy(mix[mix_numt].m_shd,tmp_m_shd[o[m_first].texture]);
    mix[mix_numt].vCount = max_v;
    mix[mix_numt].iCount = max_i;
    mix[mix_numt].geom_vBlk = new OGFVertex_v0[max_v];
@@ -1165,7 +1356,7 @@ struct merged_blk
   unsigned int tot_i = 0, tot_v = 0;
 
    for (i = 1; i < numtextures; i++)
-    delete tmp_m_dds[i], delete tmp_m_shd[i];
+    delete tmp_m_dds[i], delete tmp_m_lm_dds[i], delete tmp_m_shd[i];
    delete [] o;
 
 ///////////////////////////////////////
@@ -1207,14 +1398,13 @@ struct merged_blk
 
 	for (unsigned int j = 0;j < mix_numt; j++)
 	{
-	printf("child %u\n",j);
 	// child start
 
   if (!mix[j].vCount) { printf(" blk: vCount is zero sized!!!\n"); continue; }
   if (!mix[j].iCount) { printf(" blk: iCount is zero sized!!!\n"); continue; }
 
   ih->type = j; // children #j
-  ih->size = (8+sizeof(OGFHeader_v4))+((lstrlen(mix[j].m_dds) + lstrlen(mix[j].m_shd) + 0x02)+8)+(8+((mix[j].vCount*sizeof(OGFVertex_v0))+8))+(8+((mix[j].iCount*2)+4));
+  ih->size = (8+sizeof(OGFHeader_v4))+((strlen(mix[j].m_dds) + strlen(mix[j].m_shd) + 0x02)+8)+(8+((mix[j].vCount*sizeof(OGFVertex_v0))+8))+(8+((mix[j].iCount*2)+4));
 	fwrite(ih,sizeof(ChunkIFF),1,outputFile);
 
 	// .... 1.2.3.4
@@ -1230,15 +1420,14 @@ struct merged_blk
   // hdr4.bs ???
 	fwrite(hdr4,sizeof(OGFHeader_v4),1,outputFile);
 
-	printf(" blk: '%s'",mix[j].m_dds);
   ih->type = 0x02; // texture
-  ih->size = lstrlen(mix[j].m_dds) + lstrlen(mix[j].m_shd) + 0x02; 
+  ih->size = strlen(mix[j].m_dds) + strlen(mix[j].m_shd) + 0x02; 
 	fwrite(ih,sizeof(ChunkIFF),1,outputFile);
 	i = 0;
   fputs(mix[j].m_dds,outputFile); fwrite(&i,1,1,outputFile); 
   fputs(mix[j].m_shd,outputFile); fwrite(&i,1,1,outputFile); 
 
-	printf(" v %u",mix[j].vCount); tot_v+= mix[j].vCount;
+	tot_v+= mix[j].vCount;
   ih->type = 0x03; // verts
   ih->size = (mix[j].vCount*sizeof(OGFVertex_v0))+8;
 	fwrite(ih,sizeof(ChunkIFF),1,outputFile);
@@ -1248,7 +1437,7 @@ struct merged_blk
   fwrite(&i,4,1,outputFile);
 	fwrite(mix[j].geom_vBlk,sizeof(OGFVertex_v0)*i,1,outputFile);
 	
-	printf(" i %u\n",mix[j].iCount); tot_i+= mix[j].iCount;
+	tot_i+= mix[j].iCount;
   ih->type = 0x04; // idx
   ih->size = (mix[j].iCount*2)+4;
 	fwrite(ih,sizeof(ChunkIFF),1,outputFile);
@@ -1256,6 +1445,7 @@ struct merged_blk
   fwrite(&i,4,1,outputFile);
 	fwrite(mix[j].geom_iBlk,sizeof(unsigned short)*i,1,outputFile);
 
+	printf("."); if ((j % 50)==0) printf("\n");
 	// child end 
 	}
 
@@ -1263,7 +1453,7 @@ struct merged_blk
   delete ih;
 
   fclose(outputFile);
-  printf("writing '%s' [%u,%u] OK\n",fileName,tot_v,tot_i);
+  printf("\nwriting '%s' [v %u, i %u] OK\n",fileName,tot_v,tot_i);
 ///////////////////////////////////////
 
 } // parseFlag == 2

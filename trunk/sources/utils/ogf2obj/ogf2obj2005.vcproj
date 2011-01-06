@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="ms3d_import"
-	ProjectGUID="{C28B4754-2914-4255-94C9-17ACFE443585}"
-	RootNamespace="ms3d_import"
+	Name="ogf2obj"
+	ProjectGUID="{2452AC95-6350-401A-8A01-C494B2CF3482}"
+	RootNamespace="ogfsmda2005"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -17,9 +17,9 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			OutputDirectory="..\..\..\binaries\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)"
+			ConfigurationType="1"
 			CharacterSet="0"
 			>
 			<Tool
@@ -40,14 +40,14 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\xray_re;&quot;$(MS3D_SDK)\msLib&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;MS3D_IMPORT_EXPORTS"
+				AdditionalIncludeDirectories="..\..\3rd party\dx8sdk\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				WarningLevel="2"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -61,13 +61,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shlwapi.lib xray_re.lib msModelLib.lib"
-				OutputFile="$(OutDir)\msXRayImport.dll"
+				AdditionalDependencies="xrcore.lib d3dx8.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\bld-vs2005\debug;&quot;$(MS3D_SDK)\msLib\lib&quot;"
-				ModuleDefinitionFile="..\ms3d_xray_import.def"
+				AdditionalLibraryDirectories="..\..\3rd party\dx8sdk\libraries"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -97,9 +95,9 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			OutputDirectory="..\..\..\binaries\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)"
+			ConfigurationType="1"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
 			>
@@ -120,17 +118,13 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/MP"
-				Optimization="1"
-				AdditionalIncludeDirectories="..\..\..\xray_re;&quot;..\..\..\3rd party\milkshape_sdk\msLib&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;MS3D_IMPORT_EXPORTS"
-				StringPooling="true"
+				AdditionalIncludeDirectories="..\..\3rd party\dx8sdk\libraries"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
-				BufferSecurityCheck="false"
-				EnableEnhancedInstructionSet="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -143,12 +137,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shlwapi.lib xray_re.lib msModelLib.lib"
-				OutputFile="$(OutDir)\msXRayImport.dll"
-				AdditionalLibraryDirectories="&quot;..\..\..\3rd party\milkshape_sdk\msLib\lib&quot;;&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries&quot;"
-				ModuleDefinitionFile="..\ms3d_xray_import.def"
-				GenerateDebugInformation="false"
-				SubSystem="2"
+				AdditionalDependencies="xrcore.lib d3dx8.lib"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\ogfsmda;&quot;..\..\3rd party\dx8sdk\libraries&quot;"
+				GenerateDebugInformation="true"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -188,65 +181,9 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\ms3d_dm_import.cxx"
+				RelativePath="..\make_ogf\make_ogf.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\ms3d_object_import.cxx"
-				>
-			</File>
-			<File
-				RelativePath="..\ms3d_ogf_import.cxx"
-				>
-			</File>
-			<File
-				RelativePath="..\ms3d_skl_import.cxx"
-				>
-			</File>
-			<File
-				RelativePath="..\ms3d_xray_import.cxx"
-				>
-			</File>
-			<File
-				RelativePath="..\ms3d_xray_utils.cxx"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-			<File
-				RelativePath="..\ms3d_dm_import.h"
-				>
-			</File>
-			<File
-				RelativePath="..\ms3d_object_import.h"
-				>
-			</File>
-			<File
-				RelativePath="..\ms3d_ogf_import.h"
-				>
-			</File>
-			<File
-				RelativePath="..\ms3d_skl_import.h"
-				>
-			</File>
-			<File
-				RelativePath="..\ms3d_xray_import.h"
-				>
-			</File>
-			<File
-				RelativePath="..\ms3d_xray_utils.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
 		</Filter>
 	</Files>
 	<Globals>

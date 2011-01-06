@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ms3d_export"
-	ProjectGUID="{3654E3D8-ECAB-4800-97AC-1034D7D169D4}"
-	RootNamespace="ms3d_export"
+	Name="make_ogf"
+	ProjectGUID="{C561C1B1-A211-4CEC-BBC2-BC85D81DA119}"
+	RootNamespace="ogfsmda2005"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -18,9 +18,9 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\..\..\binaries\$(ConfigurationName)"
-			IntermediateDirectory="..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)"
-			ConfigurationType="2"
+			OutputDirectory="..\..\..\binaries\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)"
+			ConfigurationType="1"
 			CharacterSet="0"
 			>
 			<Tool
@@ -41,13 +41,14 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\xray_re;&quot;$(MS3D_SDK)\msLib&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;MS3D_EXPORT_EXPORTS"
+				AdditionalIncludeDirectories="..\..\3rd party\dx8sdk\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="2"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -61,13 +62,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shlwapi.lib xray_re.lib msModelLib.lib"
-				OutputFile="$(OutDir)\msXRayExport.dll"
+				AdditionalDependencies="xrcore.lib d3dx8.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\bld-vs2008\debug;&quot;$(MS3D_SDK)\msLib\lib&quot;"
-				ModuleDefinitionFile="..\ms3d_xray_export.def"
+				AdditionalLibraryDirectories="..\..\3rd party\dx8sdk\libraries"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
@@ -96,9 +95,9 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\..\..\..\binaries\$(ConfigurationName)"
-			IntermediateDirectory="..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)"
-			ConfigurationType="2"
+			OutputDirectory="..\..\..\binaries\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)"
+			ConfigurationType="1"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
 			>
@@ -119,16 +118,13 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/MP"
-				Optimization="1"
-				AdditionalIncludeDirectories="..\..\..\xray_re;&quot;..\..\..\3rd party\milkshape_sdk\msLib&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;MS3D_EXPORT_EXPORTS"
-				StringPooling="true"
+				AdditionalIncludeDirectories="..\..\3rd party\dx8sdk\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
-				BufferSecurityCheck="false"
-				EnableEnhancedInstructionSet="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -141,12 +137,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shlwapi.lib xray_re.lib msModelLib.lib"
-				OutputFile="$(OutDir)\msXRayExport.dll"
-				AdditionalLibraryDirectories="&quot;..\..\..\3rd party\milkshape_sdk\msLib\lib&quot;;&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries&quot;"
-				ModuleDefinitionFile="..\ms3d_xray_export.def"
-				GenerateDebugInformation="false"
-				SubSystem="2"
+				AdditionalDependencies="xrcore.lib d3dx8.lib"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\ogfsmda;..\..\3rd party\dx8sdk\libraries"
+				GenerateDebugInformation="true"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
@@ -185,57 +180,9 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\ms3d_bone_track.cxx"
+				RelativePath=".\make_ogf.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\ms3d_mesh_builder.cxx"
-				>
-			</File>
-			<File
-				RelativePath="..\ms3d_object_export.cxx"
-				>
-			</File>
-			<File
-				RelativePath="..\ms3d_skl_export.cxx"
-				>
-			</File>
-			<File
-				RelativePath="..\ms3d_xray_export.cxx"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-			<File
-				RelativePath="..\ms3d_bone_track.h"
-				>
-			</File>
-			<File
-				RelativePath="..\ms3d_mesh_builder.h"
-				>
-			</File>
-			<File
-				RelativePath="..\ms3d_object_export.h"
-				>
-			</File>
-			<File
-				RelativePath="..\ms3d_skl_export.h"
-				>
-			</File>
-			<File
-				RelativePath="..\ms3d_xray_export.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
 		</Filter>
 	</Files>
 	<Globals>

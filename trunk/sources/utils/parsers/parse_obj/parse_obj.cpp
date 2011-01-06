@@ -1,4 +1,3 @@
-#include "windows.h"
 #include <conio.h>
 #include <stdio.h>
 #include <memory.h>
@@ -7,8 +6,8 @@
 
 struct ChunkIFF
 {
-	int type;
-	int size;
+	unsigned long type;
+	unsigned long size;
 };
 
 struct vector2f {
@@ -31,25 +30,25 @@ struct Vertex
 
 struct Vertices
 {
-	int	count;
+	unsigned long	count;
 	unsigned short	*vtx;
 };
 
 struct OBJFace
 {
-	int v0, vref0, v1, vref1, v2, vref2; 
+	long v0, vref0, v1, vref1, v2, vref2; 
 };
 
 struct Faces
 {
-	int	count;
+	long	count;
 	unsigned short	*fcs;
 };
 
 struct submap
 {
- unsigned int vmap_index; // link to map
- unsigned int index; // vmap index to uv/w
+ unsigned long vmap_index; // link to map
+ unsigned long index; // vmap index to uv/w
 };
 
 struct uvmap // 0x19 (25), 0x1008 EMESH_CHUNK_VMREFS, another one
@@ -66,7 +65,7 @@ struct txmap // BLOCK 0x1012
  unsigned char dim;
  unsigned char polymap; // when = 1, third block exists
  unsigned char type; // when = 1, second block absent (vmtUV	= 0; vmtWeight	= 1;)
- unsigned int txcount;
+ unsigned long txcount;
 };
 
 struct uvcoord // BLOCK 0x1012
@@ -76,21 +75,21 @@ struct uvcoord // BLOCK 0x1012
 
 struct matpars // 0x0C (12) - BLOCK 0x0907
 {
- unsigned int m_flags;
- unsigned int fvf;
- unsigned int unk; // = 1
+ unsigned long m_flags;
+ unsigned long fvf;
+ unsigned long unk; // = 1
 };
 
 char destFlag = 0;
 
-int DecodeChunk(ChunkIFF chunk,FILE *inputFile)
+long DecodeChunk(ChunkIFF chunk,FILE *inputFile)
 {
-	int cnt;
+	unsigned long cnt;
   Vertices v;
 	Faces f;
 	char c_data; // 1
 	short s_data; // 2
-	int l_data; // 4
+	long l_data; // 4
 
 	//printf("DecodeChunk(0x%04X, 0x%08X) starts.\n",chunk.type,chunk.size);
 	//getch();
@@ -114,14 +113,14 @@ int DecodeChunk(ChunkIFF chunk,FILE *inputFile)
 		char *tmpdata = new char[chunk.size];
 		fread(tmpdata,chunk.size,1,inputFile);
 		if (!destFlag) printf(" * 0x0911 EOBJ_CHUNK_0911\n"); 
-		delete tmpdata;
+		delete [] tmpdata;
 		return 1;}
 	case 0x0912:{
 		char *tmpdata = new char[chunk.size];
 		fread(tmpdata,chunk.size,1,inputFile);
 		if (!destFlag) printf(" * 0x0912 EOBJ_CHUNK_USERDATA\n"); 
     printf("   %s\n",tmpdata); 
-		delete tmpdata;
+		delete [] tmpdata;
 		return 1;}
 	case 0x0925:{
 		fread(&c_data,chunk.size,1,inputFile);
@@ -154,7 +153,7 @@ int DecodeChunk(ChunkIFF chunk,FILE *inputFile)
 		char *tmpdata = new char[chunk.size];
 		fread(tmpdata,chunk.size,1,inputFile);
 		if (!destFlag) printf(" + 0x1001 EMESH_CHUNK_MESHNAME = %s\n",tmpdata); 
-		delete tmpdata;
+		delete [] tmpdata;
 		return 1;}
 
 	case 0x1004:{
@@ -175,7 +174,7 @@ int DecodeChunk(ChunkIFF chunk,FILE *inputFile)
 		char *tmpdata = new char[chunk.size];
 		fread(tmpdata,chunk.size,1,inputFile);
 		if (!destFlag) printf(" + 0x1010 EMESH_CHUNK_OPTIONS\n"); 
-		delete tmpdata;
+		delete [] tmpdata;
 		return 1;}
 
 	case 0x1005:{
@@ -193,13 +192,13 @@ int DecodeChunk(ChunkIFF chunk,FILE *inputFile)
 				} // else 
 				// for (cnt = 0; cnt < v.count; cnt++) 
 				  // printf("%05d v %f %f %f\n",cnt,vtx[cnt].x,vtx[cnt].y,vtx[cnt].z);
-				delete vtx;
+				delete [] vtx;
 
 			if ((chunk.size-4) > (v.count * 12)) 
 			{
     		char *tmpdata = new char[chunk.size-4-(v.count*12)];
         fread(tmpdata,chunk.size-4-(v.count*12),1,inputFile); // fake read
-     		delete tmpdata;
+     		delete [] tmpdata;
      		printf("chunk is reduced !!!!!!!!\n");
      	}
 
@@ -221,21 +220,21 @@ int DecodeChunk(ChunkIFF chunk,FILE *inputFile)
 				 printf("%05d f %d/%d/%d (%d/%d/%d)\n",cnt,
          fcs[cnt].v0,fcs[cnt].v1,fcs[cnt].v2,
          fcs[cnt].vref0,fcs[cnt].vref1,fcs[cnt].vref2); 
-				delete fcs;
+				delete [] fcs;
 		return 1;}
 
 	case 0x1013:{
 			if (destFlag) printf("e=%d, ", chunk.size >> 2); else
 				printf(" + 0x1013 EMESH_CHUNK_SG: elements=%d\n", chunk.size >> 2); 
 
-				int *ints = new int[chunk.size >> 2];
+				long *ints = new long[chunk.size >> 2];
 				fread(ints,chunk.size,1,inputFile);
 				if (destFlag) {
 					for (cnt = 0; cnt < (chunk.size >> 2); cnt++) ; // fprintf(outputFile, "%05d sg 0x%08x\n",cnt,ints[cnt]);
 				}//  else 
 				 //for (cnt = 0; cnt < (chunk.size >> 2); cnt++) 
 				  //printf("%05d sg 0x%08x\n",cnt,ints[cnt]);
-				delete ints;
+				delete [] ints;
 		return 1;}
 
 	case 0x1008:{
@@ -245,7 +244,7 @@ int DecodeChunk(ChunkIFF chunk,FILE *inputFile)
 
         l_data = chunk.size - 4; // header
         uvmap vm;
-        int k = 0;
+        long k = 0;
 				while (l_data > 0)
 				{
         fread(&vm.count,1,1,inputFile);
@@ -265,21 +264,21 @@ int DecodeChunk(ChunkIFF chunk,FILE *inputFile)
 				printf(" + 0x1009 EMESH_CHUNK_SFACE: materials=%d\n", s_data); 
 		char *tmpdata = new char[chunk.size-2];
 		fread(tmpdata,chunk.size-2,1,inputFile);
-		int p = 0;
-		for (int j=0;j<s_data;j++)
+		long p = 0;
+		for (long j=0;j<s_data;j++)
 		{
 		printf("material - %d of %d\n",j,s_data);
 		printf("name: ");p+=printf("%s\n",&tmpdata[p]);
-		int facets, ind;
-		memcpy(&facets,&tmpdata[p],sizeof(int)); p+=4;
+		long facets, ind;
+		memcpy(&facets,&tmpdata[p],sizeof(long)); p+=4;
 		printf("facets: %d\n",facets);  
-		for (int i=0;i<facets;i++)
+		for (long i=0;i<facets;i++)
 		{
-		memcpy(&ind,&tmpdata[p],sizeof(int)); p+=4;
+		memcpy(&ind,&tmpdata[p],sizeof(long)); p+=4;
 		printf("ind %d face %d\n",i,ind);
 		}
 		}
-		delete tmpdata;
+		delete [] tmpdata;
 		return 1;}
 
 	case 0x1012:{
@@ -287,14 +286,14 @@ int DecodeChunk(ChunkIFF chunk,FILE *inputFile)
 			if (destFlag) printf("txmaps=%d, ", l_data); else
 				printf(" + 0x1012 EMESH_CHUNK_VMAPS_2: tables=%d\n", l_data); 
 	txmap *tm = new txmap[l_data];
-	for (int j=0;j<l_data;j++)
+	for (long j=0;j<l_data;j++)
 	{
-		int pos = ftell(inputFile);
+		long pos = ftell(inputFile);
 		fread(&tm[j].name,MAX_T_LEN,1,inputFile);
-		fseek(inputFile, pos+lstrlen(tm[j].name)+1, SEEK_SET); 
+		fseek(inputFile, pos+strlen(tm[j].name)+1, SEEK_SET); 
 		
 		fread(&tm[j].dim,sizeof(txmap)-MAX_T_LEN,1,inputFile);
-		int tcnt = (tm[j].txcount);
+		long tcnt = (tm[j].txcount);
 
     printf(" tmap '%s' %d of %d, dim %d, tcnt = %d, polymap = %d, type = %d\n",
             tm[j].name,j,l_data,tm[j].dim,tm[j].txcount,tm[j].polymap,tm[j].type);
@@ -311,7 +310,7 @@ int DecodeChunk(ChunkIFF chunk,FILE *inputFile)
 				 for (cnt = 0; cnt < tcnt; cnt++) ;
 				 //printf("%05d uv %f %f\n",cnt, vm[cnt].u, vm[cnt].v);
 
-					delete vm;
+					delete [] vm;
 				}
 				pos = ftell(inputFile);
 				
@@ -323,15 +322,15 @@ int DecodeChunk(ChunkIFF chunk,FILE *inputFile)
 				fseek(inputFile, pos, SEEK_SET);
 				
 	}
-	delete tm;
+	delete [] tm;
 		return 1;}
 	case 0x0907:{
 		fread(&l_data,4,1,inputFile);
     printf(" + 0x0907 EOBJ_CHUNK_SURFACES_2 - materials: %d\n",l_data);
 		char *tmpdata = new char[chunk.size-4];
 		fread(tmpdata,chunk.size-4,1,inputFile);
-		int p = 0;
-		for (int j=0;j<l_data;j++)
+		long p = 0;
+		for (long j=0;j<l_data;j++)
 		{
 		printf("material - %d of %d\n",j,l_data);
 		printf("mat_name: ");p+=printf("%s\n",&tmpdata[p]);
@@ -347,21 +346,21 @@ int DecodeChunk(ChunkIFF chunk,FILE *inputFile)
 		printf("unk: 0x%08X\n",m.unk);
     p+=12; 
 		}
-		delete tmpdata;
+		delete [] tmpdata;
 		return 1;}
 	case 0x0922:{
     printf(" + 0x0922 EOBJ_CHUNK_REVISION\n");
 		char *tmpdata = new char[chunk.size];
 		fread(tmpdata,chunk.size,1,inputFile);
-		int p = 0;
+		long p = 0;
 		printf("creator: ");p+=printf("%s\n",&tmpdata[p]);
-		int time;
-		memcpy(&time,&tmpdata[p],sizeof(int));
+		long time;
+		memcpy(&time,&tmpdata[p],sizeof(long));
 		printf("time: 0x%08X\n",time); p+=8; 
 		printf("last_creator: ");p+=printf("%s\n",&tmpdata[p]);
-		memcpy(&time,&tmpdata[p],sizeof(int));
+		memcpy(&time,&tmpdata[p],sizeof(long));
 		printf("time: 0x%08X\n",time);
-		delete tmpdata;
+		delete [] tmpdata;
 		return 1;}
  	default:{
     printf(" + 0x%04X EOBJ_CHUNK_??? = %d\n", chunk.type,chunk.size);
@@ -378,9 +377,14 @@ int main(int argc, char* argv[])
 	char fileName[256];
   FILE *inputFile;
 
- 	printf("X-Ray OBJECT parser [201005xx]\n");
+ 	printf("X-Ray OBJECT parser [201012xx]\n");
+	if (argc < 2) 
+  {
+		printf("usage: parse_obj < srcfile.object >\n");
+		return 1;
+	}
 
-	if (lstrcpy((char*)fileName,argv[1]) == 0) 
+	if (strcpy((char*)fileName,argv[1]) == 0) 
   {
  	printf("ERR: no argument given.\n");
   return 1;
@@ -394,10 +398,10 @@ int main(int argc, char* argv[])
 
 	fseek(inputFile,0,SEEK_SET);
 
-	while (TRUE)
+	for (;;)
 	{
 label:
-	if (fread( &chunk.type, 4, 1, inputFile ) == 0) break;
+	if (fread( &chunk, 4, 1, inputFile ) == 0) break;
 
 	if (chunk.type ==0x7777) { fseek(inputFile,8,SEEK_SET); fullsize+=8; goto label; }
 
@@ -414,7 +418,7 @@ label:
   fullsize+= 8;fullsize+= chunk.size;
 	// sub#1
   subfullsize = chunk.size;
-	while (TRUE)
+	for (;;)
 	{
   fread( &chunk, 8, 1, inputFile );
 	printf("--> SubChunk #:0x%04X, size is 0x%08X (%u)\n",chunk.type,chunk.size,chunk.size);
@@ -422,7 +426,7 @@ label:
 	if (chunk.type == subid) {
 	// sub#2
   subsubfullsize = chunk.size;
-	while (TRUE)
+	for (;;)
 	{
   fread( &chunk, 8, 1, inputFile );
 	printf("----> Chunk #:0x%04X, size is 0x%08X (%u)\n",chunk.type,chunk.size,chunk.size);
