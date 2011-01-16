@@ -700,7 +700,7 @@ void level_tools::export_for_level_editor(level_mesh* mesh)
 	xr_object* terrain_object = 0;
 
 	std::string terrain_name;
-
+	// gr1ph starts
 	msg("exporting visuals");
 	for (b_model_vec_cit it = mesh->models().begin(), end = mesh->models().end(); it != end; ++it) {
 		if (it->type() == b_model::MT_TERRAIN) {
@@ -709,16 +709,22 @@ void level_tools::export_for_level_editor(level_mesh* mesh)
 			terrain_object = new xr_object(this);
 			make_object_ref(terrain_name, "terrain");
 			xr_mesh* mesh1 = mesh->commit(*terrain_object, *it);
-			mesh1->name() = "terrainShape";
-			register_sector_item(it->sector(0), "terrain", mesh1->name());
+			if (mesh1 != NULL)
+			{
+				mesh1->name() = "terrainShape";
+				register_sector_item(it->sector(0), "terrain", mesh1->name());
+			}
 		} else if (it->type() == b_model::MT_FAKE) {
 			xr_assert(it->num_instances() == 1);
 			if (fake_object == 0)
 				fake_object = new xr_object(this);
 			xr_mesh* mesh1 = mesh->commit(*fake_object, *it);
 			mesh1->name().assign(fake_name.get()).append("Shape");
-			register_sector_item(it->sector(0), "fake", mesh1->name());
-			fake_name.next();
+			if (mesh1 != NULL)
+			{
+				register_sector_item(it->sector(0), "fake", mesh1->name());
+				fake_name.next();
+			}
 		} else if (it->type() == b_model::MT_RAW) {
 			xr_assert(m_rmode == RM_RAW);
 			xr_assert(it->num_instances() == 1);
@@ -734,36 +740,43 @@ void level_tools::export_for_level_editor(level_mesh* mesh)
 				mesh1 = mesh->commit(*sectors_object, *it);
 			}
 			mesh1->name().assign(raw_names[sector_idx].get()).append("Shape");
-			raw_names[sector_idx].next();
-			register_sector_item(sector_idx, sector_idx == m_default_sector_idx ?
-					"default" : "sectors", mesh1->name());
+			if (mesh1 != NULL)
+			{
+				raw_names[sector_idx].next();
+				register_sector_item(sector_idx, sector_idx == m_default_sector_idx ?
+						"default" : "sectors", mesh1->name());
+			}
 		} else {
 			xr_assert(it->type() == b_model::MT_MODEL || it->type() == b_model::MT_MU_MODEL);
 			xr_object* object = new xr_object(this);
 			xr_mesh* mesh1 = mesh->commit(*object, *it);
-			mesh1->name() = "modelShape";
-			object->denominate_surfaces();
-			std::string reference;
-			xr_name_gen name;
-			if (it->type() == b_model::MT_MU_MODEL) {
-				object->flags() = EOF_MULTIPLE_USAGE;
-				name.init(mu_model_name.get());
-				make_object_ref(reference, mu_model_name.get());
-				mu_model_name.next();
-			} else {
-				name.init(model_name.get());
-				make_object_ref(reference, model_name.get());
-				model_name.next();
-			}
-			object->save_object(PA_OBJECTS, reference + ".object");
-			uint32_t age = xr_file_system::instance().file_age(PA_OBJECTS, reference + ".object");
-			for (size_t i = 0, n = it->num_instances(); i != n; ++i, name.next()) {
-				register_scene_object(name.get(), reference, it->xform(i), age);
-				register_sector_item(it->sector(i), name.get(), mesh1->name());
+			if (mesh1 != NULL)
+			{
+				mesh1->name() = "modelShape";
+				object->denominate_surfaces();
+				std::string reference;
+				xr_name_gen name;
+				if (it->type() == b_model::MT_MU_MODEL) {
+					object->flags() = EOF_MULTIPLE_USAGE;
+					name.init(mu_model_name.get());
+					make_object_ref(reference, mu_model_name.get());
+					mu_model_name.next();
+				} else {
+					name.init(model_name.get());
+					make_object_ref(reference, model_name.get());
+					model_name.next();
+				}
+				object->save_object(PA_OBJECTS, reference + ".object");
+				uint32_t age = xr_file_system::instance().file_age(PA_OBJECTS, reference + ".object");
+				for (size_t i = 0, n = it->num_instances(); i != n; ++i, name.next()) {
+					register_scene_object(name.get(), reference, it->xform(i), age);
+					register_sector_item(it->sector(i), name.get(), mesh1->name());
+				}
 			}
 			delete object;
 		}
 	}
+	// gr1ph ends
 	delete raw_names;
 
 	if (fake_object) {

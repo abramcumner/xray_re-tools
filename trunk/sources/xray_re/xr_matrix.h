@@ -92,6 +92,10 @@ template<typename T> struct _matrix {
 	void		get_xyz_i(T& x, T& y, T& z) const;
 	void		get_xyz_i(_vector3<T>& v) const;
 
+	// gr1ph starts
+	bool		can_invert_43(void) const;
+	//gr1ph ends
+
 	// these will operate with "canonical" euler angles
 	_matrix<T>&	set_euler_xyz(T x, T y, T z);
 	_matrix<T>&	set_euler_xyz(const _vector3<T>& v);
@@ -265,6 +269,16 @@ template<typename T> inline _matrix<T>& _matrix<T>::mul_a_43(const _matrix<T>& a
 template<typename T> inline _matrix<T>& _matrix<T>::mul_b_43(const _matrix<T>& b)
 {
 	return mul_43(_matrix<T>().set(*this), b);
+}
+
+template<typename T> bool _matrix<T>::can_invert_43(void) const
+{
+	T cf1 = _22*_33 - _23*_32;
+	T cf2 = _21*_33 - _23*_31;
+	T cf3 = _21*_32 - _22*_31;
+	T det = _11*cf1 - _12*cf2 + _13*cf3;
+	
+	return (!equivalent<T>(det, 0, 0.0000001f));
 }
 
 template<typename T> _matrix<T>& _matrix<T>::invert_43(const _matrix<T>& a)

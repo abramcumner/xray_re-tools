@@ -177,6 +177,13 @@ xr_mesh* level_mesh::commit(xr_object& object, const b_model& model, uint32_t in
 
 xr_mesh* level_mesh::commit(xr_object& object, const b_model_instance* instance) const
 {
+	//gr1ph starts
+	if (!instance->xform.can_invert_43())
+	{
+		msg("skipping mesh %d", instance->model_id);
+		return NULL;
+	}
+	// gr1ph ends
 	xr_assert(instance->num_faces);
 	xr_assert(instance->num_faces > 1);
 	xr_assert(instance->min_face < instance->max_face);
