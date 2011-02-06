@@ -329,6 +329,12 @@ void syncer::upgrade(int bld_ver)
 	check_or_create_fs_path(PA9_GAME_DATA, status, true);
 	check_or_create_fs_path(PA9_GAME_SPAWN, status, true);
 	check_or_create_fs_path(PA9_GAME_LEVELS, status, true);
+	
+	check_or_create_fs_path(PA10_FS_ROOT, status);
+	check_or_create_fs_path(PA10_GAME_DATA, status, true);
+	check_or_create_fs_path(PA10_GAME_SPAWN, status, true);
+	check_or_create_fs_path(PA10_GAME_LEVELS, status, true);
+
 	if (!status)
 		throw sync_error();
 
@@ -343,6 +349,59 @@ void syncer::upgrade(int bld_ver)
 
 	if (bld_ver >= 3502) {
 		msg("upgrading spawn version");
+	char *PA_UPG_GAME_SPAWN = NULL;
+	char *PA_UPG_GAME_LEVELS = NULL;
+	char *PA_UPG_LEVEL = NULL;
+
+	if (bld_ver >= 3870) {
+		load_system_ini(PA10_GAME_CONFIG);
+		PA_UPG_GAME_LEVELS = (char *)PA10_GAME_LEVELS;
+		PA_UPG_LEVEL = (char *)PA10_LEVEL;
+		PA_UPG_GAME_SPAWN = (char *)PA10_GAME_SPAWN;
+		msg("upgrading spawn version to CoP format");
+		xr_entity_vec* gs = new xr_entity_vec;
+		int i = 0;
+		for (xr_entity_vec_it it = gspawn.spawns().begin(),
+				end = gspawn.spawns().end(); it != end; ++it) {
+			cse_abstract* entity = *it;
+
+			if (get_entity_clsid(entity->name()) != &entity->clsid())
+			{
+				cse_abstract* new_entity = create_entity(entity->name());
+				xr_packet packet;
+
+				entity->spawn_write(packet, true);
+				new_entity->spawn_read(packet);
+
+				packet.clear();
+				entity->update_write(packet);
+				new_entity->update_read(packet);
+
+				new_entity->version() = CSE_VERSION_COP;
+				new_entity->script_version() = 12;
+				new_entity->spawn_id() = i++;
+				
+				gs->push_back(new_entity);
+			}
+			else
+			{
+				entity->version() = CSE_VERSION_COP;
+				entity->script_version() = 12;
+				entity->spawn_id() = i++;
+
+				gs->push_back(entity);
+			}
+		}
+		gspawn.spawns() = *gs;
+	}
+	else if (bld_ver >= 3502) {
+		load_system_ini(PA9_GAME_CONFIG);
+		PA_UPG_GAME_LEVELS = (char *)PA9_GAME_LEVELS;
+		PA_UPG_LEVEL = (char *)PA9_LEVEL;
+		PA_UPG_GAME_SPAWN = (char *)PA9_GAME_SPAWN;
+		msg("upgrading spawn version to CS format");
+		xr_entity_vec* gs = new xr_entity_vec;
+		int i = 0;
 		for (xr_entity_vec_it it = gspawn.spawns().begin(),
 				end = gspawn.spawns().end(); it != end; ++it) {
 			cse_abstract* entity = *it;
@@ -359,22 +418,22 @@ void syncer::upgrade(int bld_ver)
 		if (!fs.folder_exist(PA_GAME_LEVELS, name))
 			continue;
 
-		if (!fs.folder_exist(PA9_GAME_LEVELS, name)) {
-			msg("creating %s\\%s\\", PA9_GAME_LEVELS, name);
-			if (!fs.create_folder(PA9_GAME_LEVELS, name))
+		if (!fs.folder_exist(PA_UPG_GAME_LEVELS, name)) {
+			msg("creating %s\\%s\\", PA_UPG_GAME_LEVELS, name);
+			if (!fs.create_folder(PA_UPG_GAME_LEVELS, name))
 				throw sync_error();
 		}
 
 		fs.update_path(PA_LEVEL, PA_GAME_LEVELS, name);
-		fs.update_path(PA9_LEVEL, PA9_GAME_LEVELS, name);
+		fs.update_path(PA_UPG_LEVEL, PA_UPG_GAME_LEVELS, name);
 
 		xr_level_ai ai;
 		msg("loading %s\\%s\\%s", PA_GAME_LEVELS, name, "level.ai");
 		if (!ai.load(PA_LEVEL, "level.ai"))
 			throw sync_error();
 		ai.version() = new_ai_version;
-		msg("saving %s\\%s\\%s", PA9_GAME_LEVELS, name, "level.ai");
-		if (!ai.save(PA9_LEVEL, "level.ai"))
+		msg("saving %s\\%s\\%s", PA_UPG_GAME_LEVELS, name, "level.ai");
+		if (!ai.save(PA_UPG_LEVEL, "level.ai"))
 			throw sync_error();
 
 		xr_level_gct gct;
@@ -390,8 +449,8 @@ void syncer::upgrade(int bld_ver)
 			msg("loading %s\\%s\\%s", PA_GAME_LEVELS, name, "level.env_mod");
 			if (env_mod.load(PA_LEVEL, "level.env_mod")) {
 				env_mod.version() = ENV_MOD_VERSION_23;
-				msg("saving %s\\%s\\%s", PA9_GAME_LEVELS, name, "level.env_mod");
-				if (!env_mod.save(PA9_LEVEL, "level.env_mod"))
+				msg("saving %s\\%s\\%s", PA_UPG_GAME_LEVELS, name, "level.env_mod");
+				if (!env_mod.save(PA_UPG_LEVEL, "level.env_mod"))
 					throw sync_error();
 			}
 
@@ -399,16 +458,16 @@ void syncer::upgrade(int bld_ver)
 			msg("loading %s\\%s\\%s", PA_GAME_LEVELS, name, "level.ps_static");
 			if (ps_static.load(PA_LEVEL, "level.ps_static")) {
 				ps_static.version() = PS_VERSION_1;
-				msg("saving %s\\%s\\%s", PA9_GAME_LEVELS, name, "level.ps_static");
-				if (!ps_static.save(PA9_LEVEL, "level.ps_static"))
+				msg("saving %s\\%s\\%s", PA_UPG_GAME_LEVELS, name, "level.ps_static");
+				if (!ps_static.save(PA_UPG_LEVEL, "level.ps_static"))
 					throw sync_error();
 			}
 		}
 	}
 //	msg("moving actor to military");
 //	move_actor(gspawn.spawns(), -334.578491210938f, -25.5103607177734f, 45.0102348327637f, 16231, 1546);
-	msg("saving %s\\%s", PA9_GAME_SPAWN, "all.spawn");
-	if (!gspawn.save(PA9_GAME_SPAWN, "all.spawn"))
+	msg("saving %s\\%s", PA_UPG_GAME_SPAWN, "all.spawn");
+	if (!gspawn.save(PA_UPG_GAME_SPAWN, "all.spawn"))
 		throw sync_error();
 }
 

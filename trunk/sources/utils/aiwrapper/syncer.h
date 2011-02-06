@@ -42,6 +42,13 @@ const char PA9_GAME_SPAWN[] = "$cs_game_spawn$";
 const char PA9_GAME_LEVELS[] = "$cs_game_levels$";
 const char PA9_LEVEL[] = "$cs_level$";
 
+const char PA10_FS_ROOT[] = "$cop_fs_root$";
+const char PA10_GAME_DATA[] = "$cop_game_data$";
+const char PA10_GAME_CONFIG[] = "$cop_game_config$";
+const char PA10_GAME_SPAWN[] = "$cop_game_spawn$";
+const char PA10_GAME_LEVELS[] = "$cop_game_levels$";
+const char PA10_LEVEL[] = "$cop_level$";
+
 namespace xray_re {
 	class cse_abstract;
 	class xr_writer;

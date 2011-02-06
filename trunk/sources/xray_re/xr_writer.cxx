@@ -63,7 +63,6 @@ void xr_writer::w_s(const std::string& value)
 
 void xr_writer::w_sf(const char* format, ...)
 {
-	char buf[1024];
 	va_list ap;
 	va_start(ap, format);
 #if defined(_MSC_VER) && _MSC_VER >= 1400

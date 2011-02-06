@@ -31,7 +31,7 @@ const void usage()
 	printf(" -split_paths	restore level.game files from all.spawn\n");
 	printf(" -split_graphs	restore level.graph files from all.spawn/game.graph\n");
 	printf(" -check_paths	check walk paths in all.spawn\n");
-	printf(" -upgrade <BLD>	convert levels into Clear Sky format\n\n");
+	printf(" -upgrade <BLD>	convert levels into CS (3502) or CoP (3870) format\n\n");
 	printf("Deprecated options:\n");
 	printf(" -m2 <FILE>	adjust level graphs according to <FILE> and merge them\n");
 	printf(" -dump_gp	dump list of graph points in all level.spawn files\n");

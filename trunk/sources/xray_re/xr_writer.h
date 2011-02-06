@@ -78,6 +78,8 @@ public:
 
 private:
 	std::stack<size_t>	m_open_chunks;
+
+	char buf[8192];
 };
 
 class xr_fake_writer: public xr_writer {
