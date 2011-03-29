@@ -1,0 +1,63 @@
+CSE_ABSTRACT
+							{ name => 'dummy16',		type => 'h16',	default => 0x0001 },
+							{ name => 'section_name',	type => 'sz',	default => '' },	# 0x40
+							{ name => 'name',		type => 'sz',	default => '' },	# 0x11c
+							{ name => 's_gameid',		type => 'h8',	default => 0 },		# 0x44
+							{ name => 's_rp',		type => 'h8',	default => 0xfe },	# 0x45
+							{ name => 'position',		type => 'f32v3',default => [] },	# 0x58
+							{ name => 'direction',		type => 'f32v3',default => [] },	# 0x64
+							{ name => 'respawn_time',	type => 'h16',	default => 0 },		# 0x34
+							{ name => 'unknown_id',		type => 'h16',	default => 0xffff },	# 0x36
+							{ name => 'parent_id',		type => 'h16',	default => 0xffff },	# 0x38
+							{ name => 'phantom_id',		type => 'h16',	default => 0xffff },	# 0x3a
+							{ name => 's_flags',		type => 'h16',	default => 0x21 },	# 0x46
+если s_flags >> 5 == 1 		{ name => 'version',		type => 'u16',	default => 109 },	# 0x30 
+со 121				 		{ name => 'cse_abstract__unk1_u16',		type => 'u16',	default => 109 },	# 0x30 
+с 70 						{ name => 'script_version',	type => 'u16',	default => 2 },		# 0x32
+с 71 u8, с 94 u16			{ name => 'cse_abstract__unk2_u16',	type => 'u16',	default => 0 },		# 0x34
+с 79						{ name => 'spawn_id',	type => 'u16',	default => 0 },		# 0x34
+с 83 по 111					{ name => 'spawn_probability',	type => 'f32',	default => 1.0 },		# 0x34
+с 84 по 111					{ name => 'spawn_flags',	type => 'u32',	default => 31 },		# 0x34
+с 84 по 111					{ name => 'spawn_control',		type => 'sz',	default => '' },	# 0x36
+с 84 по 111					{ name => 'max_spawn_count',		type => 'u32',	default => 1 },	# 0x38
+с 84 по 111					{ name => 'spawn_count',		type => 'u32',	default => 0 },	# 0x3a
+с 84 по 111					{ name => 'last_spawn_time',		type => 'u64',	default => 0 },	# 0x46
+с 85 по 111					{ name => 'min_spawn_interval',		type => 'u64',	default => 0 },	# 0x30
+с 85 по 111					{ name => 'max_spawn_interval',	type => 'u64',	default => 0 },		# 0x32
+							{ name => 'extended size',	type => 'u16',	default => 0 },	# 0xa4
+							
+CSE_MOTION
+							{ name => 'motion_name', type => 'sz', default => '' },		# 0x04
+							
+CSE_VISUAL
+							{ name => 'visual_name',	type => 'sz',	default => '' },	# 0x04
+c 104						{ name => 'visual_flags',	type => 'h8',	default => 0 },		# 0x0c
+
+CSE_PH_SKELETON
+							{ name => 'skeleton_name',	type => 'sz',	default => '$editor' },	# smthg|0x08
+							{ name => 'skeleton_flags',	type => 'u8',	default => 0 },		# 0x08
+							{ name => 'source_id',		type => 'h16',	default => 0xffff },	# 0x48
+						
+CSE_ALIFE_GRAPH_POINT						
+							{ name => 'connection_point_name',	type => 'sz',	default => '' },	# 0xa4
+с 34 sz, до 34 u32			{ name => 'connection_level_name',	type => 'sz',	default => '' },	# 0x100
+							{ name => 'location0',			type => 'u8',	default => 0 },		# 0xa8
+							{ name => 'location1',			type => 'u8',	default => 0 },		# 0xa9
+							{ name => 'location2',			type => 'u8',	default => 0 },		# 0xaa
+							{ name => 'location3',			type => 'u8',	default => 0 },		# 0xab
+					
+CSE_ALIFE_OBJECT			
+c 1 до 24					{ name => 'cse_alife_object__unk1_u8',	type => 'u8'},	# 0xa4
+c 25 до 82					{ name => 'cse_alife_object__unk1_f32',	type => 'f32'},	# 0xa4
+c 1 до 82					{ name => 'cse_alife_object__unk2_s32',	type => 's32'},	# 0xa4
+c 1	до 3					{ name => 'cse_alife_object__unk3_u16',	type => 'u16'},	# 0xa4		
+c 1							{ name => 'game_vertex_id',	type => 'u16',	default => 0xffff },	# 0xa4
+с 1							{ name => 'distance',		type => 'f32',	default => 0.0 },	# 0xa8
+с 4							{ name => 'direct_control',	type => 'u32',	default => 1 },		# 0xad
+с 8							{ name => 'level_vertex_id',	type => 'u32',	default => 0xffffffff },# 0xb0
+с 23 до 78					{ name => 'spawn_id',	type => 'u16',	default => 0 },		# 0x34
+с 22 по 83					{ name => 'spawn_control',		type => 'sz',	default => '' },	# 0x36
+с 50						{ name => 'object_flags',	type => 'h32',	default => 0 },		# 0xb4
+с 57						{ name => 'custom_data',	type => 'sz',	default => ''},	
+с 62						{ name => 'story_id',		type => 's32',	default => -1 },	# 0xb8
+с 112						{ name => 'spawn_story_id',		type => 's32',	default => -1 },	# 0xb8
