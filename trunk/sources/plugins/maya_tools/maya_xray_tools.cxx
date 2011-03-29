@@ -113,7 +113,6 @@ public:
 	virtual MStatus		reader(const MFileObject& file, const MString& options, FileAccessMode mode);
 	virtual bool		haveReadMethod() const;
 	virtual MString		defaultExtension() const;
-	virtual MString		filter() const;
 	virtual MFileKind	identifyFile(const MFileObject& file, const char* buffer, short size) const;
 
 	static void*		creator();
@@ -209,7 +208,7 @@ bool maya_object_translator::canBeOpened() const { return true; }
 
 MPxFileTranslator::MFileKind maya_object_translator::identifyFile(const MFileObject& file, const char* buffer, short size) const
 {
-	return extract_extension(file) == MString("object") ? kIsMyFileType : kNotMyFileType;
+	return extract_extension(file) == defaultExtension() ? kIsMyFileType : kNotMyFileType;
 }
 
 void* maya_object_translator::creator() { return new maya_object_translator; }
@@ -237,7 +236,7 @@ MString maya_skl_object_writer::defaultExtension() const { return MString("objec
 
 MPxFileTranslator::MFileKind maya_skl_object_writer::identifyFile(const MFileObject& file, const char* buffer, short size) const
 {
-	return extract_extension(file) == MString("object") ? kIsMyFileType : kNotMyFileType;
+	return extract_extension(file) == defaultExtension() ? kIsMyFileType : kNotMyFileType;
 }
 
 void* maya_skl_object_writer::creator() { return new maya_skl_object_writer; }
@@ -404,8 +403,6 @@ MStatus maya_skls_reader::reader(const MFileObject& file, const MString& options
 bool maya_skls_reader::haveReadMethod() const { return true; }
 
 MString maya_skls_reader::defaultExtension() const { return MString("skls"); }
-
-MString maya_skls_reader::filter() const { return MString("*.skls"); }
 
 MPxFileTranslator::MFileKind maya_skls_reader::identifyFile(const MFileObject& file, const char* buffer, short size) const
 {
