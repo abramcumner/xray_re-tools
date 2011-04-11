@@ -18,12 +18,12 @@ void xr_texture_thumbnail::load(xr_reader& r)
 		xr_not_expected();
 	xr_assert(version == THM_VERSION_TEXTUREPARAM);
 
-	xr_reader* s = r.open_chunk(THM_CHUNK_DATA);
-	xr_assert(s);
-	data = new uint8_t[s->size()];
-	s->r_raw(data, s->size());
-	r.close_chunk(s);
-
+	if (r.find_chunk(THM_CHUNK_DATA)) {
+		xr_reader* s = r.open_chunk(THM_CHUNK_DATA);
+		data = new uint8_t[s->size()];
+		s->r_raw(data, s->size());
+		r.close_chunk(s);
+	}
 	uint32_t thm_type;
 	if (!r.r_chunk(THM_CHUNK_TYPE, thm_type))
 		xr_not_expected();
