@@ -11,7 +11,7 @@
 
 using namespace xray_re;
 
-static inline rgba32 to_rgba32(const fvector3& v) { return fcolor().set(v.x, v.y, v.z).get(); }
+static inline rgba32 to_rgba32(const fvector3& v) { return fcolor().set(v.z, v.y, v.x).get(); }
 
 void level_tools::reconstruct_spawns()
 {
