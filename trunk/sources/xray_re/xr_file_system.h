@@ -116,6 +116,7 @@ const char PA_GAME_MESHES[] = "$game_meshes$";
 const char PA_GAME_TEXTURES[] = "$game_textures$";
 const char PA_GAME_LEVELS[] = "$game_levels$";
 const char PA_GAME_SPAWN[] = "$game_spawn$";
+const char PA_GAME_SOUNDS[] = "$game_sounds$";
 const char PA_LEVEL[] = "$level$";
 const char PA_LOGS[] = "$logs$";
 const char PA_SOUNDS[] = "$sounds$";

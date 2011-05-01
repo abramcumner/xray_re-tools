@@ -47,8 +47,8 @@ void usage()
 	printf("	le2	split into terrain, raw edge-linked groups, MU models\n");
 	printf(" -with_lods	produce LOD textures for MU models\n");
 	printf(" -fancy <SPEC>	scale detail models and fix fences according to <SPEC>\n\n");
-//	printf("OGG/WAV options:\n");
-//	printf(" -ogg2wav	restore *.wav/*.thm in $sounds$ using *.ogg from $game_sounds$\n\n");
+	printf("OGG/WAV options:\n");
+	printf(" -ogg2wav	restore *.wav/*.thm in $sounds$ using *.ogg from $game_sounds$\n\n");
 	printf("DDS/TGA options:\n");
 	printf(" -dds2tga	restore *.tga in $textures$ using *.dds from $game_textures$\n");
 	printf(" -with_solid	don't ignore non-transparent textures (for xrLC -gi)\n");
@@ -175,7 +175,8 @@ int main(int argc, char* argv[])
 	const char* fs_spec = 0;
 	if (format == tools_base::TOOLS_LEVEL ||
 			format == tools_base::TOOLS_DDS ||
-			format == tools_base::TOOLS_FANCY) {
+			format == tools_base::TOOLS_FANCY ||
+			format == tools_base::TOOLS_OGG) {
 		if (!cl.get_string("-fs", fs_spec))
 			fs_spec = DEFAULT_FS_SPEC;
 		if (!xr_file_system::file_exist(fs_spec)) {

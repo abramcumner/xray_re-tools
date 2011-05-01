@@ -9,6 +9,13 @@
 class ogg_tools: public tools_base {
 public:
 	virtual void	process(const cl_parser& cl);
+
+private:
+	bool		check_paths() const;
+	void		process_folder(const std::string& path = "");
+	void		process_file(const std::string& path);
+
+	std::string	m_sounds;
 };
 
 #endif
