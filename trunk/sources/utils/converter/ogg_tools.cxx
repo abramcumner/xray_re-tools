@@ -117,6 +117,8 @@ void ogg_tools::process_file(const std::string& path)
 	std::string src; fs.resolve_path(PA_GAME_SOUNDS, path, src);
 	std::string dest_path(path); dest_path.replace(offs, 4, ".wav");
 	std::string dest; fs.resolve_path(PA_SOUNDS, dest_path, dest);
+	std::string folder; fs.split_path(dest, &folder, NULL, NULL);
+	fs.create_path(folder);
 	
 
 	OggVorbis_File vf;
