@@ -8,6 +8,7 @@ assets. It implements the following functions:
  - game level to LE scene conversion
  - game archive packing/unpacking
  - .dds to .tga multi-conversion
+ - .ogg to .wav/.thm multi-conversion
 
 converter is a console application (Start -> Run -> cmd.exe). Tested on
 Windows XP SP2/SP3 only.
@@ -16,8 +17,8 @@ Windows XP SP2/SP3 only.
 [Installation]
 Specify $sdk_root$ in fsconverter.ltx and copy that file into converter
 folder. Do the same with paths in converter.ini (this file can also be
-placed in $sdk_root$). These steps are only needed for -level and
--dds2tga options, otherwise no configuration is required.
+placed in $sdk_root$). These steps are only needed for -level, 
+-dds2tga and ogg2wav options, otherwise no configuration is required.
 
 It is strongly recommended to use -ro option (operation without any
 writing on disk) after any configuration changes.
@@ -86,7 +87,7 @@ Notes:
 
 [game level to LE scene conversion]
 Command line:
- converter -level <build number>:<level_name> [-out <scene_name>] [-mode maya|le|le2]
+ converter -level <build_number>:<level_name> [-out <scene_name>] [-mode maya|le|le2|raw]
 
 Examples:
  converter -level default:l01_escape -out l01_escape -mode le
@@ -151,3 +152,11 @@ $game_textures$ into .tga. Existing .tga files are not overwritten.
 
 Specify -with_solid option to handle the non-transparent textures
 as well as required for xrLC -gi.
+
+
+[.ogg to .wav/.thm multi-conversion]
+Command line:
+ converter -ogg2wav 
+
+The tool converts·.wav/.thm files into·$sounds$ using·*.ogg
+from·$game_sounds$. Existing .wav/.thm files are not overwritten.

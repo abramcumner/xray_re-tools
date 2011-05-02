@@ -1,6 +1,6 @@
 [Inroduction]
 This plugin implements .ogf, .dm, .object, .omf, .skl, .skls import and
-.object è .skl export. 
+.object and .skl export.
 
 The plugin is designed to work as a partial replacement for official
 GSC plugins and is compatible with auxiliary scripts, .mb/.ma files and
