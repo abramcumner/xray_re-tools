@@ -355,10 +355,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\maya_dm_reader.cxx"
-				>
-			</File>
-			<File
 				RelativePath="..\maya_export_tools.cxx"
 				>
 			</File>
@@ -368,26 +364,6 @@
 			</File>
 			<File
 				RelativePath="..\maya_import_tools.cxx"
-				>
-			</File>
-			<File
-				RelativePath="..\maya_object_translator.cxx"
-				>
-			</File>
-			<File
-				RelativePath="..\maya_ogf_reader.cxx"
-				>
-			</File>
-			<File
-				RelativePath="..\maya_omf_reader.cxx"
-				>
-			</File>
-			<File
-				RelativePath="..\maya_skl_translator.cxx"
-				>
-			</File>
-			<File
-				RelativePath="..\maya_skls_reader.cxx"
 				>
 			</File>
 			<File
@@ -405,10 +381,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\maya_dm_reader.h"
-				>
-			</File>
-			<File
 				RelativePath="..\maya_export_tools.h"
 				>
 			</File>
@@ -421,35 +393,13 @@
 				>
 			</File>
 			<File
-				RelativePath="..\maya_object_translator.h"
-				>
-			</File>
-			<File
-				RelativePath="..\maya_ogf_reader.h"
-				>
-			</File>
-			<File
-				RelativePath="..\maya_omf_reader.h"
-				>
-			</File>
-			<File
-				RelativePath="..\maya_skl_translator.h"
-				>
-			</File>
-			<File
-				RelativePath="..\maya_skls_reader.h"
+				RelativePath="..\maya_progress.h"
 				>
 			</File>
 			<File
 				RelativePath="..\maya_xray_material.h"
 				>
 			</File>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
 		</Filter>
 	</Files>
 	<Globals>
