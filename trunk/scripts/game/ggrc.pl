@@ -2,7 +2,7 @@
 #
 # tab size:	8
 #
-#Last edited: 18 Mar 2011, ver.0.3
+#Last edited: 23 Apr 2011, ver.0.4
 #######################################################################
 package gg_header;
 use strict;
@@ -1031,7 +1031,9 @@ sub write {
 		}
 	}
 	$outfile->close();
-	$self->update_level_ai($parent_graph->{header}->{version}, $append_graph->{header}->{version}) if not ::debug();
+	if ($parent_graph->{header}->{version} != $append_graph->{header}->{version}) {
+		$self->update_level_ai($parent_graph->{header}->{version}, $append_graph->{header}->{version}) if not ::debug();
+	}
 	if (::debug()) {
 		print "DEBUG:UPDATING VERTICES IN LEVEL.GCT...\n";
 		foreach my $level (@{$self->{levels}}) {
@@ -1081,70 +1083,63 @@ sub update_level_ai {
 	my $work_dir = getcwd();
 	print "updating level.ai...\n";
 	foreach my $level (@{$self->{levels}}) {
-		print "	updating $level->{level_name}...\n";
-		my $dir = 'levels\\'.$level->{level_name}.'';
-		chdir ($dir);
-		my $ai_file = IO::File->new('level.ai','r') or die 'cannot open level.ai for level'.$level->{level_name}.'';
-		binmode $ai_file;
-		my $data;
-		$ai_file->read($data, 0x38) or die;
-		my (
-			$version,
-			$vertex_count,
-			$cell_size,
-			$factor_y,
-			@box,
-			$neighboors,
-		) = unpack('VVfff6V4', $data);
-		if ($version == $parent_version) {
-			$ai_file->close();
-		} elsif (($version == $append_version) && ($version != $parent_version) && ($version >= 9)) {
-			my $ai_file_new = IO::File->new('level.ai.new','w');
+		if (exists $hash_append_levels{$level->{level_name}}) {
+			print "	updating $level->{level_name}...\n";
+			my $dir = 'levels\\'.$level->{level_name}.'';
+			chdir ($dir);
+			rename 'level.ai', 'level.ai.bak' or (unlink 'level.ai.bak' and rename 'level.ai', 'level.ai.bak');
+			my $ai_file = IO::File->new('level.ai.bak','r') or die 'cannot open level.ai for level'.$level->{level_name}.'';
+			binmode $ai_file;
+			my $data;
+			$ai_file->read($data, 0x38) or die;
+			my (
+				$version,
+				$vertex_count,
+				$cell_size,
+				$factor_y,
+				@box,
+				$neighboors,
+			) = unpack('VVfff6V4', $data);
+			my $ai_file_new = IO::File->new('level.ai,'w');
 			binmode $ai_file_new;
 			my $packet = stkutils::data_packet->new();
 			$packet->pack('VVfff6V4', $parent_version, $vertex_count, $cell_size, $factor_y, @box, $neighboors);
 			$ai_file_new->write($packet->data(), length($packet->data()));
-			for (my $i = 0; $i < $vertex_count; $i++) {
-				my $cell;
-				$ai_file->read($cell, 0x17) or die;
-				my (
-					$junk,
-					$cover,
-					$low_cover,
-					$plane,
-					$packed_xz_lo, $packed_xz_hi,
-					$packed_y,
-				) = unpack("a[12]vvvvCv", $cell);
-				my $cell_packet = stkutils::data_packet->new();
-				$cell_packet->pack('a[12]vvvCv', $junk, $cover, $plane, $packed_xz_lo, $packed_xz_hi, $packed_y);
-				$ai_file_new->write($cell_packet->data(), length($cell_packet->data()));
+			if ($version >= 9) {
+				for (my $i = 0; $i < $vertex_count; $i++) {
+					my $cell;
+					$ai_file->read($cell, 0x17) or die;
+					my (
+						$junk,
+						$cover,
+						$low_cover,
+						$plane,
+						$packed_xz_lo, $packed_xz_hi,
+						$packed_y,
+					) = unpack("a[12]vvvvCv", $cell);
+					my $cell_packet = stkutils::data_packet->new();
+					$cell_packet->pack('a[12]vvvCv', $junk, $cover, $plane, $packed_xz_lo, $packed_xz_hi, $packed_y);
+					$ai_file_new->write($cell_packet->data(), length($cell_packet->data()));
+				}
+			} elsif ($version < 9) {
+				for (my $i = 0; $i < $vertex_count; $i++) {
+					my $cell;
+					$ai_file->read($cell, 0x15) or die;
+					my (
+						$junk,
+						$cover,
+						$plane,
+						$packed_xz_lo, $packed_xz_hi,
+						$packed_y,
+					) = unpack('a[12]vvvCv', $cell);
+					my $cell_packet = stkutils::data_packet->new();
+					$cell_packet->pack('a[12]vvvvCv', $junk, $cover, $cover, $plane, $packed_xz_lo, $packed_xz_hi, $packed_y);
+					$ai_file_new->write($cell_packet->data(), length($cell_packet->data()));
+				}		
 			}
 			$ai_file_new->close();
-		} elsif (($version == $append_version) && ($version != $parent_version) && ($version < 9)) {
-			my $ai_file_new = IO::File->new('level.ai.new','w');
-			binmode $ai_file_new;
-			my $packet = stkutils::data_packet->new();
-			$packet->pack('VVfff6V4', $parent_version, $vertex_count, $cell_size, $factor_y, @box, $neighboors);
-			$ai_file_new->write($packet->data(), length($packet->data()));
-			for (my $i = 0; $i < $vertex_count; $i++) {
-				my $cell;
-				$ai_file->read($cell, 0x15) or die;
-				my (
-					$junk,
-					$cover,
-					$plane,
-					$packed_xz_lo, $packed_xz_hi,
-					$packed_y,
-				) = unpack('a[12]vvvCv', $cell);
-				my $cell_packet = stkutils::data_packet->new();
-				$cell_packet->pack('a[12]vvvvCv', $junk, $cover, $cover, $plane, $packed_xz_lo, $packed_xz_hi, $packed_y);
-				$ai_file_new->write($cell_packet->data(), length($cell_packet->data()));
-			}		
-			$ai_file_new->close();
-		} else {
-			$ai_file->close();
+			chdir ($work_dir);
 		}
-		chdir ($work_dir);
 	}
 }
 sub export {
