@@ -1,6 +1,6 @@
 #!perl -w -I \temp\1\bin
 #
-# last edited: 14 May 2011
+# last edited: 15 May 2011
 #
 #######################################################################
 package cse_abstract;
@@ -3297,7 +3297,7 @@ sub state_read {
 		$_[0]->{random_tasks_count} == 0 or die;
 		$_[0]->{current_attack_quantity_count} == 0 or die;
 		$_[0]->{squads_count} == 0 or die;
-		if ($_[0]->{version} >= 124) {
+		if (($_[0]->{version} >= 124) || (($_[0]->{version} == 123) && (::level()))) {
 			$_[1]->unpack_properties($_[0], (properties_info)[8]);
 		}
 	}
