@@ -208,7 +208,7 @@ MString maya_object_translator::defaultExtension() const { return MString("objec
 
 MString maya_object_translator::filter() const
 {
-#	if (MAYA_API_VERSION > 201200) 
+#	if (MAYA_API_VERSION >= 201200) 
 		return MString("*.object");
 #	else
 		return MString("*.ob*");
@@ -417,7 +417,7 @@ MString maya_skls_reader::defaultExtension() const { return MString("skls"); }
 
 MString maya_skls_reader::filter() const
 {
-#	if (MAYA_API_VERSION > 201200) 
+#	if (MAYA_API_VERSION >= 201200) 
 		return MString("*.skls");
 #	else
 		return MString("*.sk*");
