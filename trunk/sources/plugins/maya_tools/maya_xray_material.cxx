@@ -53,6 +53,7 @@
 #include "xr_shaders_xrlc_lib.h"
 #include "xr_shaders_lib.h"
 #include "xr_file_system.h"
+#include <algorithm>
 
 using namespace xray_re;
 
@@ -263,10 +264,13 @@ MStatus maya_xray_material::init()
 	xr_shaders_lib shaders_lib;
 	if (shaders_lib.load(PA_GAME_DATA, "shaders.xr")) {
 		MString field;
-		for (std::vector<std::string>::const_iterator it = shaders_lib.names().begin(),
-				end = shaders_lib.names().end(); it != end; ++it) {
-			short index = maya_field.get(*it, field);
-			CHECK_MSTATUS(enum_attr_fn.addField(field, index));
+		std::vector<std::string> names = shaders_lib.names();
+		std::sort(names.begin(), names.end());
+		short index = 0;
+		for (std::vector<std::string>::const_iterator it = names.begin(),
+				end = names.end(); it != end; ++it) {
+			maya_field.get(*it, field);
+			CHECK_MSTATUS(enum_attr_fn.addField(field, index++));
 		}
 		enum_attr_fn.setDefault("default");
 	} else {
