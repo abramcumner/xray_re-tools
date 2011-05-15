@@ -206,7 +206,14 @@ bool maya_object_translator::haveWriteMethod() const { return true; }
 
 MString maya_object_translator::defaultExtension() const { return MString("object"); }
 
-MString maya_object_translator::filter() const { return MString("*.ob*"); }
+MString maya_object_translator::filter() const
+{
+#	if (MAYA_API_VERSION > 201200) 
+		return MString("*.object");
+#	else
+		return MString("*.ob*");
+#	endif
+}
 
 bool maya_object_translator::canBeOpened() const { return true; }
 
@@ -408,7 +415,14 @@ bool maya_skls_reader::haveReadMethod() const { return true; }
 
 MString maya_skls_reader::defaultExtension() const { return MString("skls"); }
 
-MString maya_skls_reader::filter() const { return MString("*.sk*"); }
+MString maya_skls_reader::filter() const
+{
+#	if (MAYA_API_VERSION > 201200) 
+		return MString("*.skls");
+#	else
+		return MString("*.sk*");
+#	endif
+}
 
 MPxFileTranslator::MFileKind maya_skls_reader::identifyFile(const MFileObject& file, const char* buffer, short size) const
 {
