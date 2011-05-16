@@ -158,5 +158,5 @@ as well as required for xrLC -gi.
 Command line:
  converter -ogg2wav 
 
-The tool converts·.wav/.thm files into·$sounds$ using·*.ogg
-from·$game_sounds$. Existing .wav/.thm files are not overwritten.
+The tool converts .wav/.thm files into $sounds$ using·*.ogg
+from $game_sounds$. Existing .wav/.thm files are not overwritten.

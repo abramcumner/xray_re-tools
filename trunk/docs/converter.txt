@@ -163,7 +163,7 @@ Windows XP SP2/SP3.
 
 [Множественное преобразование звуков  из .ogg в .wav/.thm]
 Команда:
- converter -ogg2wav 
+ converter -ogg2wav
 
-Утилита воссоздаёт·.wav/.thm файлы·в·$sounds$, используя·*.ogg
-из·$game_sounds$. Уже существующие .wav/.thm не перезаписываются.
+Утилита воссоздаёт .wav/.thm файлы в $sounds$, используя *.ogg
+из $game_sounds$. Уже существующие .wav/.thm не перезаписываются.
