@@ -25,7 +25,7 @@ void dds_tools::process_file(const std::string& path)
 		return;
 
 	xr_texture_thumbnail thm;
-	if (!thm.load(PA_TEXTURES, path.c_str())) {
+	if (!thm.load(PA_GAME_TEXTURES, path.c_str())) {
 		msg("can't load %s", path.c_str());
 		return;
 	}
@@ -57,10 +57,15 @@ void dds_tools::process_file(const std::string& path)
 	xr_file_system& fs = xr_file_system::instance();
 	std::string tga_path(path);
 	tga_path.replace(offs, 4, ".tga");
-	if (fs.file_exist(PA_TEXTURES, tga_path)) {
+	std::string dest; fs.resolve_path(PA_TEXTURES, tga_path, dest);
+	if (fs.file_exist(dest)) {
 		msg("skipping %s (already exists)", path.c_str());
 		return;
 	}
+
+	std::string folder; fs.split_path(dest, &folder, NULL, NULL);
+	fs.create_path(folder);
+
 	std::string dds_path(path);
 	dds_path.replace(offs, 4, ".dds");
 	xr_image dds;
@@ -69,7 +74,7 @@ void dds_tools::process_file(const std::string& path)
 		return;
 	}
 	msg("saving %s", tga_path.c_str());
-	dds.save_tga(PA_TEXTURES, tga_path.c_str());
+	dds.save_tga(dest);
 }
 
 void dds_tools::process_folder(const std::string& path)
@@ -98,7 +103,7 @@ void dds_tools::process(const cl_parser& cl)
 	m_with_bump = cl.get_bool("-with_bump");
 
 	xr_file_system& fs = xr_file_system::instance();
-	m_textures = fs.resolve_path(PA_TEXTURES);
+	m_textures = fs.resolve_path(PA_GAME_TEXTURES);
 
 	process_folder();
 }

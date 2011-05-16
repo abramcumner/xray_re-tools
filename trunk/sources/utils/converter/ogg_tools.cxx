@@ -17,6 +17,7 @@ bool ogg_tools::check_paths() const
 	return status;
 }
 
+#pragma region ogg utils
 static int quiet = 1;
 static int bits = 16;
 static int endian = 0;
@@ -106,6 +107,7 @@ int rewrite_header(FILE *out, unsigned int written)
 	}
 	return 0;
 }
+#pragma endregion
 
 void ogg_tools::process_file(const std::string& path)
 {
@@ -121,8 +123,10 @@ void ogg_tools::process_file(const std::string& path)
 	fs.create_path(folder);
 	
 	//чтобы существующие звуки не перезаписывались
-	if (fs.file_exist(dest.c_str()))
+	if (fs.file_exist(dest.c_str())) {
+		msg("skipping %s (already exists)", src.c_str());
 		return;
+	}
 
 
 	OggVorbis_File vf;

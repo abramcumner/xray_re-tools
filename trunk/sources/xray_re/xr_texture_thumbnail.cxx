@@ -18,7 +18,8 @@ void xr_texture_thumbnail::load(xr_reader& r)
 		xr_not_expected();
 	xr_assert(version == THM_VERSION_TEXTUREPARAM);
 
-	if (r.find_chunk(THM_CHUNK_DATA)) {
+	bool compressed = false;
+	if (r.find_chunk(THM_CHUNK_DATA, &compressed)) {
 		xr_reader* s = r.open_chunk(THM_CHUNK_DATA);
 		data = new uint8_t[s->size()];
 		s->r_raw(data, s->size());
