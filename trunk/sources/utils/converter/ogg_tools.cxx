@@ -120,6 +120,10 @@ void ogg_tools::process_file(const std::string& path)
 	std::string folder; fs.split_path(dest, &folder, NULL, NULL);
 	fs.create_path(folder);
 	
+	//чтобы существующие звуки не перезаписывались
+	if (fs.file_exist(dest.c_str()))
+		return;
+
 
 	OggVorbis_File vf;
 	int bs = 0;
