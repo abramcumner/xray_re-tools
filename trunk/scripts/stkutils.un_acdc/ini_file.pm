@@ -66,7 +66,9 @@ use constant format_for_number => {
 	u32	=> '%u',
 	u16	=> '%u',
 	u8	=> '%u',
-	q8	=> '%u',
+	q8	=> '%.8g',
+	q16	=> '%.8g',
+	q16_old	=> '%.8g',
 	s32	=> '%d',
 	s16	=> '%d',
 	s8	=> '%d',
@@ -78,16 +80,19 @@ sub export_properties {
 	my $container = shift;
 
 	my $fh = $self->{fh};
-	print $fh "\n; $comment properties\n" if defined $comment;
+
+	print $fh "\n" if defined $comment;
+	print $fh "; $comment properties\n" if defined $comment;
 	foreach my $p (@_) {
+#	print "$p->{name}, $p->{type}\n";
 		my $format = format_for_number->{$p->{type}};
-		if ($p->{type} eq 'f32') {
+		if ($p->{type} eq 'f32' or $p->{type} eq 'q8') {
 			print $fh "$p->{name} = $container->{$p->{name}}\n";
 		} elsif (defined $format) {
 die "undefined field $p->{name}\n" unless defined $container->{$p->{name}};
 			next if defined($p->{default}) && $container->{$p->{name}} == $p->{default};
 			printf $fh "$p->{name} = $format\n", $container->{$p->{name}};
-		} elsif ($p->{type} eq 'sz') {
+		} elsif ($p->{type} eq "sz") {
 			next if defined($p->{default}) && $container->{$p->{name}} eq $p->{default};
 			my $value = $container->{$p->{name}};
 			if ($value =~ /\n/) {
@@ -119,19 +124,101 @@ die "undefined field $p->{name}\n" unless defined $container->{$p->{name}};
 				}
 				$i++;
 			}
+		} elsif ($p->{type} eq 'suppl') {
+			my @supplies;
+			my $i = 0;
+			foreach my $sect (@{$container->{$p->{name}}}) {
+				push @supplies, "section_$i";
+				$i++;
+			}
+			print $fh 'supplies = ', join(',', @supplies), "\n";
+			$i = 0;
+			foreach my $sect (@{$container->{$p->{name}}}) {
+				my $id = "section_$i";
+				print $fh "$id:section_name = $$sect{section_name}\n";
+				print $fh "$id:item_count = $$sect{item_count}\n";
+				print $fh "$id:min_factor = $$sect{min_factor}\n";
+				print $fh "$id:max_factor = $$sect{max_factor}\n";
+				print $fh "\n";
+				$i++;
+			}
+		} elsif ($p->{type} eq 'afspawns') {
+			my @supplies;
+			my $i = 0;
+			foreach my $sect (@{$container->{$p->{name}}}) {
+				push @supplies, "artefact_section_$i";
+				$i++;
+			}
+			print $fh 'artefact_spawns = ', join(',', @supplies), "\n";
+			$i = 0;
+			foreach my $sect (@{$container->{$p->{name}}}) {
+				my $id = "artefact_section_$i";
+				print $fh "$id:section_name = $$sect{section_name}\n";
+				print $fh "$id:weight = $$sect{weight}\n";
+				print $fh "\n";
+				$i++;
+			}
+		} elsif ($p->{type} eq 'afspawns_u32') {
+			my @supplies;
+			my $i = 0;
+			foreach my $sect (@{$container->{$p->{name}}}) {
+				push @supplies, "artefact_section_$i";
+				$i++;
+			}
+			print $fh 'artefact_spawns_old_format = ', join(',', @supplies), "\n";
+			$i = 0;
+			foreach my $sect (@{$container->{$p->{name}}}) {
+				my $id = "artefact_section_$i";
+				print $fh "$id:section_name = $$sect{section_name}\n";
+				print $fh "$id:weight = $$sect{weight}\n";
+				print $fh "\n";
+				$i++;
+			}
+#		} elsif ($p->{type} eq 'ordaf') {
+#			my @ord_afs;
+#			my $i = 0;
+#			my $k = 0;
+#			foreach my $sect (@{$container->{$p->{name}}}) {
+#				push @ord_afs, "unknown_section_$i";
+#				$i++;
+#			}
+#			print $fh 'unknown_sections = ', join(',', @ord_afs), "\n";
+#			$i = 0;
+#			foreach my $sect (@{$container->{$p->{name}}}) {
+#				my $id = "unknown_section_$i";
+#				print $fh "$id:unknown_string = @{$$sect{name}}\n";
+#				print $fh "$id:unknown_number = @{$$sect{number}}\n";
+#				foreach  my $af (@{$$sect->{af_sects}) {
+#					push @af_sections, "unknown_section_$i";
+#					$k++;
+#				}
+#				print $fh 'artefact_sections = ', join(',', @af_sections), "\n";
+#				$k = 0;
+#				foreach my $af (@{$$sect->{af_sects}) {
+#					my $af_id = "artefact_section_$i";
+#					print $fh "$id_$af_id:artefact_name = @{$$af{af_section}[0]}\n";
+#					print $fh "$id_$af_id:number_1 = @{$$af{af_section}[1]}\n";
+#					print $fh "$id_$af_id:number_2 = @{$$af{af_section}[2]}\n";
+#					$k++;
+#				}
+#				$i++;
+#			}
 		} else {
 			next if defined(@{$p->{default}}) && @{$container->{$p->{name}}} == @{$p->{default}};
 			print $fh "$p->{name} = ", join(',', @{$container->{$p->{name}}}), "\n";
 		}
 	}
+#	print $fh "\n" unless (not (defined $comment));
 }
 sub import_properties {
 	my $self = shift;
 	my $section = shift;
 	my $container = shift;
 
+#	print "$section\n";
 	die unless defined $self->{sections_hash}{$section};
 	foreach my $p (@_) {
+#	print "$p->{name}\n";
 		my $value = $self->value($section, $p->{name});
 		if ($p->{type} eq 'sz') {
 			$container->{$p->{name}} = (defined $value) ? $value : $p->{default};
@@ -149,6 +236,25 @@ sub import_properties {
 				my $shape = $self->import_shape_properties($section, $id);
 				push @{$container->{$p->{name}}}, $shape;
 			}
+		} elsif ($p->{type} eq 'suppl') {
+			foreach my $id (split /,/, $value) {
+				$id =~ s/^\s*|\s*$//g;
+				my $sect = $self->import_suppl_properties($section, $id);
+				push @{$container->{$p->{name}}}, $sect;
+			}
+		} elsif ($p->{type} eq 'afspawns' or $p->{type} eq 'afspawns_u32') {
+				foreach my $id (split /,/, $value) {
+					$id =~ s/^\s*|\s*$//g;
+					my $sect = $self->import_afspawns_properties($section, $id);
+					push @{$container->{$p->{name}}}, $sect;
+				}
+#		} elsif ($p->{type} eq 'ordaf') {
+#			die unless defined $value;
+#			foreach my $id (split /,/, $value) {
+#				$id =~ s/^\s*|\s*$//g;
+#				my $sect = $self->import_ordaf_properties($section, $id);
+#				push @{$container->{$p->{name}}}, $sect;
+#			}
 		} else {
 			@{$container->{$p->{name}}} = defined $value ?
 					split(/,/, $value) : @{$p->{default}};
@@ -179,12 +285,66 @@ sub import_shape_properties {
 	}
 	return \%shape;
 }
+sub import_suppl_properties {
+	my $self = shift;
+	my ($section, $id) = @_;
+
+	my %item;
+
+	$item{section_name} = $self->value($section, "$id:section_name") or die "no section_name in $section\n";
+	$item{item_count} = $self->value($section, "$id:item_count") or die "no item_count in $section\n";
+	$item{min_factor} = $self->value($section, "$id:min_factor") or die "no min_factor in $section\n";
+	$item{max_factor} = $self->value($section, "$id:max_factor") or die "no max_factor in $section\n";
+
+	return \%item;
+}
+sub import_afspawns_properties {
+	my $self = shift;
+	my ($section, $id) = @_;
+
+	my %item;
+
+	$item{section_name} = $self->value($section, "$id:section_name") or die "no section_name in $section\n";
+	$item{weight} = $self->value($section, "$id:weight") or die "no weight in $section\n";
+
+	return \%item;
+}
+#sub import_ordaf_properties {
+#	my $self = shift;
+#	my ($section, $id) = @_;
+#
+#	my %item;
+#
+#	my $unknown_string = $self->value($section, "$id:unknown_string") or die "no unknown_string in $section\n";
+#	my $unknown_number = $self->value($section, "$id:unknown_number") or die "no unknown_number in $section\n";
+#	my %art;
+#	foreach my $af_id (split /,/, $self->value($section, "artefact_sections")) {
+#		$af_id =~ s/^\s*|\s*$//g;
+#		
+#		my $artefact_name = $self->value($section, "$id_$af_id:artefact_name") or die "no artefact_name in $section\n";
+#		my $number_1 = $self->value($section, "$id_$af_id:number_1") or die "no number_1 in $section\n";
+#		my $number_2 = $self->value($section, "$id_$af_id:number_2") or die "no number_2 in $section\n";
+#		push @{$art}, $artefact_name, $number_1, $number_2;
+#	}
+#	push @{$item}, $unknown_string, $unknown_number, \%art;
+#
+#	return \%item;
+#}
 sub value {
 	my $self = shift;
 	my ($section, $name) = @_;
-
 	die unless defined $self->{sections_hash}{$section};
 	return $self->{sections_hash}{$section}{$name};
+}
+sub is_value_exists {
+	my $self = shift;
+	my ($section, $name) = @_;
+	return defined $self->{sections_hash}{$section}{$name};
+}
+sub is_section_exists {
+	my $self = shift;
+	my ($section) = @_;
+	return defined $self->{sections_hash}{$section};
 }
 
 1;

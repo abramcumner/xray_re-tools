@@ -3651,12 +3651,12 @@ sub state_write {
 	}
 }
 sub update_read {
-	if (($_[0]->{version} > 101) && ($_[0]->{version} <= 118) && ($_[0]->{script_version} <= 5)) {
+	if (($_[0]->{version} > 101) && ((($_[0]->{version} <= 118) && ($_[0]->{script_version} <= 5)) || (::use_hack()))) {
 		$_[1]->unpack_properties($_[0], upd_properties_info);
 	}
 }
 sub update_write {
-	if (($_[0]->{version} > 101) && ($_[0]->{version} <= 118) && ($_[0]->{script_version} <= 5)) {
+	if (($_[0]->{version} > 101) && ((($_[0]->{version} <= 118) && ($_[0]->{script_version} <= 5)) || (::use_hack()))) {
 		$_[1]->pack_properties($_[0], upd_properties_info);
 	}
 }
@@ -3678,7 +3678,7 @@ sub state_import {
 	if ($_[0]->{version} > 106) {
 		$_[1]->import_properties($_[2], $_[0], (properties_info)[6]);
 	}
-	if ((not ::level()) && ($_[0]->{version} > 101) && ($_[0]->{version} <= 118) && ($_[0]->{script_version} <= 5)) {
+	if ((not ::level()) && ($_[0]->{version} > 101) && ((($_[0]->{version} <= 118) && ($_[0]->{script_version} <= 5)) || (::use_hack()))) {
 		$_[1]->import_properties($_[2], $_[0], upd_properties_info);
 	}
 }
@@ -3700,7 +3700,7 @@ sub state_export {
 	if ($_[0]->{version} > 106) {
 		$_[1]->export_properties(undef, $_[0], (properties_info)[6]);
 	}
-	if ((not ::level()) && ($_[0]->{version} > 101) && ($_[0]->{version} <= 118) && ($_[0]->{script_version} <= 5)) {
+	if ((not ::level()) && ($_[0]->{version} > 101) && ((($_[0]->{version} <= 118) && ($_[0]->{script_version} <= 5)) || (::use_hack()))) {
 		$_[1]->export_properties(undef, $_[0], upd_properties_info);
 	}
 }
@@ -4096,7 +4096,7 @@ sub update_read {
 				$_[1]->unpack_properties($_[0], (upd_properties_info)[7]);
 			}
 		}
-	} elsif (($_[0]->{version} == 118) && ($_[0]->{script_version} > 5)) {
+	} elsif ((($_[0]->{version} >= 118) && ($_[0]->{script_version} > 5)) && (not (::use_hack()))) {
 		$_[1]->unpack_properties($_[0], (upd_properties_info)[0]);
 		if ($_[0]->{'upd:num_items'} != 0) {
 			$_[1]->unpack_properties($_[0], (upd_properties_info)[3]);
@@ -4144,7 +4144,7 @@ sub update_write {
 				$_[1]->pack_properties($_[0], (upd_properties_info)[7]);
 			}
 		}
-	} elsif (($_[0]->{version} == 118) && ($_[0]->{script_version} > 5)) {
+	} elsif ((($_[0]->{version} >= 118) && ($_[0]->{script_version} > 5)) && (not (::use_hack()))) {
 	my $flags = ($_[0]->{'upd:num_items'});
 	my $mask = $flags >> 5;
 		$_[1]->pack_properties($_[0], (upd_properties_info)[0]);
@@ -4198,7 +4198,7 @@ sub state_import {
 					$_[1]->import_properties($_[2], $_[0], (upd_properties_info)[7]);
 				}
 			}
-		} elsif (($_[0]->{version} == 118) && ($_[0]->{script_version} > 5)) {
+	} elsif ((($_[0]->{version} >= 118) && ($_[0]->{script_version} > 5)) && (not (::use_hack()))) {
 			$_[1]->import_properties($_[2], $_[0], (upd_properties_info)[0]);
 			if ($_[0]->{'upd:num_items'} != 0) {
 				$_[1]->import_properties($_[2], $_[0], (upd_properties_info)[3]);
@@ -4252,7 +4252,7 @@ sub state_export {
 				$_[1]->export_properties(undef, $_[0], (upd_properties_info)[7]);
 			}
 		}
-	} elsif (($_[0]->{version} == 118) && ($_[0]->{script_version} > 5)) {
+	} elsif ((($_[0]->{version} >= 118) && ($_[0]->{script_version} > 5)) && (not (::use_hack()))) {
 		$_[1]->export_properties(undef, $_[0], (upd_properties_info)[0]);
 		if ($_[0]->{'upd:num_items'} != 0) {
 			$_[1]->export_properties(undef, $_[0], (upd_properties_info)[3]);
@@ -4582,25 +4582,25 @@ sub state_write {
 }
 sub update_read {
 	cse_alife_item::update_read(@_);
-	if (($_[0]->{version} >= 118) && ($_[0]->{script_version} > 5)) {
+	if (($_[0]->{version} >= 118) && ($_[0]->{script_version} > 5) && (not ::use_hack())) {
 		$_[1]->unpack_properties($_[0], upd_properties_info);
 	}
 }
 sub update_write {
 	cse_alife_item::update_write(@_);
-	if (($_[0]->{version} >= 118) && ($_[0]->{script_version} > 5)) {
+	if (($_[0]->{version} >= 118) && ($_[0]->{script_version} > 5) && (not ::use_hack())) {
 		$_[1]->pack_properties($_[0], upd_properties_info);
 	}
 }
 sub state_import {
 	cse_alife_item::state_import(@_);
-	if (not (::level()) && ($_[0]->{version} >= 118) && ($_[0]->{script_version} > 5)) {
+	if (not (::level()) && ($_[0]->{version} >= 118) && ($_[0]->{script_version} > 5) && (not ::use_hack())) {
 		$_[1]->import_properties($_[2], $_[0], upd_properties_info);
 	}
 }
 sub state_export {
 	cse_alife_item::state_export(@_);
-	if (not (::level()) && ($_[0]->{version} >= 118) && ($_[0]->{script_version} > 5)) {
+	if (not (::level()) && ($_[0]->{version} >= 118) && ($_[0]->{script_version} > 5) && (not ::use_hack())) {
 		$_[1]->export_properties(undef, $_[0], upd_properties_info);
 	}
 }
@@ -5102,54 +5102,54 @@ sub state_export {
 package build_version;
 use strict;
 use constant build_verions => (
-	{ version => 128, script_version => 12, build => 'Call Of Pripyat (any patch)', short_build => 'cop'},	# 0x1c0 (0x1e0)
-	{ version => 124, script_version => 8, build => 'Clear Sky (patch 1.5.04 or higher)', short_build => 'cs4'},	# 0x1c0 (0x1e0)
-	{ version => 123, script_version => 8, build => 'Clear Sky (patch 1.5.03)', short_build => 'cs3'},	# 0x1c0 (0x1e0)
-	{ version => 122, script_version => 8, build => 'Clear Sky (patch 1.5.00 - 1.5.02)', short_build => 'cs0'},	# 0x1c0 (0x1e0)
-	{ version => 118, script_version => 6, build => 'Shadow Of Chernobyl (patch 1.0001 or higher) or xrCore build 3120', short_build => 'soc1'},
-	{ version => 118, script_version => 5, build => 'xrCore build 2559-2947', short_build => 'soc0'},	# 0x1c0 (0x1e0)
-	{ version => 117, script_version => 4, build => 'xrCore build 2571'},	# 0x1c0 (0x1e0)
-	{ version => 115, script_version => 3, build => 'xrCore build 2365'},	# 0x1c0 (0x1e0)
-	{ version => 109, script_version => 2, build => 'xrCore build 2307'},	# 0x1c0 (0x1e0)
-	{ version => 104, script_version => 2, build => 'xrCore build 2217, 2232'},	# 0x1c0 (0x1e0)
-	{ version => 103, script_version => 2, build => 'xrCore build 2198, 2191'},	# 0x1c0 (0x1e0)
-	{ version => 102, script_version => 2, build => 'xrCore build 2221'},	# 0x1c0 (0x1e0)
-	{ version => 101, script_version => 2, build => 'xrCore build 2205, 2215'},	# 0x1c0 (0x1e0)
-	{ version => 95, script_version => 1, build => 'xrCore build 2218-2201'},	# 0x1c0 (0x1e0)
-	{ version => 94, script_version => 1, build => 'xrCore build 2212-2217'},	# 0x1c0 (0x1e0)
-	{ version => 93, script_version => 0, build => 'xrCore build 2202'},	# 0x1c0 (0x1e0)
-	{ version => 92, script_version => 0, build => 'xrCore build 1994'},	# 0x1c0 (0x1e0)
-	{ version => 90, script_version => 0, build => 'xrCore build 1964-1971'},	# 0x1c0 (0x1e0)
-	{ version => 89, script_version => 0, build => 'xrCore build 1957'},	# 0x1c0 (0x1e0)
-	{ version => 85, script_version => 0, build => 'xrCore build 1936'},	# 0x1c0 (0x1e0)
-	{ version => 79, script_version => 0, build => 'xrCore build 1935'},	# 0x1c0 (0x1e0)
-	{ version => 77, script_version => 0, build => 'xrCore build 1925'},	# 0x1c0 (0x1e0)
-	{ version => 76, script_version => 0, build => 'xrCore build 1902-1917'},	# 0x1c0 (0x1e0)
-	{ version => 75, script_version => 0, build => 'xrCore build 1893'},	# 0x1c0 (0x1e0)
-	{ version => 73, script_version => 0, build => 'xrCore build 1875'},	# 0x1c0 (0x1e0)
-	{ version => 72, script_version => 0, build => 'xrCore build 1865'},	# 0x1c0 (0x1e0)
-	{ version => 65, script_version => 0, build => 'xrCore build 1850'},	# 0x1c0 (0x1e0)
-	{ version => 63, script_version => 0, build => 'xrCore build 1842'},	# 0x1c0 (0x1e0)
-	{ version => 60, script_version => 0, build => 'xrCore build 1844 (19 May 2005)'},	# 0x1c0 (0x1e0)
-	{ version => 59, script_version => 0, build => 'xrCore build 1833-1835'},	# 0x1c0 (0x1e0)
-	{ version => 56, script_version => 0, build => 'xrCore build 1834 (09 April 2005)'},	# 0x1c0 (0x1e0)
-	{ version => 51, script_version => 0, build => 'xrCore build 1844-1849'},	# 0x1c0 (0x1e0)
-	{ version => 49, script_version => 0, build => 'xrCore build 1835'},	# 0x1c0 (0x1e0)
-	{ version => 47, script_version => 0, build => 'xrCore build 1834 (09 Feb 2005)'},	# 0x1c0 (0x1e0)
-	{ version => 46, script_version => 0, build => 'xrCore build 1829'},	# 0x1c0 (0x1e0)
-	{ version => 45, script_version => 0, build => 'xrCore build 1828'},	# 0x1c0 (0x1e0)
-	{ version => 44, script_version => 0, build => 'xrCore build 1851'},	# 0x1c0 (0x1e0)
-	{ version => 41, script_version => 0, build => 'xrCore build 1837'},	# 0x1c0 (0x1e0)
-	{ version => 40, script_version => 0, build => 'xrCore build 1610-1638'},	# 0x1c0 (0x1e0)
-	{ version => 39, script_version => 0, build => 'xrCore build 1511-1580'},	# 0x1c0 (0x1e0)
-	{ version => 38, script_version => 0, build => 'xrCore build 1510'},	# 0x1c0 (0x1e0)
-	{ version => 35, script_version => 0, build => 'xrCore build 1475'},	# 0x1c0 (0x1e0)
-	{ version => 34, script_version => 0, build => 'xrCore build 1475'},	# 0x1c0 (0x1e0)
-	{ version => 16, script_version => 0, build => 'xrCore build 1472'},	# 0x1c0 (0x1e0)
-	{ version => 14, script_version => 0, build => 'xrCore build 1472'},	# 0x1c0 (0x1e0)
-	{ version => 13, script_version => 0, build => 'xrCore build 1472'},	# 0x1c0 (0x1e0)
-	{ version => 8, script_version => 0, build => 'xrCore build 1469'},	# 0x1c0 (0x1e0)
-	{ version => 7, script_version => 0, build => 'xrCore build 1465'},	# 0x1c0 (0x1e0)
+	{ version => 128, script_version => 12, build => 'Call Of Pripyat (any patch)', 		short_build => 'cop',  graph_build => 'cop'},	# 0x1c0 (0x1e0)
+	{ version => 124, script_version => 8, build => 'Clear Sky (patch 1.5.04 or higher)', 	short_build => 'cs4',  graph_build => 'cop'},	# 0x1c0 (0x1e0)
+	{ version => 123, script_version => 8, build => 'Clear Sky (patch 1.5.03)', 			short_build => 'cs3',  graph_build => 'cop'},	# 0x1c0 (0x1e0)
+	{ version => 122, script_version => 8, build => 'Clear Sky (patch 1.5.00 - 1.5.02)', 	short_build => 'cs0',  graph_build => 'cop'},	# 0x1c0 (0x1e0)
+	{ version => 118, script_version => 6, build => 'Shadow Of Chernobyl (patch 1.0001 or higher) or xrCore build 3120', short_build => 'soc1',  graph_build => 'soc'},
+	{ version => 118, script_version => 5, build => 'xrCore build 2559-2947', 				short_build => 'soc0', graph_build => 'soc'},	# 0x1c0 (0x1e0)
+	{ version => 117, script_version => 4, build => 'xrCore build 2571', graph_build => 'soc'},	# 0x1c0 (0x1e0)
+	{ version => 115, script_version => 3, build => 'xrCore build 2365', graph_build => 'soc'},	# 0x1c0 (0x1e0)
+	{ version => 109, script_version => 2, build => 'xrCore build 2307', graph_build => '2215'},	# 0x1c0 (0x1e0)
+	{ version => 104, script_version => 2, build => 'xrCore build 2217, 2232', graph_build => '2215'},	# 0x1c0 (0x1e0)
+	{ version => 103, script_version => 2, build => 'xrCore build 2198, 2191', graph_build => '2215'},	# 0x1c0 (0x1e0)
+	{ version => 102, script_version => 2, build => 'xrCore build 2221', graph_build => '2215'},	# 0x1c0 (0x1e0)
+	{ version => 101, script_version => 2, build => 'xrCore build 2205, 2215', graph_build => '2215'},	# 0x1c0 (0x1e0)
+	{ version => 95, script_version => 1, build => 'xrCore build 2218-2201', graph_build => '2215'},	# 0x1c0 (0x1e0)
+	{ version => 94, script_version => 1, build => 'xrCore build 2212-2217', graph_build => '2215'},	# 0x1c0 (0x1e0)
+	{ version => 93, script_version => 0, build => 'xrCore build 2202', graph_build => '1935'},	# 0x1c0 (0x1e0)
+	{ version => 92, script_version => 0, build => 'xrCore build 1994', graph_build => '1935'},	# 0x1c0 (0x1e0)
+	{ version => 90, script_version => 0, build => 'xrCore build 1964-1971', graph_build => '1935'},	# 0x1c0 (0x1e0)
+	{ version => 89, script_version => 0, build => 'xrCore build 1957', graph_build => '1935'},	# 0x1c0 (0x1e0)
+	{ version => 85, script_version => 0, build => 'xrCore build 1936', graph_build => '1935'},	# 0x1c0 (0x1e0)
+	{ version => 79, script_version => 0, build => 'xrCore build 1935', graph_build => '1935'},	# 0x1c0 (0x1e0)
+	{ version => 77, script_version => 0, build => 'xrCore build 1925', graph_build => '1935'},	# 0x1c0 (0x1e0)
+	{ version => 76, script_version => 0, build => 'xrCore build 1902-1917', graph_build => '1935'},	# 0x1c0 (0x1e0)
+	{ version => 75, script_version => 0, build => 'xrCore build 1893', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 73, script_version => 0, build => 'xrCore build 1875', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 72, script_version => 0, build => 'xrCore build 1865', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 65, script_version => 0, build => 'xrCore build 1850', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 63, script_version => 0, build => 'xrCore build 1842', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 60, script_version => 0, build => 'xrCore build 1844 (19 May 2005)', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 59, script_version => 0, build => 'xrCore build 1833-1835', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 56, script_version => 0, build => 'xrCore build 1834 (09 April 2005)', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 51, script_version => 0, build => 'xrCore build 1844-1849', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 49, script_version => 0, build => 'xrCore build 1835', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 47, script_version => 0, build => 'xrCore build 1834 (09 Feb 2005)', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 46, script_version => 0, build => 'xrCore build 1829', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 45, script_version => 0, build => 'xrCore build 1828', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 44, script_version => 0, build => 'xrCore build 1851', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 41, script_version => 0, build => 'xrCore build 1837', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 40, script_version => 0, build => 'xrCore build 1610-1638', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 39, script_version => 0, build => 'xrCore build 1511-1580', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 38, script_version => 0, build => 'xrCore build 1510', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 35, script_version => 0, build => 'xrCore build 1475', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 34, script_version => 0, build => 'xrCore build 1475', graph_build => '1510'},	# 0x1c0 (0x1e0)
+	{ version => 16, script_version => 0, build => 'xrCore build 1472', graph_build => '1472'},	# 0x1c0 (0x1e0)
+	{ version => 14, script_version => 0, build => 'xrCore build 1472', graph_build => '1472'},	# 0x1c0 (0x1e0)
+	{ version => 13, script_version => 0, build => 'xrCore build 1472', graph_build => '1472'},	# 0x1c0 (0x1e0)
+	{ version => 8, script_version => 0, build => 'xrCore build 1469', graph_build => '1469'},	# 0x1c0 (0x1e0)
+	{ version => 7, script_version => 0, build => 'xrCore build 1465', graph_build => '1469'},	# 0x1c0 (0x1e0)
 	{ version => 3, script_version => 0, build => 'xrCore build 1233-1265'},	# 0x1c0 (0x1e0)
 	{ version => 2, script_version => 0, build => 'xrCore build 1230-1254'},	# 0x1c0 (0x1e0)
 );
@@ -5169,7 +5169,291 @@ sub version_by_build {
 	}
 	return undef;
 }
+sub graph_build {
+	foreach my $info (build_verions) {
+		if (($_[0] == $info->{version}) && ($_[1] == $info->{script_version})) {
+			return $info->{graph_build};
+		}
+	}
+	return undef;
+}
 #######################################################################
+package gg_header;
+use strict;
+use constant header_1472 => (
+	{ name => 'version',		type => 'u32' },
+	{ name => 'vertex_count',	type => 'u32' },
+	{ name => 'level_count',	type => 'u32' },
+);
+use constant header_1935 => (
+	{ name => 'version',		type => 'u32' },
+	{ name => 'level_count',	type => 'u32' },
+	{ name => 'vertex_count',	type => 'u32' },
+	{ name => 'edge_count',		type => 'u32' },
+	{ name => 'level_point_count',	type => 'u32' },
+);
+use constant header_2215 => (
+	{ name => 'version',		type => 'u32' },
+	{ name => 'level_count',	type => 'u32' },
+	{ name => 'vertex_count',	type => 'u32' },
+	{ name => 'edge_count',		type => 'u32' },
+	{ name => 'level_point_count',	type => 'u32' },
+	{ name => 'guid',	type => 'guid' },
+);
+use constant header_SOC => (
+	{ name => 'version',		type => 'u8' },
+	{ name => 'vertex_count',	type => 'u16' },
+	{ name => 'edge_count',		type => 'u32' },
+	{ name => 'level_point_count',	type => 'u32' },
+	{ name => 'guid',		type => 'guid' },
+	{ name => 'level_count',	type => 'u8' },
+);
+sub new {
+	my $class = shift;
+	my $self = {};
+	bless($self, $class);
+	return $self;
+}
+sub read {
+	if ($_[2] eq '1469' or $_[2] eq '1472') {
+		$_[1]->unpack_properties($_[0], header_1472);
+	} elsif ($_[2] eq '1510' or $_[2] eq '1935') {
+		$_[1]->unpack_properties($_[0], header_1935);	
+	} elsif ($_[2] eq '2215') {
+		$_[1]->unpack_properties($_[0], (header_2215)[0..5]);	
+	} else {
+		$_[1]->unpack_properties($_[0], header_SOC);		
+	}
+}
+#######################################################################
+package gg_level;
+use strict;
+use constant level_1469 => (
+	{ name => 'level_name',		type => 'sz' },
+	{ name => 'offset',		type => 'f32v3' },
+);
+use constant level_1472 => (
+	{ name => 'level_name',		type => 'sz' },
+	{ name => 'offset',		type => 'f32v3' },
+	{ name => 'level_id',		type => 'u32' },
+);
+use constant level_1935 => (
+	{ name => 'level_name',		type => 'sz' },
+	{ name => 'offset',		type => 'f32v3' },
+	{ name => 'level_id',		type => 'u32' },
+	{ name => 'section_name',	type => 'sz' },
+);
+use constant level_2215 => (
+	{ name => 'level_name',		type => 'sz' },
+	{ name => 'offset',		type => 'f32v3' },
+	{ name => 'level_id',		type => 'u32' },
+	{ name => 'section_name',	type => 'sz' },
+	{ name => 'guid',	type => 'guid' },
+);
+use constant level_SOC => (
+	{ name => 'level_name',		type => 'sz' },
+	{ name => 'offset',		type => 'f32v3' },
+	{ name => 'level_id',		type => 'u8' },
+	{ name => 'section_name',	type => 'sz' },
+	{ name => 'guid',	type => 'guid' },
+);
+sub new {
+	my $class = shift;
+	my $self = {};
+	bless($self, $class);
+	return $self;
+}
+sub read {
+	if ($_[2] eq '1469') {
+		$_[1]->unpack_properties($_[0], level_1469);
+		if ($_[0]->{level_name} eq 'level2_test') {
+			$_[0]->{level_id} = 0;
+		} elsif ($_[0]->{level_name} eq 'occ_part') {
+			$_[0]->{level_id} = 1;
+		} else {
+			$_[0]->{level_id} = 2;
+		}
+	} elsif ($_[2] eq '1472' or $_[2] eq '1510') {
+		$_[1]->unpack_properties($_[0], level_1472);
+	} elsif ($_[2] eq '1935') {
+		$_[1]->unpack_properties($_[0], level_1935);	
+	} elsif ($_[2] eq '2215') {
+		$_[1]->unpack_properties($_[0], level_2215);	
+	} else {
+		$_[1]->unpack_properties($_[0], level_SOC);		
+	}
+}
+#######################################################################
+package gg_vertex;
+use strict;
+use constant vertex_1472 => (
+	{ name => 'level_point',	type => 'f32v3' },
+	{ name => 'game_point',		type => 'f32v3' },
+	{ name => 'level_id',	type => 'u8' },
+	{ name => 'level_vertex_id',	type => 'u24' },
+	{ name => 'vertex_type',	type => 'u8v4' },
+	{ name => 'edge_count',	type => 'u8' },
+	{ name => 'edge_offset',	type => 'u24' },
+);
+use constant vertex_1935 => (
+	{ name => 'level_point',	type => 'f32v3' },
+	{ name => 'game_point',		type => 'f32v3' },
+	{ name => 'level_id',	type => 'u8' },
+	{ name => 'level_vertex_id',	type => 'u24' },
+	{ name => 'vertex_type',	type => 'u8v4' },
+	{ name => 'edge_count',	type => 'u8' },		#1
+	{ name => 'edge_offset',	type => 'u24' },		#4
+	{ name => 'level_point_count',		type => 'u8' },			#1
+	{ name => 'level_point_offset',	type => 'u24' },	#4
+);
+use constant vertex_SOC => (
+	{ name => 'level_point',	type => 'f32v3' },
+	{ name => 'game_point',		type => 'f32v3' },
+	{ name => 'level_id',	type => 'u8' },
+	{ name => 'level_vertex_id',	type => 'u24' },
+	{ name => 'vertex_type',	type => 'u8v4' },
+	{ name => 'edge_offset',	type => 'u32' },
+	{ name => 'level_point_offset',	type => 'u32' },
+	{ name => 'edge_count',		type => 'u8' },
+	{ name => 'level_point_count',	type => 'u8' },
+);
+sub new {
+	my $class = shift;
+	my $self = {};
+	bless($self, $class);
+	return $self;
+}
+sub read {
+	if (!defined $_[4]) {
+		$_[1]->unpack_properties($_[0], vertex_1472);
+	} elsif ($_[4] eq '1510' or $_[4] eq '1935' or $_[4] eq '2215') {
+		$_[1]->unpack_properties($_[0], vertex_1935);
+	} else {
+		$_[1]->unpack_properties($_[0], vertex_SOC);
+	}
+	if (defined $_[4]) {
+		$_[0]->{edge_index} = ($_[0]->{edge_offset} - $_[2]) / (::edge_block_size($_[4]));
+		$_[0]->{level_point_index} = ($_[0]->{level_point_offset} - $_[3]) / 0x14;
+	} else {
+		$_[0]->{edge_index} = ($_[0]->{edge_offset} - $_[2]) / (::edge_block_size($_[3]));
+	}
+}
+#######################################################################
+package gg_edge;
+use strict;
+use constant edge_builds => (
+	{ name => 'game_vertex_id',	type => 'u32' },
+	{ name => 'distance',		type => 'f32' },
+);
+use constant edge_SOC => (
+	{ name => 'game_vertex_id',	type => 'u16' },
+	{ name => 'distance',		type => 'f32' },
+);
+sub new {
+	my $class = shift;
+	my $self = {};
+	bless($self, $class);
+	return $self;
+}
+sub read {
+	if ($_[2] eq 'soc' or $_[2] eq 'cop') {
+		$_[1]->unpack_properties($_[0], edge_SOC);
+	} else {
+		$_[1]->unpack_properties($_[0], edge_builds);
+	}
+}
+#######################################################################
+package vertex_table;
+use strict;
+use IO::File;
+use stkutils::data_packet;
+use stkutils::chunked_file;
+
+sub new {
+	my $class = shift;
+	my $self = {};
+	bless($self, $class);
+	return $self;
+}
+sub read {
+	my $self = shift;
+	my ($version, $spawn) = @_;
+	my $data;
+	my $packet;
+
+	print "reading graph...\n";
+	if ($version < 122) {
+		my $fh = IO::File->new('game.graph', 'r') or die "cannot open game.graph\n";
+		binmode $fh;
+		$fh->read($data, 225000);
+		$packet = stkutils::data_packet->new($data);
+	} else {
+		$data = substr($spawn->{section4_raw_data}, 0, 225000);
+		$packet = stkutils::data_packet->new($data);
+	}
+	my $hs = ::header_size($self->{build_version});
+	my $vbs = ::vertex_block_size($self->{build_version});
+	my $ebs = ::edge_block_size($self->{build_version});
+	print "	reading header...\n";
+#	$fh->read($data, $hs) or die;
+	my $data_h = substr($data, 0, $hs);
+	$self->{header} = gg_header->new();
+	$self->{header}->read(stkutils::data_packet->new($data_h), $self->{build_version});
+	my $edges_offset = $self->{header}->{vertex_count} * $vbs;
+	my $level_points_offset;
+	if (not ($self->{build_version} eq '1469' or $self->{build_version} eq '1472')) {
+		$level_points_offset = $edges_offset + $self->{header}->{edge_count} * $ebs;
+	}
+	print "	reading levels...\n";	
+	# 4KB should be enough for the level
+#	$fh->read($data, 0x1000) or die;
+	my $data_l = substr($data, 0, 0x1000);
+	my $packet_l = stkutils::data_packet->new(substr($data_l, $hs));
+	for (my $i = 0; $i < $self->{header}->{level_count}; $i++) {
+		my $level = gg_level->new();			
+		$level->read($packet_l, $self->{build_version});
+		push @{$self->{levels}}, $level;
+	}	
+	my %level_by_id = ();
+	foreach my $level (@{$self->{levels}}) {
+		$level_by_id{$level->{level_id}} = \$level;
+	}
+	print "	reading vertices...\n";	
+#	$fh->seek(-$packet->length(), SEEK_CUR);
+	my $packet_v = stkutils::data_packet->new(substr($data, 0x1000 - $packet_l->length()));
+	for (my $i = 0; $i < $self->{header}->{vertex_count}; $i++) {
+#		$fh->read($data, $vbs) or die;
+		my $vertex = gg_vertex->new();
+		if ($self->{build_version} eq '1469' or $self->{build_version} eq '1472') {
+			$vertex->read($packet_v, $edges_offset, $self->{build_version});
+		} else {
+			$vertex->read($packet_v, $edges_offset, $level_points_offset, $self->{build_version});
+		}
+		my $level_name = $level_by_id{$vertex->{level_id}};
+		die "no such level for vertice!!!" if (not defined $level_name);
+		push @{$self->{vertices}}, $vertex;
+	}
+	my $game_vertex_id = 0;
+	my $level_id = -1;
+	foreach my $vertex (@{$self->{vertices}}) {
+		if ($vertex->{level_id} != $level_id) {
+			my $level = $level_by_id{$vertex->{level_id}};
+			$level_id = $vertex->{level_id};
+			$self->{level_by_guid}{$game_vertex_id} = $$level->{level_name};
+		}
+		$game_vertex_id++;
+	}
+}
+sub level_name {
+	my $self = shift;
+	foreach my $table (sort {$b <=> $a} keys %{$self->{level_by_guid}}) {
+		if ($_[0] >= $table) {
+			return $self->{level_by_guid}{$table};
+		}
+	}
+	return undef;
+}
+#####################################################################
 package alife_object;
 use strict;
 use stkutils::data_packet;
@@ -6615,7 +6899,7 @@ use strict;
 use IO::File;
 use stkutils::ini_file;
 use stkutils::chunked_file;
-use stkutils::level 'name_by_gvid';
+
 sub new {
 	my $class = shift;
 	my $self = {};
@@ -6737,18 +7021,18 @@ sub import_way {
 }
 sub export {
 	my $self = shift;
-	my ($version, $script_version, $old_gvid, $new_gvid) = @_;
+	my ($version, $script_version, $old_gvid, $new_gvid, $graph) = @_;
 
 	if (not(::level())) {
-		$self->export_alife($version, $script_version, $old_gvid, $new_gvid);
-		$self->export_way($old_gvid, $new_gvid);
+		$self->export_alife($version, $script_version, $old_gvid, $new_gvid, $graph);
+		$self->export_way($old_gvid, $new_gvid, $graph);
 	} else {
 		$self->export_level($version, $script_version, 0, 0);
 	}		
 }
 sub export_alife {
 	my $self = shift;
-	my ($version, $script_version, $old_gvid, $new_gvid) = @_;
+	my ($version, $script_version, $old_gvid, $new_gvid, $graph) = @_;
 
 	my $id = 0;
 	my %if_by_level;
@@ -6756,7 +7040,7 @@ sub export_alife {
 	foreach my $object (@{$self->{alife_objects}}) {
 		$object->convert_spawn($version, $script_version, $old_gvid, $new_gvid);
 		my $cse_object = $object->{cse_object};
-		my $level = name_by_gvid($cse_object->{game_vertex_id});
+		my $level = $graph->level_name($cse_object->{game_vertex_id});
 #		print "$cse_object->{game_vertex_id}\n";
 		die "unknown location of the alife object\n" unless defined $level;
 		my $lif = $if_by_level{$level};
@@ -6792,7 +7076,7 @@ sub export_level {
 }
 sub export_way {
 	my $self = shift;
-	my ($old_gvid, $new_gvid) = @_;
+	my ($version, $script_version, $old_gvid, $new_gvid, $graph) = @_;
 	
 	if (defined @{$self->{way_objects}}) {
 		my %info_by_level;
@@ -6802,7 +7086,7 @@ sub export_way {
 			foreach my $point (@{$object->{points}}) {
 				$point->{game_vertex_id} += ($new_gvid - $old_gvid);
 			}
-			my $level = name_by_gvid($object->{points}[0]->{game_vertex_id});
+			my $level = $graph->level_name($object->{points}[0]->{game_vertex_id});
 			if (defined $level) {
 				$default_level = $level;
 			} else {
@@ -6836,13 +7120,114 @@ sub export_way {
 	}
 }
 ############################################################
+package parsing ;
+use strict;
+use IO::File;
+use stkutils::ini_file;
+use stkutils::chunked_file;
+
+sub new {
+	my $class = shift;
+	my $self = {};
+	bless($self, $class);
+	return $self;
+}
+use constant way_name_exceptions => {
+	kat_teleport_to_dark_city_orientation	=> 'l03u_agr_underground',
+	walk_3					=> 'l05_bar',
+	rad_heli_move				=> 'l10_radar',
+	pri_heli4_go2_path			=> 'l11_pripyat',
+	sar_teleport_0000_exit_look		=> 'l12u_sarcofag',
+	sar_teleport_0000_exit_walk		=> 'l12u_sarcofag',
+	val_ambush_dest_look		=> 'l04_darkvalley',
+};
+sub import {
+	my $self = shift;
+	my ($fn) = @_;
+
+	$self->import_alife($fn);
+	if (::way()) {
+		$self->import_way($fn);
+	}
+}
+sub import_alife {
+	my $self = shift;
+	my ($if) = @_;
+	my $lif = stkutils::ini_file->new($if, 'r') or die "cannot open $if\n";
+	print "importing alife objects from file $if...\n";
+	foreach my $section (@{$lif->{sections_list}}) {
+		my $object = alife_object->new();
+		$object->state_import($lif, $section);
+		push @{$self->{alife_objects}}, $object;
+	}
+	$lif->close();
+}
+sub import_way {
+	my $self = shift;
+	my ($if) = @_;
+
+	my $lif = stkutils::ini_file->new('way'.substr($if, 5), 'r') or die;
+	print "importing way objects from file $if...\n";
+	foreach my $section (@{$lif->{sections_list}}) {
+		my $object = way_object->new();
+		$object->state_import($lif, $section);
+		push @{$self->{way_objects}}, $object;
+	}
+	$lif->close();
+}
+sub export {
+	my $self = shift;
+	my ($parse, $old_gvid, $new_gvid) = @_;
+
+	$self->export_alife($parse, $old_gvid, $new_gvid);
+	if (::way()) {
+		$self->export_way($parse, $old_gvid, $new_gvid);
+	}
+}
+sub export_alife {
+	my $self = shift;
+	my ($fn, $old_gvid, $new_gvid, $graph) = @_;
+
+	my $id = 0;
+	my %if_by_level;
+	my @levels;
+	my $if = stkutils::ini_file->new($fn, 'w') or die;
+	print "exporting alife objects...\n";
+	foreach my $object (@{$self->{alife_objects}}) {
+		$object->{cse_object}->{game_vertex_id} += $new_gvid - $old_gvid;
+		$object->state_export($if, $id++);
+	}
+	$if->close();
+}
+sub export_way {
+	my $self = shift;
+	my ($fn, $old_gvid, $new_gvid) = @_;
+	
+	if (defined @{$self->{way_objects}}) {
+
+		foreach my $object (@{$self->{way_objects}}) {
+			foreach my $point (@{$object->{points}}) {
+				$point->{game_vertex_id} += ($new_gvid - $old_gvid);
+			}
+			
+		}
+		my $if = stkutils::ini_file->new('way'.substr($fn, 5), 'w') or die;
+		my $id = 0;
+		print "exporting way objects...\n";
+		foreach my $object (@{$self->{way_objects}}) {
+			$object->state_export($if, $id++);
+		}
+		$if->close();
+	}
+}
+############################################################
 package all_spawn;
 use strict;
 use IO::File;
 #use Scalar::Util 'blessed';
 use stkutils::ini_file;
 use stkutils::chunked_file;
-use stkutils::level 'name_by_gvid';
+
 sub new {
 	my $class = shift;
 	my $self = {};
@@ -7328,14 +7713,14 @@ sub import_graph {
 }
 sub export {
 	my $self = shift;
-	my ($fn) = @_;
+	my ($fn, $graph) = @_;
 
 	if (not(::level())) {
 		my $if = stkutils::ini_file->new($fn, 'w') or die;
 		$self->export_header($if);
-		$self->export_alife($if);
+		$self->export_alife($if, $graph);
 		$self->export_section2($if);
-		$self->export_way($if);
+		$self->export_way($if, $graph);
 		$self->export_graph($if);
 		$if->close();
 	} else {
@@ -7355,14 +7740,14 @@ sub export_header {
 }
 sub export_alife {
 	my $self = shift;
-	my ($if) = @_;
+	my ($if, $graph) = @_;
 
 	my $id = 0;
 	my %if_by_level;
 	my @levels;
 	foreach my $object (@{$self->{alife_objects}}) {
 		my $cse_object = $object->{cse_object};
-		my $level = name_by_gvid($cse_object->{game_vertex_id});
+		my $level = $graph->level_name($cse_object->{game_vertex_id});
 		die "unknown location of the alife object\n" unless defined $level;
 		my $lif = $if_by_level{$level};
 		if (!defined $lif) {
@@ -7436,14 +7821,14 @@ use constant way_name_exceptions => {
 };
 sub export_way {
 	my $self = shift;
-	my ($if) = @_;
+	my ($if, $graph) = @_;
 	
 	if (defined @{$self->{way_objects}}) {
 		my %info_by_level;
 
 		my $default_level = 'l05_bar';
 		foreach my $object (@{$self->{way_objects}}) {
-			my $level = name_by_gvid($object->{points}[0]->{game_vertex_id});
+			my $level = $graph->level_name($object->{points}[0]->{game_vertex_id});
 			if (defined $level) {
 				$default_level = $level;
 			} else {
@@ -7568,13 +7953,18 @@ sub usage {
 S.T.A.L.K.E.R. all.spawn compiler/decompiler
 Usage: acdc -d all.spawn [-o outdir]
        acdc -c all.ltx [-f flag1[,...]] [-a level:point] [-o outfile]
-	acdc -convert <location> [-game1 <game1>,<old_gvid0>] [-game2 <game2>,<new_gvid0>]
 END
 }
 sub convert_usage {
 	return <<END
 	Bad Game Syntax!
-Usage: acdc -convert <location> -game1 <game1>,<old_gvid0> -game2 <game2>,<new_gvid0>
+Usage: acdc -convert <location> [-game1 <game1>,<old_gvid0>] [-game2 <game2>,<new_gvid0>]
+END
+}
+sub parse_usage {
+	return <<END
+	Bad Game Syntax!
+Usage: acdc -parse <location> [-game1 <old_gvid0>] [-game2 <new_gvid0>] [-way]
 END
 }
 
@@ -7586,9 +7976,12 @@ my %flags_hash;
 my $actor_pos;
 my $level_spawn;
 my $use_2942;
+my $use_hack;
 my $convert;
 my $game1;
 my $game2;
+my $parse;
+my $way;
 
 GetOptions(
 	'd=s' => \$spawn_file,
@@ -7600,7 +7993,10 @@ GetOptions(
 	'f=s' => \$flags,
 	'a=s' => \$actor_pos,
 	'l' => \$level_spawn,	
-	'2942' => \$use_2942,	
+	'2942' => \$use_2942,
+	'hack' => \$use_hack,
+	'parse=s' => \$parse,		
+	'way' => \$way,	
 ) or die usage();
 
 if (defined $flags) {
@@ -7611,7 +8007,7 @@ if (defined $flags) {
 }
 
 if (defined $convert) {
-	die "bad params\n" if (defined $src_file or defined $actor_pos or defined $spawn_file or (not (defined $game1 or defined $game2)));
+	die convert_usage() if (defined $src_file or defined $actor_pos or defined $spawn_file or (not (defined $game1 or defined $game2)));
 	my $params = {};
 	$params->{old_game} = {};
 	$params->{new_game} = {};
@@ -7634,6 +8030,11 @@ if (defined $convert) {
 	$params->{new_game}->{script_version},
 	$params->{new_game}->{build}) = build_version::version_by_build($params->{new_game}->{short_build});
 	print "converting from $params->{old_game}->{build} spawn format to $params->{new_game}->{build} spawn format...\n";
+	my $graph = vertex_table->new();
+	$graph->{build_version} = build_version::graph_build($params->{old_game}->{version}, $params->{old_game}->{script_version});
+	if (not ::level()) {
+		$graph->read();
+	}
 	my $spawn = converting->new();
 	$spawn->import($convert);
 	File::Path::mkpath('converted_spawn', 0);
@@ -7702,12 +8103,17 @@ if (defined $convert) {
 	my $spawn = all_spawn->new();
 	print "reading $spawn_file...\n";
 	$spawn->read($spawn_file, $table->{version});
+	my $graph = vertex_table->new();
+	$graph->{build_version} = build_version::graph_build($table->{version}, $table->{script_version});
+	if (not ::level()) {
+		$graph->read($table->{version}, $spawn);
+	}
 	defined $out && do {
 		File::Path::mkpath($out, 0);
 		chdir $out or die "cannot change path to $out\n";
 	};
 	print "exporting alife objects...\n";	
-	$spawn->export('all.ltx');
+	$spawn->export('all.ltx', $graph);
 } elsif (defined $src_file) {
 	die "bad params\n" if defined $spawn_file;
 	my $spawn = all_spawn->new();
@@ -7720,16 +8126,58 @@ if (defined $convert) {
 	print "writing $out...\n";
 	$spawn->write($out);
 	print "done!\n";
+} elsif (defined $parse) {
+	die parse_usage() if (defined $src_file or defined $actor_pos or defined $spawn_file or (not (defined $game1 or defined $game2)));
+	print "parsing...\n";
+	my $spawn = parsing->new();
+	$spawn->import($parse);
+	File::Path::mkpath('parsed_spawn', 0);
+	chdir 'parsed_spawn' or die "cannot change path to parsed_spawn\n";
+	$spawn->export($parse, $game1, $game2);
+	print "done!\n";	
 } else {
 	die usage();
 }
 
-sub is_convert {return defined $convert;}
+sub is_convert {return defined $convert}
+sub way {return defined $way}
 sub is_flag_defined {
 	return (defined $flags_hash{$_[0]}) ? 1 : 0;
 }
-sub level {return (defined $level_spawn)}
-sub use_2942 {return (defined $use_2942)}
+sub level {return defined $level_spawn}
+sub use_2942 {return defined $use_2942}
+sub use_hack {return defined $use_hack}
+sub edge_block_size {
+	if ($_[0] eq 'soc' or $_[0] eq 'cop') {
+		return 0x06;
+	} else {
+		return 0x08;
+	}
+}
+sub vertex_block_size {
+	if ($_[0] eq '1469' or $_[0] eq '1472') {
+		return 0x24;
+	} elsif ($_[0] eq '1510' or $_[0] eq '1935' or $_[0] eq '2215') {
+		return 0x28;
+	} else {
+		return 0x2a;
+	}
+}
+sub header_size {
+	if ($_[0] eq '1469' or $_[0] eq '1472') {
+		return 0x0C;
+	} elsif ($_[0] eq '1510' or $_[0] eq '1935') {
+		return 0x14;
+	} elsif ($_[0] eq '2215') {
+		if (::level_graph()) {
+			return 0x14;
+		} else {
+			return 0x24;
+		}
+	} else {
+		return 0x1C;
+	}
+}
 
 my %markers;
 sub set_save_marker {
