@@ -1,0 +1,399 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{7ADF7F28-CC62-489D-81EB-B4922F0611CB}</ProjectGuid>
+    <RootNamespace>xray_re</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\binaries\$(Configuration)\libraries\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\binaries\$(Configuration)\libraries\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\binaries\$(Configuration)\libraries\x64\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\intermediate\$(Configuration)\$(ProjectName)\x64\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\3rd party\nvtt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>nvtt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\nvtt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>nvtt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\bld-vs2008\x64\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>..\..\3rd party\nvtt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>nvtt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>..\..\3rd party\nvtt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>nvtt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\xr_dm.cxx" />
+    <ClCompile Include="..\xr_object.cxx" />
+    <ClCompile Include="..\xr_ogf.cxx" />
+    <ClCompile Include="..\xr_ogf_v3.cxx" />
+    <ClCompile Include="..\xr_ogf_v4.cxx" />
+    <ClCompile Include="..\xr_surface.cxx" />
+    <ClCompile Include="..\xr_matrix.cxx" />
+    <ClCompile Include="..\xr_quaternion.cxx" />
+    <ClCompile Include="..\xr_vector3.cxx" />
+    <ClCompile Include="..\xr_file_system.cxx" />
+    <ClCompile Include="..\xr_file_system_win32.cxx" />
+    <ClCompile Include="..\xr_ini_file.cxx" />
+    <ClCompile Include="..\xr_lzhuf.cxx" />
+    <ClCompile Include="..\xr_reader.cxx" />
+    <ClCompile Include="..\xr_reader_scrambler.cxx" />
+    <ClCompile Include="..\xr_scrambler.cxx" />
+    <ClCompile Include="..\xr_writer.cxx" />
+    <ClCompile Include="..\xr_bone.cxx" />
+    <ClCompile Include="..\xr_envelope.cxx" />
+    <ClCompile Include="..\xr_envelope_eval.cxx" />
+    <ClCompile Include="..\xr_influence.cxx" />
+    <ClCompile Include="..\xr_motion.cxx" />
+    <ClCompile Include="..\xr_obj_motion.cxx" />
+    <ClCompile Include="..\xr_skeleton.cxx" />
+    <ClCompile Include="..\xr_skl_motion.cxx" />
+    <ClCompile Include="..\xr_blender.cxx" />
+    <ClCompile Include="..\xr_build_lights.cxx" />
+    <ClCompile Include="..\xr_cform.cxx" />
+    <ClCompile Include="..\xr_d3d_light.cxx" />
+    <ClCompile Include="..\xr_details.cxx" />
+    <ClCompile Include="..\xr_gamemtls_lib.cxx" />
+    <ClCompile Include="..\xr_level.cxx" />
+    <ClCompile Include="..\xr_level_ai.cxx" />
+    <ClCompile Include="..\xr_level_cform.cxx" />
+    <ClCompile Include="..\xr_level_details.cxx" />
+    <ClCompile Include="..\xr_level_dm.cxx" />
+    <ClCompile Include="..\xr_level_env_mod.cxx" />
+    <ClCompile Include="..\xr_level_fog_vol.cxx" />
+    <ClCompile Include="..\xr_level_game.cxx" />
+    <ClCompile Include="..\xr_level_gct.cxx" />
+    <ClCompile Include="..\xr_level_gct_v9.cxx" />
+    <ClCompile Include="..\xr_level_geom.cxx" />
+    <ClCompile Include="..\xr_level_glows.cxx" />
+    <ClCompile Include="..\xr_level_graph.cxx" />
+    <ClCompile Include="..\xr_level_hom.cxx" />
+    <ClCompile Include="..\xr_level_lights.cxx" />
+    <ClCompile Include="..\xr_level_ltx.cxx" />
+    <ClCompile Include="..\xr_level_portals.cxx" />
+    <ClCompile Include="..\xr_level_ps_static.cxx" />
+    <ClCompile Include="..\xr_level_sectors.cxx" />
+    <ClCompile Include="..\xr_level_shaders.cxx" />
+    <ClCompile Include="..\xr_level_snd_env.cxx" />
+    <ClCompile Include="..\xr_level_snd_static.cxx" />
+    <ClCompile Include="..\xr_level_som.cxx" />
+    <ClCompile Include="..\xr_level_spawn.cxx" />
+    <ClCompile Include="..\xr_level_visuals.cxx" />
+    <ClCompile Include="..\xr_level_wallmarks.cxx" />
+    <ClCompile Include="..\xr_shaders_lib.cxx" />
+    <ClCompile Include="..\xr_shaders_xrlc_lib.cxx" />
+    <ClCompile Include="..\xr_ai_cross_table.cxx" />
+    <ClCompile Include="..\xr_ai_graph.cxx" />
+    <ClCompile Include="..\xr_ai_way.cxx" />
+    <ClCompile Include="..\xr_clsid.cxx" />
+    <ClCompile Include="..\xr_entity.cxx" />
+    <ClCompile Include="..\xr_entity_factory.cxx" />
+    <ClCompile Include="..\xr_entity_script.cxx" />
+    <ClCompile Include="..\xr_entity_zenobian.cxx" />
+    <ClCompile Include="..\xr_game_graph.cxx" />
+    <ClCompile Include="..\xr_game_spawn.cxx" />
+    <ClCompile Include="..\xr_packet.cxx" />
+    <ClCompile Include="..\xr_build_err.cxx" />
+    <ClCompile Include="..\xr_geom_buf.cxx" />
+    <ClCompile Include="..\xr_mesh.cxx" />
+    <ClCompile Include="..\xr_mesh_builder.cxx" />
+    <ClCompile Include="..\xr_mesh_vbuf.cxx" />
+    <ClCompile Include="..\xr_cl_parser.cxx" />
+    <ClCompile Include="..\xr_guid.cxx" />
+    <ClCompile Include="..\xr_image.cxx" />
+    <ClCompile Include="..\xr_image_bmp.cxx" />
+    <ClCompile Include="..\xr_image_dds.cxx" />
+    <ClCompile Include="..\xr_image_tga.cxx" />
+    <ClCompile Include="..\xr_log.cxx" />
+    <ClCompile Include="..\xr_name_gen.cxx" />
+    <ClCompile Include="..\xr_sound_thumbnail.cxx" />
+    <ClCompile Include="..\xr_texture_thumbnail.cxx" />
+    <ClCompile Include="..\xr_scene.cxx" />
+    <ClCompile Include="..\xr_scene_ai_map.cxx" />
+    <ClCompile Include="..\xr_scene_details.cxx" />
+    <ClCompile Include="..\xr_scene_glows.cxx" />
+    <ClCompile Include="..\xr_scene_groups.cxx" />
+    <ClCompile Include="..\xr_scene_lights.cxx" />
+    <ClCompile Include="..\xr_scene_objects.cxx" />
+    <ClCompile Include="..\xr_scene_part.cxx" />
+    <ClCompile Include="..\xr_scene_particles.cxx" />
+    <ClCompile Include="..\xr_scene_portals.cxx" />
+    <ClCompile Include="..\xr_scene_revision.cxx" />
+    <ClCompile Include="..\xr_scene_sectors.cxx" />
+    <ClCompile Include="..\xr_scene_shapes.cxx" />
+    <ClCompile Include="..\xr_scene_sound_envs.cxx" />
+    <ClCompile Include="..\xr_scene_sound_srcs.cxx" />
+    <ClCompile Include="..\xr_scene_spawns.cxx" />
+    <ClCompile Include="..\xr_scene_visuals.cxx" />
+    <ClCompile Include="..\xr_scene_wallmarks.cxx" />
+    <ClCompile Include="..\xr_scene_ways.cxx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\xr_dm.h" />
+    <ClInclude Include="..\xr_object.h" />
+    <ClInclude Include="..\xr_object_format.h" />
+    <ClInclude Include="..\xr_ogf.h" />
+    <ClInclude Include="..\xr_ogf_format.h" />
+    <ClInclude Include="..\xr_ogf_v3.h" />
+    <ClInclude Include="..\xr_ogf_v4.h" />
+    <ClInclude Include="..\xr_surface.h" />
+    <ClInclude Include="..\xr_aabb.h" />
+    <ClInclude Include="..\xr_cylinder.h" />
+    <ClInclude Include="..\xr_limits.h" />
+    <ClInclude Include="..\xr_math.h" />
+    <ClInclude Include="..\xr_matrix.h" />
+    <ClInclude Include="..\xr_obb.h" />
+    <ClInclude Include="..\xr_plane.h" />
+    <ClInclude Include="..\xr_quaternion.h" />
+    <ClInclude Include="..\xr_rect.h" />
+    <ClInclude Include="..\xr_shape.h" />
+    <ClInclude Include="..\xr_sphere.h" />
+    <ClInclude Include="..\xr_vector2.h" />
+    <ClInclude Include="..\xr_vector3.h" />
+    <ClInclude Include="..\xr_vector4.h" />
+    <ClInclude Include="..\xr_file_system.h" />
+    <ClInclude Include="..\xr_file_system_win32.h" />
+    <ClInclude Include="..\xr_ini_file.h" />
+    <ClInclude Include="..\xr_lzhuf.h" />
+    <ClInclude Include="..\xr_reader.h" />
+    <ClInclude Include="..\xr_scrambler.h" />
+    <ClInclude Include="..\xr_writer.h" />
+    <ClInclude Include="..\xr_bone.h" />
+    <ClInclude Include="..\xr_envelope.h" />
+    <ClInclude Include="..\xr_influence.h" />
+    <ClInclude Include="..\xr_motion.h" />
+    <ClInclude Include="..\xr_obj_motion.h" />
+    <ClInclude Include="..\xr_skeleton.h" />
+    <ClInclude Include="..\xr_skl_motion.h" />
+    <ClInclude Include="..\xr_blender.h" />
+    <ClInclude Include="..\xr_build_lights.h" />
+    <ClInclude Include="..\xr_cform.h" />
+    <ClInclude Include="..\xr_d3d_lights.h" />
+    <ClInclude Include="..\xr_details.h" />
+    <ClInclude Include="..\xr_gamemtls_lib.h" />
+    <ClInclude Include="..\xr_level.h" />
+    <ClInclude Include="..\xr_level_ai.h" />
+    <ClInclude Include="..\xr_level_cform.h" />
+    <ClInclude Include="..\xr_level_details.h" />
+    <ClInclude Include="..\xr_level_dm.h" />
+    <ClInclude Include="..\xr_level_env_mod.h" />
+    <ClInclude Include="..\xr_level_fog_vol.h" />
+    <ClInclude Include="..\xr_level_game.h" />
+    <ClInclude Include="..\xr_level_gct.h" />
+    <ClInclude Include="..\xr_level_geom.h" />
+    <ClInclude Include="..\xr_level_glows.h" />
+    <ClInclude Include="..\xr_level_graph.h" />
+    <ClInclude Include="..\xr_level_hom.h" />
+    <ClInclude Include="..\xr_level_lights.h" />
+    <ClInclude Include="..\xr_level_ltx.h" />
+    <ClInclude Include="..\xr_level_portals.h" />
+    <ClInclude Include="..\xr_level_ps_static.h" />
+    <ClInclude Include="..\xr_level_sectors.h" />
+    <ClInclude Include="..\xr_level_shaders.h" />
+    <ClInclude Include="..\xr_level_snd_env.h" />
+    <ClInclude Include="..\xr_level_snd_static.h" />
+    <ClInclude Include="..\xr_level_som.h" />
+    <ClInclude Include="..\xr_level_spawn.h" />
+    <ClInclude Include="..\xr_level_version.h" />
+    <ClInclude Include="..\xr_level_visuals.h" />
+    <ClInclude Include="..\xr_level_wallmarks.h" />
+    <ClInclude Include="..\xr_shaders_lib.h" />
+    <ClInclude Include="..\xr_shaders_xrlc_lib.h" />
+    <ClInclude Include="..\xr_wallmarks.h" />
+    <ClInclude Include="..\xr_ai_cross_table.h" />
+    <ClInclude Include="..\xr_ai_graph.h" />
+    <ClInclude Include="..\xr_ai_map.h" />
+    <ClInclude Include="..\xr_ai_version.h" />
+    <ClInclude Include="..\xr_ai_way.h" />
+    <ClInclude Include="..\xr_clsid.h" />
+    <ClInclude Include="..\xr_entity.h" />
+    <ClInclude Include="..\xr_entity_factory.h" />
+    <ClInclude Include="..\xr_entity_script.h" />
+    <ClInclude Include="..\xr_entity_zenobian.h" />
+    <ClInclude Include="..\xr_game_graph.h" />
+    <ClInclude Include="..\xr_game_spawn.h" />
+    <ClInclude Include="..\xr_packet.h" />
+    <ClInclude Include="..\xr_build_err.h" />
+    <ClInclude Include="..\xr_geom_buf.h" />
+    <ClInclude Include="..\xr_mesh.h" />
+    <ClInclude Include="..\xr_mesh_builder.h" />
+    <ClInclude Include="..\xr_mesh_utils.h" />
+    <ClInclude Include="..\xr_mesh_vbuf.h" />
+    <ClInclude Include="..\xr_remapper.h" />
+    <ClInclude Include="..\xr_cl_parser.h" />
+    <ClInclude Include="..\xr_color.h" />
+    <ClInclude Include="..\xr_fixed_vector.h" />
+    <ClInclude Include="..\xr_guid.h" />
+    <ClInclude Include="..\xr_image.h" />
+    <ClInclude Include="..\xr_log.h" />
+    <ClInclude Include="..\xr_name_gen.h" />
+    <ClInclude Include="..\xr_sound_thumbnail.h" />
+    <ClInclude Include="..\xr_string_utils.h" />
+    <ClInclude Include="..\xr_texture_thumbnail.h" />
+    <ClInclude Include="..\xr_thumbnail.h" />
+    <ClInclude Include="..\xr_types.h" />
+    <ClInclude Include="..\xr_utils.h" />
+    <ClInclude Include="..\xr_scene.h" />
+    <ClInclude Include="..\xr_scene_ai_map.h" />
+    <ClInclude Include="..\xr_scene_common.h" />
+    <ClInclude Include="..\xr_scene_details.h" />
+    <ClInclude Include="..\xr_scene_glows.h" />
+    <ClInclude Include="..\xr_scene_groups.h" />
+    <ClInclude Include="..\xr_scene_lights.h" />
+    <ClInclude Include="..\xr_scene_objects.h" />
+    <ClInclude Include="..\xr_scene_part.h" />
+    <ClInclude Include="..\xr_scene_particles.h" />
+    <ClInclude Include="..\xr_scene_portals.h" />
+    <ClInclude Include="..\xr_scene_revision.h" />
+    <ClInclude Include="..\xr_scene_sectors.h" />
+    <ClInclude Include="..\xr_scene_shapes.h" />
+    <ClInclude Include="..\xr_scene_sound_envs.h" />
+    <ClInclude Include="..\xr_scene_sound_srcs.h" />
+    <ClInclude Include="..\xr_scene_spawns.h" />
+    <ClInclude Include="..\xr_scene_visuals.h" />
+    <ClInclude Include="..\xr_scene_wallmarks.h" />
+    <ClInclude Include="..\xr_scene_ways.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+  </ImportGroup>
+</Project>
