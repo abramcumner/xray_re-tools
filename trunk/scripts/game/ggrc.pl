@@ -2,7 +2,7 @@
 #
 # tab size:	8
 #
-#Last edited: 23 Apr 2011, ver.0.4
+#Last edited: 23 May 2011, ver.0.5
 #######################################################################
 package gg_header;
 use strict;
@@ -343,6 +343,7 @@ use IO::File;
 use stkutils::data_packet;
 use stkutils::chunked_file;
 use Cwd;
+use Digest::MD5 qw(md5_hex);
 sub new {
 	my $class = shift;
 	my $self = {};
@@ -530,7 +531,7 @@ sub write {
 		}
 		$game_vertex_id++;
 	}	
-#die;	
+
 	my %append_level_by_id = ();	
 	foreach my $level (@{$append_graph->{levels}}) {
 		$append_level_by_id{$level->{level_id}} = \$level;
@@ -589,7 +590,6 @@ sub write {
 			$gvid_to_substract += $append_level_by_gvid_count{$level};
 		}
 	}
-#	print "$new_level_gvids_offsets{'escape'}, $append_level_by_gvid{'escape'}, $append_level_by_gvid_count{'escape'}\n";
 ##### Ðàç ÷òåíèå êðîññ-òàáëèö è ëåâåë-ïîèíòîâ æðåò ìíîãî ïàìÿòè, áóäåì äîñòàâàòü íóæíûå äàííûå ïðÿìî ïåðåä çàïèñüþ. ####	
 	
 	my $edge_indexes = 0;
@@ -636,12 +636,7 @@ sub write {
 					my $vertex2 = $append_graph->{vertices}[$edge->{game_vertex_id}];
 					my $level_control = $append_level_by_id{$vertex2->{level_id}};
 					if (exists($hash_append_levels{$$level_control->{level_name}})) {
-#						print "$edge->{game_vertex_id}\n";
-#						print "$new_level_gvids_offsets{$$level_control->{level_name}}\n";
 						$edge->{game_vertex_id} -= $new_level_gvids_offsets{$$level_control->{level_name}};
-						if ($edge->{game_vertex_id} < 934) {
-							die "$edge->{game_vertex_id}, $$level_control->{level_name}";
-						}
 						push @{$self->{edges}}, $edge;
 					} else {
 						($vertex->{edge_count})--;
@@ -656,9 +651,16 @@ sub write {
 				push @{$self->{vertices}}, $vertex;
 			}
 	}	
+	my %level_guid_by_name = ();
+	foreach my $level (@{$self->{levels}}) {
+		if (($parent_graph->{header}->{version} > 7) && ($append_graph->{header}->{version} == 7) && exists($hash_append_levels{$level->{level_name}})) {
+			$level->{guid} = genGUID($level->{level_name});
+			$level_guid_by_name{$level->{level_name}} = $level->{guid};
+		}
+	}
 ##### Çàïèøåì ñíà÷àëà ëåâåë-ãðàôû ######
-	print "	writing level graphs...\n";
 	my $work_dir = getcwd();
+	print "	writing level graphs...\n";
 	foreach my $level (@{$self->{levels}}) {
 		my $edge_offsets = 0;
 		$edge_indexes = 0;
@@ -727,7 +729,11 @@ sub write {
 			$new_level->{offset} = [0,0,0];
 			$new_level->{level_id} = 0 if (defined($level->{level_id}));
 			$new_level->{section_name} = '' if (defined($level->{section_name}));
-			$new_level->{guid} = $level->{guid} if (defined($level->{guid}));				
+			if (defined($level->{guid})) {
+				$new_level->{guid} = $level->{guid};
+			} else {
+				$new_level->{guid} = $level_guid_by_name{$level->{level_name}};
+			}
 			my $packet_level =  stkutils::data_packet->new();	
 			$new_level->write($packet_level, $parent_graph->{build_version}, $new_level->{level_id});
 			$lg_file->write($packet_level->data(), length($packet_level->data()));		
@@ -748,7 +754,6 @@ sub write {
 			chdir ($work_dir);
 		}
 	}
-
 ########################################
 	
 	$self->{header} = gg_header->new();
@@ -771,13 +776,15 @@ sub write {
 			}
 		}
 	}
-	
+
+### ÇÀÏÈÑÜ ØÀÏÊÈ ###	
 	print "writing new graph...\n";
 	my $outfile = IO::File->new('game.graph.new', 'w') or die;
 	binmode $outfile;
 	my $packet_header = stkutils::data_packet->new();
 	$self->{header}->write($packet_header, $parent_graph->{build_version}, 1);
 	$outfile->write($packet_header->data(), length($packet_header->data()));
+### ÇÀÏÈÑÜ ÓÐÎÂÍÅÉ ###
 	print "	writing levels...\n";
 	my $lev_id = 1;
 	my %new_id_by_old_id = ();
@@ -789,6 +796,7 @@ sub write {
 	}
 	my $edge_offset = (::vertex_block_size($parent_graph->{build_version})) * $self->{header}->{vertex_count};
 	my $lp_offset = $edge_offset + (::edge_block_size($parent_graph->{build_version})) * $self->{header}->{edge_count};
+### ÇÀÏÈÑÜ ÂÅÐÒÅÊÑÎÂ ###
 	print "	writing vertices...\n";
 	foreach my $vertex (@{$self->{vertices}}) {
 		my $packet = stkutils::data_packet->new();
@@ -796,6 +804,7 @@ sub write {
 		$vertex->write($packet, $parent_graph->{build_version}, $edge_offset, $lp_offset);
 		$outfile->write($packet->data(), length($packet->data()));
 	}
+### ÇÀÏÈÑÜ ÑÂßÇÅÉ ###
 	print "	writing edges...\n";
 	foreach my $edge (@{$self->{edges}}) {
 		my $packet = stkutils::data_packet->new();
@@ -830,7 +839,7 @@ sub write {
 		}
 		$append_gg->close();		
 	}
-
+### ÇÀÏÈÑÜ ÊÐÎÑÑ-ÒÀÁËÈÖ ###
 	print "	writing cross tables...\n";
 	my $global_version = 0;
 	my $global_guid = 0;
@@ -914,12 +923,23 @@ sub write {
 				my $gct_file = stkutils::chunked_file->new('level.gct', 'r');
 				my $cross_table = gg_cross_table->new();
 				my ($index, $size) = $gct_file->r_chunk_open();
-				($cross_table->{version},
-				$cross_table->{cell_count},
-				$cross_table->{vertex_count},
-				$cross_table->{level_guid},
-				$cross_table->{game_guid}) = unpack('VVVa[16]a[16]', $gct_file->r_chunk_data());
+				if ($size == 0x2C) {
+					($cross_table->{version},
+					$cross_table->{cell_count},
+					$cross_table->{vertex_count},
+					$cross_table->{level_guid},
+					$cross_table->{game_guid}) = unpack('VVVa[16]a[16]', $gct_file->r_chunk_data());
+				} elsif ($size == 0x0C) {
+					($cross_table->{version},
+					$cross_table->{cell_count},
+					$cross_table->{vertex_count}) = unpack('VVV', $gct_file->r_chunk_data());				
+				} else {
+					die "unexpected size of header chunk in $level cross table\n"
+				}
 				$gct_file->r_chunk_close();
+				if ($cross_table->{version} < 8) {
+					$cross_table->{level_guid} = $level_guid_by_name{$level};
+				}
 				$cross_table->{version} = $global_version;
 				$cross_table->{game_guid} = $global_guid;
 				($index, $size) = $gct_file->r_chunk_open();
@@ -936,36 +956,6 @@ sub write {
 		}
 	} else {
 		print "		updating old cross tables...\n";
-		foreach my $level (keys %hash_parent_levels) {
-			my $dir = 'levels\\'.$level.'';
-			chdir ($dir);
-			my $data;
-			my $gct_file = stkutils::chunked_file->new('level.gct', 'r');
-			my $cross_table = gg_cross_table->new();
-			my ($index, $size) = $gct_file->r_chunk_open();
-			($cross_table->{version},
-			$cross_table->{cell_count},
-			$cross_table->{vertex_count},
-			$cross_table->{level_guid},
-			$cross_table->{game_guid}) = unpack('VVVa[16]a[16]', $gct_file->r_chunk_data());
-			$gct_file->r_chunk_close();
-
-			($index, $size) = $gct_file->r_chunk_open();
-			$cross_table->{size} = $size;
-			$cross_table->{raw_data} = $gct_file->r_chunk_data();
-			$gct_file->r_chunk_close();
-			$global_version = $cross_table->{version};
-			$global_guid = $cross_table->{game_guid};
-			$gct_file->close();
-			rename 'level.gct', 'level.gct.bak' or (unlink 'level.gct.bak' and rename 'level.gct', 'level.gct.bak') ;
-			$gct_file = stkutils::chunked_file->new('level.gct', 'w');
-			my $packet = stkutils::data_packet->new();
-			$packet->pack('VVVa[16]a[16]',$cross_table->{version}, $cross_table->{cell_count}, $cross_table->{vertex_count},$cross_table->{level_guid}, $cross_table->{game_guid});
-			$gct_file->w_chunk(0, $packet->{data});
-			$gct_file->w_chunk(1, $cross_table->{raw_data});
-			$gct_file->close();
-			chdir ($work_dir);	
-		}
 		if ($append_graph->{build_version} eq 'cop') {
 			print "		writing new cross tables...\n";
 			foreach my $level_name (sort {$append_level_by_gvid{$a} <=> $append_level_by_gvid{$b}} keys %append_level_by_gvid) {
@@ -980,16 +970,22 @@ sub write {
 						my $packet = stkutils::data_packet->new($ct_header);
 						my @values = $packet->unpack('VVVVa[16]a[16]');
 						$new_table->{size} = $values[0];
-						$new_table->{version} = $global_version;
+						$new_table->{version} = $parent_graph->{header}->{version};
 						$new_table->{cell_count} = $values[2];
 						$new_table->{vertex_count} = $values[3];
 						$new_table->{level_guid} = $values[4];
-						$new_table->{game_guid} = $global_guid;
+						$new_table->{game_guid} = $parent_graph->{header}->{guid};
 
 						my $dir = 'levels\\'.$level_name.'';
 						chdir ($dir);
 						my $gct_file = stkutils::chunked_file->new('level.gct', 'w');
-						$packet->pack('VVVa[16]a[16]',$new_table->{version}, $new_table->{cell_count}, $new_table->{vertex_count},$new_table->{level_guid}, $new_table->{game_guid});
+						if ($parent_graph->{header}->{version} > 7) {
+							$packet->pack('VVVa[16]a[16]',$new_table->{version}, $new_table->{cell_count}, $new_table->{vertex_count},$new_table->{level_guid}, $new_table->{game_guid});
+						} elsif ($parent_graph->{header}->{version} == 7) {
+							$packet->pack('VVV',$new_table->{version}, $new_table->{cell_count}, $new_table->{vertex_count});
+						} else {
+							die "unsupported cross table version\n"
+						}
 						$gct_file->w_chunk(0, $packet->{data});
 						my $ct_raw = '';
 						$append_gg->read($ct_raw, $new_table->{size} - 0x30);
@@ -1006,23 +1002,40 @@ sub write {
 				my $gct_file = stkutils::chunked_file->new('level.gct', 'r');
 				my $cross_table = gg_cross_table->new();
 				my ($index, $size) = $gct_file->r_chunk_open();
-				($cross_table->{version},
-				$cross_table->{cell_count},
-				$cross_table->{vertex_count},
-				$cross_table->{level_guid},
-				$cross_table->{game_guid}) = unpack('VVVa[16]a[16]', $gct_file->r_chunk_data());
+				if ($size == 0x2C) {
+					($cross_table->{version},
+					$cross_table->{cell_count},
+					$cross_table->{vertex_count},
+					$cross_table->{level_guid},
+					$cross_table->{game_guid}) = unpack('VVVa[16]a[16]', $gct_file->r_chunk_data());
+				} elsif ($size == 0x0C) {
+					($cross_table->{version},
+					$cross_table->{cell_count},
+					$cross_table->{vertex_count}) = unpack('VVV', $gct_file->r_chunk_data());				
+				} else {
+					die "unexpected size of header chunk in $level cross table\n"
+				}
 				$gct_file->r_chunk_close();
 				($index, $size) = $gct_file->r_chunk_open();
 				$cross_table->{size} = $size;
 				$cross_table->{raw_data} = $gct_file->r_chunk_data();
 				$gct_file->r_chunk_close();
-				$cross_table->{version} = $global_version;
-				$cross_table->{game_guid} = $global_guid;
+				$cross_table->{version} = $parent_graph->{header}->{version};
+				if ($append_graph->{header}->{version} == 7) {
+					$cross_table->{level_guid} = $level_guid_by_name{$level};
+				}
+				$cross_table->{game_guid} = $parent_graph->{header}->{guid};
 				$gct_file->close();
 				rename 'level.gct', 'level.gct.bak' or (unlink 'level.gct.bak' and rename 'level.gct', 'level.gct.bak') ;
 				$gct_file = stkutils::chunked_file->new('level.gct', 'w');
 				my $packet = stkutils::data_packet->new();
-				$packet->pack('VVVa[16]a[16]',$cross_table->{version}, $cross_table->{cell_count}, $cross_table->{vertex_count},$cross_table->{level_guid}, $cross_table->{game_guid});
+				if ($parent_graph->{header}->{version} > 7) {
+					$packet->pack('VVVa[16]a[16]',$cross_table->{version}, $cross_table->{cell_count}, $cross_table->{vertex_count},$cross_table->{level_guid}, $cross_table->{game_guid});
+				} elsif ($parent_graph->{header}->{version} == 7) {
+					$packet->pack('VVV',$cross_table->{version}, $cross_table->{cell_count}, $cross_table->{vertex_count});
+				} else {
+					die "unsupported cross table version\n"
+				}
 				$gct_file->w_chunk(0, $packet->{data});
 				$gct_file->w_chunk(1, $cross_table->{raw_data});
 				$gct_file->close();
@@ -1031,8 +1044,80 @@ sub write {
 		}
 	}
 	$outfile->close();
-	if ($parent_graph->{header}->{version} != $append_graph->{header}->{version}) {
-		$self->update_level_ai($parent_graph->{header}->{version}, $append_graph->{header}->{version}) if not ::debug();
+### ÎÁÍÎÂËÅÍÈÅ ÀÈ-ÑÅÒÊÈ ###
+	if (($parent_graph->{header}->{version} != $append_graph->{header}->{version}) && (not ::debug())) {
+		my $work_dir = getcwd();
+		print "updating level.ai...\n";
+		my $parent_version = $parent_graph->{header}->{version};
+		my $append_version = $append_graph->{header}->{version};
+		foreach my $level (@{$self->{levels}}) {
+			if (exists $hash_append_levels{$level->{level_name}}) {
+				print "	updating $level->{level_name}...\n";
+				my $dir = 'levels\\'.$level->{level_name}.'';
+				chdir ($dir);
+				rename 'level.ai', 'level.ai.bak' or (unlink 'level.ai.bak' and rename 'level.ai', 'level.ai.bak');
+				my $ai_file = IO::File->new('level.ai.bak','r') or die 'cannot open level.ai for level'.$level->{level_name}.'';
+				binmode $ai_file;
+				my $data;
+				$ai_file->read($data, 0x38) or die;
+				my (
+					$version,
+					$vertex_count,
+					$cell_size,
+					$factor_y,
+					@box,
+					$neighboors,
+				) = unpack('VVfff6V4', $data);
+				my $ai_file_new = IO::File->new('level.ai','w');
+				binmode $ai_file_new;
+				my $packet = stkutils::data_packet->new();
+				$packet->pack('VVfff6V4', $parent_version, $vertex_count, $cell_size, $factor_y, @box, $neighboors);
+				$ai_file_new->write($packet->data(), length($packet->data()));
+				if (($parent_version < 10) && ($append_version < 10)) {
+					my $raw_data = '';
+					my $size = -s 'level.ai.bak';
+					$ai_file->read($raw_data, $size - 0x38) or die;
+					$ai_file_new->write($raw_data, length($raw_data));
+				} else {
+					if ($version == 10) {
+						for (my $i = 0; $i < $vertex_count; $i++) {
+							my $cell;
+							$ai_file->read($cell, 0x17) or die;
+							my (
+								$junk,
+								$cover,
+								$low_cover,
+								$plane,
+								$packed_xz_lo, $packed_xz_hi,
+								$packed_y,
+							) = unpack("a[12]vvvvCv", $cell);
+							my $cell_packet = stkutils::data_packet->new();
+							$cell_packet->pack('a[12]vvvCv', $junk, $cover, $plane, $packed_xz_lo, $packed_xz_hi, $packed_y);
+							$ai_file_new->write($cell_packet->data(), length($cell_packet->data()));
+						}
+					} elsif ($version < 10) {
+						for (my $i = 0; $i < $vertex_count; $i++) {
+							my $cell;
+							$ai_file->read($cell, 0x15) or die;
+							my (
+								$junk,
+								$cover,
+								$plane,
+								$packed_xz_lo, $packed_xz_hi,
+								$packed_y,
+							) = unpack('a[12]vvvCv', $cell);
+							my $cell_packet = stkutils::data_packet->new();
+							$cell_packet->pack('a[12]vvvvCv', $junk, $cover, $cover, $plane, $packed_xz_lo, $packed_xz_hi, $packed_y);
+							$ai_file_new->write($cell_packet->data(), length($cell_packet->data()));
+						}		
+					}
+				}
+				$ai_file_new->close();
+				chdir ($work_dir);
+			}
+		}
+	} else {
+		print "no need to update ai-map\n";
 	}
 	if (::debug()) {
 		print "DEBUG:UPDATING VERTICES IN LEVEL.GCT...\n";
@@ -1075,72 +1160,6 @@ sub write {
 		}
 	}
 	print "done!\n";
-}
-sub update_level_ai {
-	my $self = shift;
-	my $parent_version = shift;
-	my $append_version = shift;
-	my $work_dir = getcwd();
-	print "updating level.ai...\n";
-	foreach my $level (@{$self->{levels}}) {
-		if (exists $hash_append_levels{$level->{level_name}}) {
-			print "	updating $level->{level_name}...\n";
-			my $dir = 'levels\\'.$level->{level_name}.'';
-			chdir ($dir);
-			rename 'level.ai', 'level.ai.bak' or (unlink 'level.ai.bak' and rename 'level.ai', 'level.ai.bak');
-			my $ai_file = IO::File->new('level.ai.bak','r') or die 'cannot open level.ai for level'.$level->{level_name}.'';
-			binmode $ai_file;
-			my $data;
-			$ai_file->read($data, 0x38) or die;
-			my (
-				$version,
-				$vertex_count,
-				$cell_size,
-				$factor_y,
-				@box,
-				$neighboors,
-			) = unpack('VVfff6V4', $data);
-			my $ai_file_new = IO::File->new('level.ai,'w');
-			binmode $ai_file_new;
-			my $packet = stkutils::data_packet->new();
-			$packet->pack('VVfff6V4', $parent_version, $vertex_count, $cell_size, $factor_y, @box, $neighboors);
-			$ai_file_new->write($packet->data(), length($packet->data()));
-			if ($version >= 9) {
-				for (my $i = 0; $i < $vertex_count; $i++) {
-					my $cell;
-					$ai_file->read($cell, 0x17) or die;
-					my (
-						$junk,
-						$cover,
-						$low_cover,
-						$plane,
-						$packed_xz_lo, $packed_xz_hi,
-						$packed_y,
-					) = unpack("a[12]vvvvCv", $cell);
-					my $cell_packet = stkutils::data_packet->new();
-					$cell_packet->pack('a[12]vvvCv', $junk, $cover, $plane, $packed_xz_lo, $packed_xz_hi, $packed_y);
-					$ai_file_new->write($cell_packet->data(), length($cell_packet->data()));
-				}
-			} elsif ($version < 9) {
-				for (my $i = 0; $i < $vertex_count; $i++) {
-					my $cell;
-					$ai_file->read($cell, 0x15) or die;
-					my (
-						$junk,
-						$cover,
-						$plane,
-						$packed_xz_lo, $packed_xz_hi,
-						$packed_y,
-					) = unpack('a[12]vvvCv', $cell);
-					my $cell_packet = stkutils::data_packet->new();
-					$cell_packet->pack('a[12]vvvvCv', $junk, $cover, $cover, $plane, $packed_xz_lo, $packed_xz_hi, $packed_y);
-					$ai_file_new->write($cell_packet->data(), length($cell_packet->data()));
-				}		
-			}
-			$ai_file_new->close();
-			chdir ($work_dir);
-		}
-	}
 }
 sub export {
 	my $self = shift;
@@ -1349,6 +1368,18 @@ sub count_level_points {
 	}
 	print "level points: $count\n";
 }
+sub genGUID {
+    my $seed = shift;
+    my $md5 = uc md5_hex ($seed);
+    my @octets = $md5 =~ /(.{2})/g;
+    
+    substr $octets[6], 0, 1, '4'; # GUID Version 4
+    substr $octets[8], 0, 1, '8'; # draft-leach-uuids-guids-01.txt GUID variant 
+    my $GUID = "@octets[0..3]@octets[4..5]@octets[6..7]@octets[8..9]@octets[10..15]";
+    
+    $GUID =~ s/ //g;
+    return $GUID;
+}
 #######################################################################
 package main;
 use strict;
@@ -1448,7 +1479,7 @@ sub header_size {
 	}
 }
 
-if (!(::add_edge)) {
+if (!(::add_edge())) {
 	my $gg1 = game_graph->new();
 	$gg1->{build_version} = $b1;
 	$gg1->{levels_to_keep} = $l1;

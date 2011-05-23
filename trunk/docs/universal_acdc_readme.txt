@@ -1,6 +1,6 @@
 ===S.T.A.L.K.E.R. *.spawn compiler/decompiler for every build from 1465===
 
-Дата последних правок: 18 мая 2011
+Дата последних правок: 23 мая 2011
 
 Кратко: данный acdc предназначен для распаковки all.spawn/level.spawn от любого билда, начиная с 1465. Информацию
 о версии спавна скрипт берет из параметров cse_abstract первой читаемой секции (version и script_version), 

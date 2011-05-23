@@ -1,6 +1,6 @@
 #!perl -w -I \temp\1\bin
 #
-# last edited: 15 May 2011
+# last edited: 23 May 2011
 #
 #######################################################################
 package cse_abstract;
@@ -8169,11 +8169,7 @@ sub header_size {
 	} elsif ($_[0] eq '1510' or $_[0] eq '1935') {
 		return 0x14;
 	} elsif ($_[0] eq '2215') {
-		if (::level_graph()) {
-			return 0x14;
-		} else {
-			return 0x24;
-		}
+		return 0x24;
 	} else {
 		return 0x1C;
 	}
