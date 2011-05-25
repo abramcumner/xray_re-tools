@@ -19,13 +19,15 @@ void xr_image::save_tga(xr_writer& w) const
 	w.w_u8(32);
 	w.w_u8(0x2f);
 	
-	for (rgba32 *p = m_data, *end = p + m_width*m_height; p != end; ++p) {
-		rgba32 value = *p;
-		w.w_u8(uint8_t(value >> 16));
-		w.w_u8(uint8_t(value >> 8));
-		w.w_u8(uint8_t(value >> 0));
-		w.w_u8(uint8_t(value >> 24));
-	}
+	//for (rgba32 *p = m_data, *end = p + m_width*m_height; p != end; ++p) {
+	//	rgba32 value = *p;
+	//	//w.w_u8(uint8_t(value >> 0));
+	//	//w.w_u8(uint8_t(value >> 8));
+	//	//w.w_u8(uint8_t(value >> 16));
+	//	//w.w_u8(uint8_t(value >> 24));
+	//	w.w_u32(value);
+	//}
+	w.w_raw(m_data, m_width*m_height * sizeof(rgba32));
 }
 
 bool xr_image::save_tga(const char* path, const char* name) const
