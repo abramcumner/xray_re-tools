@@ -318,7 +318,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				AdditionalIncludeDirectories=".."
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;__SSE2__;__SSE__;__MMX__"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;__SSE2__;__SSE__;__MMX__;HAVE_CUDA"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
@@ -338,6 +338,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="cudart.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

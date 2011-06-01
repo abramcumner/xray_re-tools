@@ -389,6 +389,8 @@
 				OutputFile="$(OutDir)\$(ProjectName)_cuda.exe"
 				AdditionalLibraryDirectories="$(OutDir)\libraries"
 				GenerateManifest="true"
+				IgnoreAllDefaultLibraries="false"
+				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
