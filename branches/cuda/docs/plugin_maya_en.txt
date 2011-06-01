@@ -1,0 +1,24 @@
+[Inroduction]
+This plugin implements .ogf, .dm, .object, .omf, .skl, .skls import and
+.object and .skl export.
+
+The plugin is designed to work as a partial replacement for official
+GSC plugins and is compatible with auxiliary scripts, .mb/.ma files and
+official export plugin (xrayMaya_export.mll)
+
+
+[Installation]
+Copy xrayMayaTools.mll into $MAYA_LOCATION\bin\plug-ins,
+xray_path.ltx -- into $MAYA_LOCATION\bin (and update $sdk_root$).
+Remove xrayMaya_material.mll to avoid conflict.
+Disable auto-loading of xrayMaya_export.mll and load it only when
+it is actually required. That is necessary to work-around the FPU
+precision bug in xrCore.dll.
+
+
+[Usage]
+To import external animations (.skl/.skls/.omf), create and select Maya
+character object.
+
+Notes:
+ - big files such as stalker_animation.omf require more than 2GB RAM.

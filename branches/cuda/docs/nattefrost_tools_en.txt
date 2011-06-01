@@ -1,0 +1,24 @@
+Utility: ogf2obj 
+Usage: ogf2obj modelname.ogf modelname.object > parse.log
+if modelname.object skipped - shows structured dump model content, if setted parse.log 
+than this will be written to file, otherwise conversion to modelname.object ( wavefront obj format ) 
+
+Utility: ogf2smd 
+Usage: ogf2smd model_name.ext 
+modelname.ext: xray ogf v4 ( composite model, unites by this: copy /b cat.ogf + catanimation.omf ) 
+Result: conversion to catalog /smd of animations (smd format), reference.smd - base model
+
+Utility: parse_lev 
+Usage: parselev < mode > modelname.ogf > parse.log 
+mode 0: shows structured dump of model content. when setted parse.log this will be written to file
+mode 1: conversion to model_name.ogf 
+mode 2: conversion to model_name.ogf (with vertex optimization) - don't recommended!!! 
+
+Utility: make_ogf 
+Usage: makeogf < number of vertices > < number of indexes > < modelname.îgf > 
+vertices: from 3 to 2^32 (cutted to multiple 3) 
+indexes: from 3 to 65535 (cutted to multiple 3) 
+model_name.îgf: file name - receiver
+Result: creating "trash" psevdorandom model 2 x 2 metres for testing loading on engine and videocard
+
+All console utilites better to run from Far Manager (or cmd.exe) :)

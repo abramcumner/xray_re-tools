@@ -1,0 +1,25 @@
+; имя_карты = секция_с_параметрами
+[levels]
+;testers_mp_atp		= default
+l01_escape		= default
+l02_garbage		= default
+l03_agroprom		= default
+l04_darkvalley		= default
+l05_bar			= default
+
+[default]
+fix_details		= details_params
+fix_fences		= fences_params
+
+[details_params]
+min_scale_factor	= 1.3		; коэффициент увеличения min_scale
+max_scale_factor	= 1.8		; коэффициент увеличения max_scale
+ignore_no_waving	= false		; масштабировать ли ещё и опавшие листья
+density_factor		= 1.0		; коэффициент увеличения плотности (пока игнорируется)
+
+; список текстур, для которых заменить shader на def_shaders\def_aref[_v]
+[fences_params]
+mtl\mtl_fence2
+mtl\mtl_fence2n
+prop\prop_barbwire1
+prop\prop_barbwire3

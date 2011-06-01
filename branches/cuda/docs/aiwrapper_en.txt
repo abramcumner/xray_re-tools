@@ -1,0 +1,153 @@
+[Programms requipments]
+ - X-Ray MOD SDK
+ - MOD SDK + S.T.A.L.K.E.R. version 1.0004 and higher
+
+
+[Specified files and folders]
+aiwrapper.exe		- main-constructor
+fsaiwrapper.ltx		- paths ways for aiwrapper
+aiwrapper.ini		- settings file for aiwrapper
+2215\			- shadow tree, which xrAI uses 
+                    from build 2215 (all updates in it 
+                    aiwrapper is doing automaticly)
+
+deprecated\links.sample	- example of changing edges of AI-graph
+
+
+[Installation]
+Copy aiwrapper.exe and fsaiwrapper.ltx to any folder,
+fix needs path $sdk_root$ (root folder of SDK),
+$2215_fs_root$ (path to shadow tree build 2215) and $cs_fs_root$
+(path to CS tree). Last needs only for aiwrapper -upgrade.
+
+Put aiwrapper.ini into folder with aiwrapper.exe, or into $sdk_root$.
+
+Set $sdk_root$ in $2215_fs_root$\fsgame.ltx.
+
+After that execute one time:
+	> aiwrapper -split_spawns
+
+and if you use modified game:
+	> aiwrapper -split_paths
+
+This commands will split all.spawn into original level.spawn/level.game.
+
+Enumerated files below are in use during work of aiwrapper and xrAI:
+gamedata\config\*
+gamedata\game.graph
+gamedata\spawns\all.spawn
+gamedata\levels\*\level.ai
+gamedata\levels\*\level.game
+gamedata\levels\*\level.gct
+gamedata\levels\*\level.graph
+gamedata\levels\*\level.spawn
+
+
+[Commandline settings of aiwrapper]
+Old xrAI parametres:
+ -h or -?	- help in english
+ -verify <map_name>	- check AI-greed connections for map in
+			  gamedata\levels\<map_name>\
+ -f <map_name>	- build AI-greed for map in 
+		  gamedata\levels\<map_name>\
+ -draft		- draft build of AI-greed (without calculating covers)
+ -g <map_name>	- build AI-graph and crosstable with AI-greed 
+		- for map in gamedata\levels\<map_name>\
+ -m		- gather AI-graphs points of maps into one global game graph
+ -s		- build all.spawn
+
+Own parametres:
+ -fs <file>	- use your own file for setting pathes
+		  (default is fsaiwrapper.ltx)
+ -fast_sync	- update only old files in shadow tree
+ -split_spawns	- break all.spawn to original level.spawn's
+ -split_paths	- break all.spawn to original level.game's
+ -check_paths	- check all.spawn for presence of walk-pathes with hanging vertex'es
+ -upgrade <version>	- reconstruct преобразовать final game.graph,
+		  spawns\all.spawn and
+		  levels\*\level.{ai|gct|env_mod|ps_static} to CS format. 
+              setting <version> should be 3120 for leaked GC'07 build 
+              or 3502 and more for final versions of CS.
+
+Old parametres:
+ -m2 <file>	- gather AI-graphs of maps into one game graph with
+              link changes from your stated file
+ -dump_gp	- put list of original AI-graph vertex'es to
+              file with name links.output
+
+[Introdaction in AI-graph]
+New level should have at least one graph_point and have
+level_changers to other maps. There are two types of level changers.
+First type is used only by player and can added to LE or with acdc.pl.(we dont discuss them)
+Second type is needed for AI-objects moving. AI-transitions(level changers)
+for maps for which we have src you can set in LE. If you havent have
+src, you can use converter.exe.
+
+Usually one AI-graph point is not enough. 
+You can look needed density using this LUA function:
+
+function show_game_graph()
+	local gg = game_graph()
+	for gvid=0,2791 do
+		if gg:valid_vertex_id(gvid) then
+			local vertex = gg:vertex(gvid)
+			local level_name = alife():level_name(vertex:level_id())
+			local lvid = vertex:level_vertex_id()
+			local pos = vertex:level_point()
+			local obj = alife():create("medkit", pos, lvid, gvid)
+			level.map_add_object_spot_ser(obj.id, "alife_presentation_monstr", level_name..":"..gvid)
+		end
+	end
+end
+
+
+[Building AI-components of map]
+1) Add level to list in gamedata\config\game_levels.ltx
+2) LevelEditor -> Compile -> Make Game, там же Make AI-Map и Build.
+3) Build draft AI-greed: 
+	> aiwrapper -draft -f <map_name>
+   Output: gamedata\levels\<map_name>\level.ai.
+4) Check link connections into AI-greed:
+	> aiwrapper -verify <map_name>
+   In case of error you should fix AI-cells in LE and repeat from step 2.
+5) Calculating covers for AI-greed. You should first build geometry
+   to have build.cform (xrLC, we will not discuss it here). Command:
+	> aiwrapper -f <map_name>
+   This step is optional and not needs on only stages of map testing.
+6) Build AI-graphs:
+	> aiwrapper -g <map_name>
+   Output: gamedata\levels\<map_name>\level.{graph|gct.raw}
+7) Gather AI-graphs of maps into one global game graph:
+	> aiwrapper -m
+   Output: gamedata\game.graph and gamedata\levels\*\level.gct
+   (look below in case if we dont have src of maps)
+8) Build all.spawn
+	> aiwrapper -s
+   Output: gamedata\spawns\all.spawn
+9) Add level_changer to new map using acdc.pl.
+   We dont discuss this here.
+10) Register your level in gamedata\config\game_maps_single.ltx.
+   We dont discuss this here.
+
+
+[Notes]
+ - It looks like xrAI from 2215 calculating AI-graphs a bit different,
+   including connection points between levels in global graph. This
+   can affect to speed and also ways of characters moving between maps.
+ - As the result of final building of full game all maps level.gct 
+   will be updated, so this files will need to include spread with 
+   your mod. 
+
+
+[Setting connections between maps without src -- old information]
+For building reverse connections with maps without src you should build
+game.graph with command:
+	> aiwrapper -m2 <file_with_additional_connections_descriptions>
+
+List of target points(vertexes) for AI-level_changers you can get with:
+	> aiwrapper -dump_graph <file_name>
+
+Example of this file is here: deprecated\links.sample.
+
+After gathering of AI-graphs you can look your result by this:
+	> ggtool.pl game.graph

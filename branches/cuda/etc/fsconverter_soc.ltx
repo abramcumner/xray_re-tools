@@ -1,0 +1,34 @@
+$sdk_root$		= false| false| c:\program files\x-ray sdk\level_editor\
+$sdk_root_raw$		= false| false| $sdk_root$|				rawdata\
+$local_root$		= false| false| $sdk_root$
+$server_backup$    	= true|  false| $sdk_root$|     		backup\
+;
+$game_data$    		= false| true|  $sdk_root$|				gamedata\
+$game_ai$    		= true|  false| $game_data$|       		ai\
+$game_spawn$    	= true|  false| $game_data$|       		spawns\
+$game_levels$    	= true|  false| $game_data$|       		levels\
+$game_meshes$    	= true|  true|  $game_data$|       		meshes\|    	*.ogf;*.omf| 	Game Object files
+$game_anims$    	= true|  true|  $game_data$|       		anims\|    	*.anm;*.anms| 	Animation files
+$game_dm$    		= true|  true|  $game_data$|       		meshes\|    	*.dm|          	Detail Model files
+$game_shaders$    	= true|  true|  $game_data$|       		shaders\
+$game_sounds$    	= true|  true|  $game_data$|       		sounds\
+$game_textures$    	= true|  true|  $game_data$|       		textures\
+$game_saves$    	= true|  false| $sdk_root$|       		savedgames\|	*.sav|          Saved games
+$game_scripts$    	= true|  false| $game_data$|       		scripts\|      	*.script|       Game script files
+$game_config$    	= true|  false| $game_data$|       		config\
+;
+$level$      		= false| false| $game_levels$
+$logs$      		= true|  false| $sdk_root$|      		logs\|    	*.err|          Log files
+$sounds$    		= true|  true|  $sdk_root_raw$|    		sounds\|    	*.wav|          Wave files
+$textures$    		= true|  true|  $sdk_root_raw$| 		textures\
+$objects$    		= true|  true|  $sdk_root_raw$|			objects\|    	*.object;*.lwo| XRay objects
+$clips$      		= true|  true|  $sdk_root_raw$| 		objects\|    	*.clip|         Object clips
+$maps$      		= true|  true|  $sdk_root$|      		maps\|    	*.level|        XRay levels
+$groups$      		= true|  true|  $sdk_root$|      		groups\|    	*.group|        XRay groups
+$temp$      		= true|  false| $sdk_root$|       		temp\
+$import$    		= true|  true|  $sdk_root$|       		import\|    	*.object;*.lwo;*.txt;*.xr;*.wav;*.obj;*.ltx|    Files
+$detail_objects$  	= true|  true|  $import$|       		|    		*.dti|          Detail indices
+$omotion$    		= true|  true|  $import$|        		|    		*.anm|          Object animation files
+$omotions$    		= true|  true|  $import$|        		|    		*.anms|         Object animation list files
+$smotion$    		= true|  true|  $import$|        		|    		*.skl;*.skls|   Skeleton motion files
+$sbones$    		= true|  true| 	$import$|        		|    		*.bones|       	Skeleton bone data files

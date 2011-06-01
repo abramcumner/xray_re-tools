@@ -1,0 +1,7 @@
+DESCRIPTION 'MilkShape 3D RAWExporter'
+
+VERSION     1.0
+
+LIBRARY      "msRAWExporter"
+EXPORTS
+    CreatePlugIn
