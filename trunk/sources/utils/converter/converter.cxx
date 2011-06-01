@@ -10,6 +10,7 @@
 #include "xrdemo_tools.h"
 #include "xr_file_system.h"
 #include "xr_log.h"
+#include <time.h>
 
 using namespace xray_re;
 
@@ -233,7 +234,11 @@ int main(int argc, char* argv[])
 		msg("locked");
 		return 0;
 	}
+
+	clock_t start = clock();
 	tools->process(cl);
+	msg("total time: %.3lfs", (clock() - start) / 1.0 / CLOCKS_PER_SEC);
+
 	delete tools;
 	return 0;
 }
