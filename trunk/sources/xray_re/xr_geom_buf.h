@@ -228,7 +228,7 @@ inline void xr_flexbuf::set_owner(bool owner) { m_owner = owner; }
 
 template<typename T> inline T* xr_flexbuf::copy(const T* source, T* target, size_t size) const
 {
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#if defined(_MSC_VER) && _MSC_VER >= 1400 && _MSC_VER < 1600
 	stdext::unchecked_uninitialized_copy(source, source + size, target);
 #else
 	std::uninitialized_copy(source, source + size, target);

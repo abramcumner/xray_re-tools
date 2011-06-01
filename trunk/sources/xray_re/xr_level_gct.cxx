@@ -20,7 +20,7 @@ xr_level_gct::xr_level_gct(const xr_level_gct& that)
 	m_game_guid = that.m_game_guid;
 	if (that.m_cells) {
 		m_cells = new gct_cell[m_num_nodes = that.m_num_nodes];
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#if defined(_MSC_VER) && _MSC_VER >= 1400 && _MSC_VER < 1600
 		stdext::unchecked_uninitialized_copy(that.m_cells, that.m_cells + that.m_num_nodes, m_cells);
 #else
 		std::uninitialized_copy(that.m_cells, that.m_cells + that.m_num_nodes, m_cells);

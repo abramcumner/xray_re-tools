@@ -81,7 +81,7 @@ template<typename T> struct ptr_greater {
 	inline bool operator()(const T* l, const T* r) const { return *l > *r; }
 };
 
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#if defined(_MSC_VER) && _MSC_VER >= 1400 && _MSC_VER < 1600
 #define xr_uninitialized_fill_n(p, n, v)	stdext::unchecked_uninitialized_fill_n((p), (n), (v))
 #else
 #define xr_uninitialized_fill_n(p, n, v)	std::uninitialized_fill_n((p), (n), (v))
