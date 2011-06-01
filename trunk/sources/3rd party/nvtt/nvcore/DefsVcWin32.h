@@ -18,13 +18,13 @@
 #define NV_CONST
 
 // Set standard function names.
-#if _MSC_VER < 1500
 #define snprintf _snprintf
-#define vsnprintf _vsnprintf
+#if _MSC_VER < 1500
+#	define vsnprintf _vsnprintf
+#endif
 #define vsscanf _vsscanf
 #define chdir _chdir
 #define getcwd _getcwd 
-#endif
 
 #define va_copy(a, b)	a = b
 
@@ -71,8 +71,6 @@ typedef uint32              uint;
 #pragma warning(disable : 4702)		// unreachable code in inline expanded function
 #pragma warning(disable : 4711)		// function selected for automatic inlining
 #pragma warning(disable : 4725)		// Pentium fdiv bug
-
-#pragma warning(disable : 4345)		// behavior change: an object of POD type constructed with an initializer of the form () will be default-initialized
 
 #pragma warning(disable : 4786)		// Identifier was truncated and cannot be debugged.
 

@@ -14,10 +14,10 @@ namespace nv
 
 	uint strHash(const char * str, uint h) NV_PURE;
 
-	/// String hash vased on Bernstein's hash.
+	/// String hash based on Bernstein's hash.
 	inline uint strHash(const char * data, uint h = 5381)
 	{
-		uint i;
+		uint i = 0;
 		while(data[i] != 0) {
 			h = (33 * h) ^ uint(data[i]);
 			i++;
@@ -47,9 +47,6 @@ namespace nv
 		explicit StringBuilder( int size_hint );
 		StringBuilder( const char * str );
 		StringBuilder( const StringBuilder & );
-		StringBuilder( int size_hint, const StringBuilder & );	
-		StringBuilder( const char * format, ... ) __attribute__((format (printf, 2, 3)));
-		StringBuilder( int size_hint, const char * format, ... ) __attribute__((format (printf, 3, 4)));
 	
 		~StringBuilder();
 	
@@ -120,18 +117,16 @@ namespace nv
 		char * m_str;
 		
 	};
-	
 
-	/// Path string.
+
+	/// Path string. @@ This should be called PathBuilder.
 	class NVCORE_CLASS Path : public StringBuilder
 	{
 	public:
 		Path() : StringBuilder() {}
 		explicit Path(int size_hint) : StringBuilder(size_hint) {}
-		Path(const StringBuilder & str) : StringBuilder(str) {}
-		Path(int size_hint, const StringBuilder & str) : StringBuilder(size_hint, str) {}	
-		Path(const char * format, ...) __attribute__((format (printf, 2, 3)));
-		Path(int size_hint, const char * format, ...) __attribute__((format (printf, 3, 4)));
+		Path(const char * str) : StringBuilder(str) {}
+		Path(const Path & path) : StringBuilder(path) {}
 		
 		const char * fileName() const;
 		const char * extension() const;
@@ -140,7 +135,7 @@ namespace nv
 		
 		void stripFileName();
 		void stripExtension();
-		
+
 		// statics
 		NVCORE_API static char separator();
 		NVCORE_API static const char * fileName(const char *);
@@ -156,15 +151,14 @@ namespace nv
 		/// Constructs a null string. @sa isNull()
 		String()
 		{
-			data = s_null.data;
-			addRef();
+			data = NULL;
 		}
 
 		/// Constructs a shared copy of str.
 		String(const String & str)
 		{
 			data = str.data;
-			addRef();
+			if (data != NULL) addRef();
 		}
 
 		/// Constructs a shared string from a standard string.
@@ -188,7 +182,6 @@ namespace nv
 		/// Dtor.
 		~String()
 		{
-			nvDebugCheck(data != NULL);
 			release();
 		}
 
@@ -213,19 +206,23 @@ namespace nv
 		/// Implement value semantics.
 		String & operator=( const String & str )
 		{
-			release();
-			data = str.data;
-			addRef();
+			if (str.data != data)
+			{
+				release();
+				data = str.data;
+				addRef();
+			}
 			return *this;
 		}
 
 		/// Equal operator.
 		bool operator==( const String & str ) const
 		{
-			nvDebugCheck(data != NULL);
-			nvDebugCheck(str.data != NULL);
 			if( str.data == data ) {
 				return true;
+			}
+			if ((data == NULL) != (str.data == NULL)) {
+				return false;
 			}
 			return strcmp(data, str.data) == 0;
 		}
@@ -233,18 +230,21 @@ namespace nv
 		/// Equal operator.
 		bool operator==( const char * str ) const
 		{
-			nvDebugCheck(data != NULL);
 			nvCheck(str != NULL);	// Use isNull!
+			if (data == NULL) {
+				return false;
+			}
 			return strcmp(data, str) == 0;
 		}
 
 		/// Not equal operator.
 		bool operator!=( const String & str ) const
 		{
-			nvDebugCheck(data != NULL);
-			nvDebugCheck(str.data != NULL);
 			if( str.data == data ) {
 				return false;
+			}
+			if ((data == NULL) != (str.data == NULL)) {
+				return true;
 			}
 			return strcmp(data, str.data) != 0;
 		}
@@ -252,13 +252,15 @@ namespace nv
 		/// Not equal operator.
 		bool operator!=( const char * str ) const
 		{
-			nvDebugCheck(data != NULL);
 			nvCheck(str != NULL);	// Use isNull!
+			if (data == NULL) {
+				return false;
+			}
 			return strcmp(data, str) != 0;
 		}
 	
 		/// Returns true if this string is the null string.
-		bool isNull() const { nvDebugCheck(data != NULL); return data == s_null.data; }
+		bool isNull() const { return data == NULL; }
 	
 		/// Return the exact length.
 		uint length() const { nvDebugCheck(data != NULL); return uint(strlen(data)); }
@@ -267,44 +269,45 @@ namespace nv
 		uint hash() const { nvDebugCheck(data != NULL); return strHash(data); }
 	
 		/// const char * cast operator.
-		operator const char * () const { nvDebugCheck(data != NULL); return data; }
+		operator const char * () const { return data; }
 	
 		/// Get string pointer.
-		const char * str() const { nvDebugCheck(data != NULL); return data; }
+		const char * str() const { return data; }
 	
 
 	private:
 
-		enum null_t { null };
-		
-		// Private constructor for null string.
-		String(null_t) {
-			setString("");
-		}
-
 		// Add reference count.
-		void addRef() {
-			nvDebugCheck(data != NULL);
-			setRefCount(getRefCount() + 1);
-		}
-		
-		// Decrease reference count.
-		void release() {
-			nvDebugCheck(data != NULL);
-
-			const uint16 count = getRefCount();
-			setRefCount(count - 1);
-			if( count - 1 == 0 ) {
-				mem::free(data - 2);
-				data = NULL;
+		void addRef()
+		{
+			if (data != NULL)
+			{
+				setRefCount(getRefCount() + 1);
 			}
 		}
 		
-		uint16 getRefCount() const {
+		// Decrease reference count.
+		void release()
+		{
+			if (data != NULL)
+			{
+				const uint16 count = getRefCount();
+				setRefCount(count - 1);
+				if (count - 1 == 0) {
+					mem::free(data - 2);
+					data = NULL;
+				}
+			}
+		}
+		
+		uint16 getRefCount() const
+		{
+			nvDebugCheck(data != NULL);
 			return *reinterpret_cast<const uint16 *>(data - 2);
 		}
 		
 		void setRefCount(uint16 count) {
+			nvDebugCheck(data != NULL);
 			nvCheck(count < 0xFFFF);
 			*reinterpret_cast<uint16 *>(const_cast<char *>(data - 2)) = uint16(count);
 		}
@@ -342,8 +345,6 @@ namespace nv
 		}
 	
 	private:
-
-		NVCORE_API static String s_null;
 
 		const char * data;
 		
