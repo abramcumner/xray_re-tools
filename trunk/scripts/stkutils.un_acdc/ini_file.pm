@@ -7,7 +7,7 @@ sub new {
 	my $class = shift;
 	my ($fn, $mode) = @_;
 
-	my $fh = IO::File->new($fn, $mode) or die "cannot open $fn\n";
+	my $fh = IO::File->new($fn, $mode) or return undef;
 
 	my $self = {};
 	$self->{fh} = $fh;

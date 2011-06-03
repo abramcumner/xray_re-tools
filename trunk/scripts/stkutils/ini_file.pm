@@ -24,7 +24,7 @@ sub _include_ini {
 		#print "ini: reading '$fn'\n";
 	}
 	
-	my $fh = IO::File->new($fn, 'r') or die "cannot include $fn\n";
+	my $fh = IO::File->new($fn, 'r') or return undef;
 	#print "ini: reading '$fn'\n";
 	
 	my $dirname = dirname($fn);
