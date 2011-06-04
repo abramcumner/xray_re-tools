@@ -2,7 +2,7 @@
 #
 # tab size:	8
 #
-#Last edited: 3 June 2011, ver.0.6
+#Last edited: 5 June 2011, ver.0.6
 #######################################################################
 package gg_header;
 use strict;
@@ -399,9 +399,10 @@ sub read {
 		push @{$self->{vertices}}, $vertex;
 	}
 	print "	reading edges...\n";	
-	if ($self->{build_version} eq '1469' or $self->{build_version} eq '1472' or $self->{build_version} eq '1510' or ::level_graph()) {
+	if ($self->{build_version} eq '1469' or $self->{build_version} eq '1472' or ::level_graph()) {
 		my $size = -s $fn;
 		my $read_offset = tell ($fh);
+		print "$read_offset\n";
 		my $edge_count = ($size - $read_offset)/$ebs;
 		for (my $i = 0; $i < $edge_count; $i++) {
 			$fh->read($data, $ebs) or die;
@@ -1176,7 +1177,7 @@ sub write {
 		my $packet = stkutils::data_packet->new($data);	
 		my ($index,
 		$size,
-		$global_xrlc_version) = $packet->unpack('VVv');
+		$parent_xrlc_version) = $packet->unpack('VVv');
 		$level_file->close();
 		foreach my $level (@{$self->{levels}}) {
 			if (exists $hash_append_levels{$level->{level_name}}) {
@@ -1191,9 +1192,9 @@ sub write {
 				$size,
 				$xrlc_version) = $packet->unpack('VVv');
 				$level_file->close();
-				$version = $parent_xrlc_version;
+				$xrlc_version = $parent_xrlc_version;
 				my $level_file_raw = IO::File->new('level.new', 'w') or die;
-				$level_file_raw->write(pack('VVv',$index,$size,$xrlc_version), 0xa)
+				$level_file_raw->write(pack('VVv',$index,$size,$xrlc_version), 0xa);
 				$level_file_raw->write($packet->data(), $packet->length());
 				$level_file_raw->close();
 				rename 'level', 'level.bak';

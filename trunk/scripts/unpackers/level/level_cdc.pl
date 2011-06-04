@@ -1,6 +1,6 @@
 #!perl -w
 #
-#v 0.2 Last Edited: 03 June 2011
+#v 0.2 Last Edited: 05 June 2011
 ###########################################################
 package level;
 use strict;
@@ -684,8 +684,9 @@ sub export {
 			printf $cf "unk_1 = %s\n", @{$self->{fsl_light_dynamic}->{$i}{unk}}[1];
 			printf $cf "unk_2 = %s\n", @{$self->{fsl_light_dynamic}->{$i}{unk}}[2];
 			printf $cf "unk_3 = %s\n", @{$self->{fsl_light_dynamic}->{$i}{unk}}[3];
-			printf $cf "unk_4 = %s\n\n", @{$self->{fsl_light_dynamic}->{$i}{unk}}[4];
+			printf $cf "unk_4 = %s\n", @{$self->{fsl_light_dynamic}->{$i}{unk}}[4];
 		}
+		print "\n";
 	}
 }
 sub import {
