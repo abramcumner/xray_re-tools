@@ -49,6 +49,9 @@ void dds_tools::process_file(const std::string& path)
 			break;
 		msg("skipping %s (bump map)", path.c_str());
 		return;
+	case xr_texture_thumbnail::tt_normal_map:
+	case xr_texture_thumbnail::tt_terrina:
+		break;
 	default:
 		msg("skipping %s (unknown) %#x", path.c_str(), thm.type);
 		return;

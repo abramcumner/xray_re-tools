@@ -64,6 +64,8 @@ public:
 		tt_image	= 0,
 		tt_cube_map	= 1,
 		tt_bump_map	= 2,
+		tt_normal_map = 3,
+		tt_terrina = 4,
 		tt_force_u32	= UINT32_MAX,
 	};
 	enum et_material {
