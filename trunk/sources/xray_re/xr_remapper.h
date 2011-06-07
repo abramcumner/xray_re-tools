@@ -29,7 +29,7 @@ inline xr_remapper::xr_remapper(size_t size):
 	m_min(0), m_max(uint32_t(size & UINT32_MAX) - 1)
 {
 	m_mapping = new uint32_t[size];
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#if defined(_MSC_VER) && _MSC_VER >= 1400 && _MSC_VER < 1600
 	stdext::unchecked_uninitialized_fill_n(m_mapping, size, BAD_IDX);
 #else
 	std::uninitialized_fill_n(m_mapping, size, BAD_IDX);
@@ -39,7 +39,7 @@ inline xr_remapper::xr_remapper(size_t size):
 inline xr_remapper::xr_remapper(uint32_t min, uint32_t max): m_min(min), m_max(max)
 {
 	m_mapping = new uint32_t[max - min + 1];
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#if defined(_MSC_VER) && _MSC_VER >= 1400 && _MSC_VER < 1600
 	stdext::unchecked_uninitialized_fill_n(m_mapping, max - min + 1, BAD_IDX);
 #else
 	std::uninitialized_fill_n(m_mapping, max - min + 1, BAD_IDX);

@@ -447,7 +447,11 @@ size_t level_mesh::assign_contact_groups(b_submesh_vec& submeshes, b_collision_v
 		sm->group = group;
 		size_t num_faces = sm->num_faces;
 		for (;;) {
+#if defined(_MSC_VER) && _MSC_VER >= 1600
+			b_collision contact(sm, nullptr);
+#else
 			b_collision contact(sm, 0);
+#endif
 			for (b_collision_vec_it end1 = contacts.end(),
 					it1 = std::lower_bound(contacts.begin(), end1, contact);
 					it1 != end1 && sm == it1->first; ++it1) {
