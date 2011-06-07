@@ -225,6 +225,7 @@
 				AdditionalOptions="/LARGEADDRESSAWARE"
 				AdditionalLibraryDirectories="$(OutDir)\libraries"
 				GenerateManifest="true"
+				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
