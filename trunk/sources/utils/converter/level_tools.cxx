@@ -212,6 +212,7 @@ void level_tools::reconstruct_scene(const char* level_name, const char* scene_na
 	msg("scene name: %s", m_scene_name);
 	m_scene = new xr_scene();
 	m_scene->name() = m_level_name = level_name;
+	m_scene->name_prefix() = level_name;
 	m_scene->set_quality(m_level->xrlc_quality());
 	if (const xr_level_ltx* ltx = m_level->ltx()) {
 		if (m_level->xrlc_version() >= XRLC_VERSION_12) {
