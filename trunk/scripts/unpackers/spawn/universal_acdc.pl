@@ -1,6 +1,6 @@
 #!perl -w -I \temp\1\bin
 #
-# last edited: 23 May 2011
+# last edited: 9 June 2011
 #
 #######################################################################
 package cse_abstract;
@@ -1529,11 +1529,10 @@ sub update_read {
 	}
 	$_[1]->unpack_properties($_[0], (upd_properties_info)[1..3]);
 	if (($_[0]->{version} > 109) && 
-		(not ($_[0]->{section_name} eq 'm_rat_e') && 
 		((($_[1]->length() > 7) && ((ref($_[0]) eq 'cse_alife_creature_crow') || (ref($_[0]) eq 'cse_alife_creature_phantom'))) || 
 		(($_[1]->length() > 19) && ((ref($_[0]) eq 'cse_alife_monster_zombie') || (ref($_[0]) eq 'cse_alife_psy_dog_phantom') || (ref($_[0]) eq 'se_monster'))) || 
 		(($_[1]->length() > 20) && (ref($_[0]) eq 'se_stalker') && ($_[0]->{version} > 109)) || 
-		(($_[1]->length() > 28) && (ref($_[0]) eq 'se_actor'))))) {
+		(($_[1]->length() > 28) && (ref($_[0]) eq 'se_actor')))) {
 		$_[1]->unpack_properties($_[0], (upd_properties_info)[4..5]);
 	} else {
 		if ($_[0]->{version} > 79) {
@@ -2702,7 +2701,7 @@ use constant properties_info => (
 	{ name => 'sim_forced_online',	type => 'u8',	default => 0 },
 );
 sub state_read {
-	if ($_[0]->{section_name} eq 'm_rat_e') {
+	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 101)) {
 		cse_alife_monster_rat::state_read(@_);
 	} else {
 		cse_alife_monster_base::state_read(@_);
@@ -2722,7 +2721,7 @@ sub state_read {
 	}
 }
 sub state_write {
-	if ($_[0]->{section_name} eq 'm_rat_e') {
+	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 101)) {
 		cse_alife_monster_rat::state_write(@_);
 	} else {
 		cse_alife_monster_base::state_write(@_);
@@ -2741,7 +2740,7 @@ sub state_write {
 	}
 }
 sub update_read {
-	if ($_[0]->{section_name} eq 'm_rat_e') {
+	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 101)) {
 		cse_alife_monster_rat::update_read(@_);
 	} else {
 		cse_alife_monster_base::update_read(@_);
@@ -2749,14 +2748,14 @@ sub update_read {
 	die unless $_[1]->length == 0;
 }
 sub update_write {
-	if ($_[0]->{section_name} eq 'm_rat_e') {
+	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 101)) {
 		cse_alife_monster_rat::update_write(@_);
 	} else {
 		cse_alife_monster_base::update_write(@_);
 	}
 }
 sub state_import {
-	if ($_[0]->{section_name} eq 'm_rat_e') {
+	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 101)) {
 		cse_alife_monster_rat::state_import(@_);
 	} else {
 		cse_alife_monster_base::state_import(@_);
@@ -2775,7 +2774,7 @@ sub state_import {
 	}
 }
 sub state_export {
-	if ($_[0]->{section_name} eq 'm_rat_e') {
+	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 101)) {
 		cse_alife_monster_rat::state_export(@_);
 	} else {
 		cse_alife_monster_base::state_export(@_);
@@ -2879,7 +2878,7 @@ sub state_read {
 	cse_alife_monster_abstract::state_read(@_);
 	$_[1]->unpack_properties($_[0], (properties_info)[0..1]);
 	if ($_[0]->{version} < 7) {
-	$_[1]->unpack_properties($_[0], (properties_info)[20]);
+		$_[1]->unpack_properties($_[0], (properties_info)[20]);
 	}
 	$_[1]->unpack_properties($_[0], (properties_info)[2..19]);
 	if ($_[0]->{version} > 39) {
@@ -5457,991 +5456,7 @@ sub level_name {
 package alife_object;
 use strict;
 use stkutils::data_packet;
-use constant section_to_class => {
-	actor					=> 'se_actor',
-
-	graph_point				=> 'cse_alife_graph_point',
-
-	stalker					=> 'se_stalker',
-	stalker_monolith			=> 'se_stalker',
-	stalker_zombied				=> 'se_stalker',
-	stalker_fresh_zombied		=> 'se_stalker',
-	stalker_trader				=> 'se_stalker',
-	stalker_sakharov			=> 'se_stalker',
-	stalker_die_hard			=> 'se_stalker',
-	stalker_strelok				=> 'se_stalker',
-	m_stalker_e				=> 'se_stalker',
-	m_stalker_demo				=> 'se_stalker',
-	m_stalker_wolf				=> 'se_stalker',
-	m_barman				=> 'se_stalker',
-	m_osoznanie				=> 'se_stalker',
-	m_bandit_commander		=> 'cse_alife_human_stalker',
-	m_fraction_commander	=> 'cse_alife_human_stalker',
-	m_fraction_soldier		=> 'cse_alife_human_stalker',
-	m_fraction_sniper		=> 'cse_alife_human_stalker',
-	m_fraction_specnaz		=> 'cse_alife_human_stalker',
-	m_army_soldier			=> 'cse_alife_human_stalker',
-	m_army_commander		=> 'cse_alife_human_stalker',
-	m_army_sniper			=> 'cse_alife_human_stalker',
-	m_army_specnaz			=> 'cse_alife_human_stalker',
-	m_bandit_bandit			=> 'cse_alife_human_stalker',
-	m_sniper				=> 'cse_alife_human_stalker',
-	m_idol_e				=> 'cse_alife_object_idol',
-	m_dummy					=> 'cse_alife_object_dummy',
-	m_target_cs_cask 				=> 'cse_target_cs_cask',
-	m_target_cs_base 				=> 'cse_target_cs_base',
-	m_trader				=> 'cse_alife_trader',
-	m_lesnik				=> 'cse_alife_trader',
-	
-	respawn					=> 'se_respawn',
-	spawn_group				=> 'cse_alife_spawn_group',
-	spawn_group_zone		=> 'cse_alife_spawn_group',
-	
-	detector_simple				=> 'cse_alife_item_detector',
-	detector_elite				=> 'cse_alife_item_detector',
-
-	zat_b12_documents_2			=> 'cse_alife_item_pda',
-	zat_b39_joker_pda			=> 'cse_alife_item_pda',
-	zat_a23_gauss_rifle_docs		=> 'cse_alife_item_pda',
-	zat_b40_notebook			=> 'cse_alife_item_pda',
-	jup_a9_evacuation_info			=> 'cse_alife_item_pda',
-	jup_a9_meeting_info			=> 'cse_alife_item_pda',
-	jup_a9_losses_info			=> 'cse_alife_item_pda',
-	jup_a9_delivery_info			=> 'cse_alife_item_pda',
-	jup_a9_way_info				=> 'cse_alife_item_pda',
-	jup_a9_conservation_info		=> 'cse_alife_item_pda',
-	jup_a9_power_info			=> 'cse_alife_item_pda',
-	jup_b200_tech_materials_wire		=> 'cse_alife_item_pda',
-	jup_b200_tech_materials_acetone		=> 'cse_alife_item_pda',
-	jup_b200_tech_materials_capacitor	=> 'cse_alife_item_pda',
-	jup_b200_tech_materials_textolite	=> 'cse_alife_item_pda',
-	jup_b200_tech_materials_transistor	=> 'cse_alife_item_pda',
-
-	helm_respirator_joker			=> 'cse_alife_item_helmet',
-	helm_respirator				=> 'cse_alife_item_helmet',
-	helm_tactic				=> 'cse_alife_item_helmet',
-	helm_hardhat				=> 'cse_alife_item_helmet',
-
-	m_bloodsucker_e				=> 'se_monster',
-	bloodsucker_weak			=> 'se_monster',
-	bloodsucker_normal			=> 'se_monster',
-	bloodsucker_strong			=> 'se_monster',
-	bloodsucker_arena			=> 'se_monster',
-	bloodsucker_mil				=> 'se_monster',
-
-	m_boar_e				=> 'se_monster',
-	boar_weak				=> 'se_monster',
-	boar_normal				=> 'se_monster',
-	boar_strong				=> 'se_monster',
-
-	m_burer_e				=> 'se_monster',
-	burer_weak				=> 'se_monster',
-	burer_normal				=> 'se_monster',
-	burer_arena				=> 'se_monster',
-	m_burer_normal				=> 'se_monster',
-	m_burer_normal_black			=> 'se_monster',
-	burer_indoor				=> 'se_monster',
-	burer_outdoor				=> 'se_monster',
-
-	m_cat_e					=> 'se_monster',
-	cat_weak				=> 'se_monster',
-	cat_normal				=> 'se_monster',
-	cat_strong				=> 'se_monster',
-
-	m_chimera_e				=> 'se_monster',
-	m_chimera				=> 'se_monster',
-	chimera_weak				=> 'se_monster',
-	chimera_normal				=> 'se_monster',
-	chimera_strong				=> 'se_monster',
-
-	m_controller_e				=> 'se_monster',
-	m_controller_normal			=> 'se_monster',
-	m_controller_normal_fat			=> 'se_monster',
-	m_controller_old			=> 'se_monster',
-	m_controller_old_fat			=> 'se_monster',
-	controller_tubeman			=> 'se_monster',
-
-	m_crow					=> 'cse_alife_creature_crow',
-
-	m_dog_e					=> 'se_monster',
-	dog_weak				=> 'se_monster',
-	dog_normal				=> 'se_monster',
-	dog_strong				=> 'se_monster',
-
-	m_flesh_e				=> 'se_monster',
-	flesh_weak				=> 'se_monster',
-	flesh_normal				=> 'se_monster',
-	flesh_strong				=> 'se_monster',
-
-	m_fracture_e				=> 'se_monster',
-	fracture_weak				=> 'se_monster',
-	fracture_normal				=> 'se_monster',
-	fracture_strong				=> 'se_monster',
-
-	m_gigant_e				=> 'se_monster',
-	gigant_normal				=> 'se_monster',
-	gigant_strong				=> 'se_monster',
-
-	m_phantom				=> 'cse_alife_creature_phantom',
-
-	m_poltergeist_e				=> 'se_monster',
-	m_poltergeist_normal			=> 'se_monster',
-	m_poltergeist_normal_tele		=> 'se_monster',
-	m_poltergeist_tele_outdoor		=> 'se_monster',
-	m_poltergeist_normal_flame		=> 'se_monster',
-	m_poltergeist_strong_flame		=> 'se_monster',
-
-	m_pseudodog_e				=> 'se_monster',
-	pseudodog_weak				=> 'se_monster',
-	pseudodog_normal			=> 'se_monster',
-	pseudodog_strong			=> 'se_monster',
-	pseudodog_arena				=> 'se_monster',
-	psy_dog					=> 'se_monster',
-	psy_dog_phantom				=> 'se_monster',	# cse_alife_psy_dog_phantom really
-	psy_dog_radar				=> 'se_monster',
-
-	m_rat_e					=> 'se_monster',
-	rat_group					=> 'cse_alife_rat_group',
-
-	m_snork_e				=> 'se_monster',
-	snork_weak				=> 'se_monster',
-	snork_normal				=> 'se_monster',
-	snork_strong				=> 'se_monster',
-	aes_snork				=> 'se_monster',
-	snork_arena				=> 'se_monster',
-	snork_indoor				=> 'se_monster',
-	snork_outdoor				=> 'se_monster',
-	snork_jumper				=> 'se_monster',
-
-	m_tushkano_e				=> 'se_monster',
-	m_tushkano_normal			=> 'se_monster',
-	tushkano_normal				=> 'se_monster',
-
-	m_zombie_e				=> 'se_monster',
-	zombie_weak				=> 'se_monster',
-	zombie_normal				=> 'se_monster',
-	zombie_strong				=> 'se_monster',
-	zombie_immortal				=> 'se_monster',
-
-	breakable_object			=> 'cse_alife_object_breakable',
-
-	search_light				=> 'cse_alife_object_projector',
-	physic_object				=> 'cse_alife_object_physic',
-	script_object				=> 'cse_alife_dynamic_object_visual',
-	physic_destroyable_object		=> 'cse_alife_object_physic',
-	physic_door				=> 'cse_alife_object_physic',
-	jup_b219_gate				=> 'cse_alife_object_physic',
-	door_lab_x8				=> 'cse_alife_object_physic',
-	gaz_plita				=> 'cse_alife_object_physic',
-	gaz_plita_small				=> 'cse_alife_object_physic',
-	gaz_balon				=> 'cse_alife_object_physic',
-	child_bench				=> 'cse_alife_object_physic',
-	stul_child_01				=> 'cse_alife_object_physic',
-	stul_school_01				=> 'cse_alife_object_physic',
-	stul_school_01_br			=> 'cse_alife_object_physic',
-
-	climable_object				=> 'cse_alife_object_climable',
-	lights_hanging_lamp			=> 'cse_alife_object_hanging_lamp',
-	lights_signal_light			=> 'cse_alife_object_hanging_lamp',
-
-	shooting_target_1			=> 'cse_alife_object_physic',
-
-	box_bottle_1				=> 'cse_alife_object_physic',
-	molot					=> 'cse_alife_object_physic',
-	keyga					=> 'cse_alife_object_physic',
-	box_1a					=> 'cse_alife_object_physic',
-	box_1c					=> 'cse_alife_object_physic',
-	box_metall_01				=> 'cse_alife_object_physic',
-	box_paper				=> 'cse_alife_object_physic',
-	box_wood_01				=> 'cse_alife_object_physic',
-	box_wood_02				=> 'cse_alife_object_physic',
-	wood_fence_1				=> 'cse_alife_object_physic',
-	wood_fence_4				=> 'cse_alife_object_physic',
-	balon_02link				=> 'cse_alife_object_physic',
-	axe					=> 'cse_alife_object_physic',
-	saw					=> 'cse_alife_object_physic',
-	hammer					=> 'cse_alife_object_physic',
-	pick					=> 'cse_alife_object_physic',
-	riffler					=> 'cse_alife_object_physic',
-	lopata					=> 'cse_alife_object_physic',
-	pri_a28_actor_hideout			=> 'cse_alife_object_physic',
-
-	balon_01				=> 'cse_alife_object_physic',
-	balon_02				=> 'cse_alife_object_physic',
-	balon_02a				=> 'cse_alife_object_physic',
-	bidon					=> 'cse_alife_object_physic',
-	bochka_close_1				=> 'cse_alife_object_physic',
-	bochka_close_2				=> 'cse_alife_object_physic',
-	bochka_close_3				=> 'cse_alife_object_physic',
-	bochka_close_4				=> 'cse_alife_object_physic',
-
-	notebook				=> 'cse_alife_object_physic',
-	priemnik_gorizont			=> 'cse_alife_object_physic',
-	rupor					=> 'cse_alife_object_physic',
-	transiver				=> 'cse_alife_object_physic',
-	tv_1					=> 'cse_alife_object_physic',
-	table_lamp_01				=> 'cse_alife_object_physic',
-	komp_monitor				=> 'cse_alife_object_physic',
-	komp_klava				=> 'cse_alife_object_physic',
-	komp_block				=> 'cse_alife_object_physic',
-
-	banka_kraski_1				=> 'cse_alife_object_physic',
-	kanistra_01				=> 'cse_alife_object_physic',
-	kanistra_02				=> 'cse_alife_object_physic',
-	vedro_01				=> 'cse_alife_object_physic',
-	tiski					=> 'cse_alife_object_physic',
-
-	bottle_3l				=> 'cse_alife_object_physic',
-	freezer					=> 'cse_alife_object_physic',
-	bludo					=> 'cse_alife_object_physic',
-	kastrula				=> 'cse_alife_object_physic',
-	kastrula_up				=> 'cse_alife_object_physic',
-	krujka					=> 'cse_alife_object_physic',
-	lojka					=> 'cse_alife_object_physic',
-	miska					=> 'cse_alife_object_physic',
-	tarelka1				=> 'cse_alife_object_physic',
-	tarelka2				=> 'cse_alife_object_physic',
-	teapot_1				=> 'cse_alife_object_physic',
-
-	kolyaska_01				=> 'cse_alife_object_physic',
-	kolyaska_01_braked			=> 'cse_alife_object_physic',
-	kolyaska_wheel_01_braked		=> 'cse_alife_object_physic',
-	wheel_litter_01				=> 'cse_alife_object_physic',
-	wheel_litter_01_braked			=> 'cse_alife_object_physic',
-	med_stolik_01				=> 'cse_alife_object_physic',
-
-	fire_vedro				=> 'cse_alife_object_physic',
-	ognetushitel				=> 'cse_alife_object_physic',
-
-	smart_cover				=> 'se_smart_cover',
-
-	inventory_box				=> 'cse_alife_inventory_box',
-
-	space_restrictor			=> 'cse_alife_space_restrictor',
-	script_zone				=> 'cse_alife_space_restrictor',
-	touch_zone				=> 'cse_alife_space_restrictor',
-	anomal_zone				=> 'cse_alife_space_restrictor',
-
-	level_changer				=> 'se_level_changer',
-
-	zone_team_base				=> 'cse_alife_team_base_zone',
-
-	smart_terrain				=> 'se_smart_terrain',
-
-	anomaly_field				=> 'se_anomaly_field',
-
-	zone_ameba				=> 'cse_alife_zone_visual',
-	zone_ameba1				=> 'cse_alife_zone_visual',
-
-	zone_mine_steam_weak			=> 'se_zone_anom',
-	zone_mine_steam_average			=> 'se_zone_anom',
-
-	zone_mine_static_strong			=> 'se_zone_anom',
-	zone_mine_chemical_weak			=> 'se_zone_anom',
-	zone_mine_chemical_average		=> 'se_zone_anom',
-	zone_mine_chemical_strong		=> 'se_zone_anom',
-
-	fireball_acidic_zone			=> 'se_zone_torrid',
-
-	camp_zone				=> 'cse_alife_space_restrictor',
-
-	zone_burning_fuzz			=> 'se_zone_visual',
-	zone_burning_fuzz1			=> 'se_zone_visual',
-	zone_burning_fuzz_weak			=> 'se_zone_visual',
-	zone_burning_fuzz_average		=> 'se_zone_visual',
-	zone_burning_fuzz_strong		=> 'se_zone_visual',
-	zone_burning_fuzz_bottom_weak		=> 'se_zone_visual',
-	zone_burning_fuzz_bottom_average	=> 'se_zone_visual',
-	zone_burning_fuzz_bottom_strong		=> 'se_zone_visual',
-
-	zone_buzz				=> 'se_zone_anom',
-	zone_buzz_weak				=> 'se_zone_anom',
-	zone_buzz_average			=> 'se_zone_anom',
-	zone_buzz_strong			=> 'se_zone_anom',
-
-	zone_gravi_zone				=> 'se_zone_anom',
-	zone_gravi_zone_weak			=> 'se_zone_anom',
-	zone_gravi_zone_weak_noart			=> 'se_zone_anom',
-	zone_gravi_zone_average			=> 'se_zone_anom',
-	zone_gravi_zone_strong			=> 'se_zone_anom',
-	zone_gravi_zone_killing			=> 'se_zone_anom',
-
-	zone_campfire_mp_nolight		=> 'cse_alife_anomalous_zone',
-	zone_campfire_grill			=> 'cse_alife_anomalous_zone',
-	zone_flame				=> 'cse_alife_anomalous_zone',
-	zone_zhar				=> 'cse_alife_anomalous_zone',
-	zone_emi				=> 'cse_alife_anomalous_zone',
-	zone_flame_small			=> 'cse_alife_anomalous_zone',
-	campfire				=> 'cse_alife_anomalous_zone',
-
-	zone_mincer				=> 'se_zone_anom',
-	zone_mincer_weak			=> 'se_zone_anom',
-	zone_mincer_weak_noart			=> 'se_zone_anom',
-	zone_mincer_average			=> 'se_zone_anom',
-	zone_mincer_strong			=> 'se_zone_anom',
-
-	zone_mine_field				=> 'cse_alife_anomalous_zone',
-	zone_mine_field_strong			=> 'cse_alife_anomalous_zone',
-	zone_mine_field_no_damage		=> 'cse_alife_anomalous_zone',
-	zone_death				=> 'cse_alife_anomalous_zone',
-
-	zone_monolith				=> 'cse_alife_anomalous_zone',
-
-	zone_mosquito_bald			=> 'se_zone_anom',
-	zone_mosquito_bald_weak			=> 'se_zone_anom',
-	zone_mosquito_bald_weak_noart		=> 'se_zone_anom',
-	zone_mosquito_bald_average		=> 'se_zone_anom',
-	zone_mosquito_bald_strong		=> 'se_zone_anom',
-	zone_mosquito_bald_strong_noart		=> 'se_zone_anom',
-
-	zone_no_gravity				=> 'cse_alife_anomalous_zone',
-
-	zone_acid_fog			=> 'cse_alife_anomalous_zone',
-	zone_lava				=> 'cse_alife_anomalous_zone',
-	zone_rusty_hair			=> 'cse_alife_anomalous_zone',
-	zone_x					=> 'cse_alife_anomalous_zone',	
-	zone_x1					=> 'cse_alife_anomalous_zone',	
-	zone_x2					=> 'cse_alife_anomalous_zone',	
-	zone_x3					=> 'cse_alife_anomalous_zone',		
-	
-	zone_radioactive			=> 'cse_alife_anomalous_zone',
-	zone_radioactive_weak			=> 'cse_alife_anomalous_zone',
-	zone_radioactive_average		=> 'cse_alife_anomalous_zone',
-	zone_radioactive_strong			=> 'cse_alife_anomalous_zone',
-	zone_radioactive_killing		=> 'cse_alife_anomalous_zone',
-
-	zone_teleport				=> 'cse_alife_anomalous_zone',
-	zone_teleport_out			=> 'cse_alife_anomalous_zone',
-	zone_teleport_monolith			=> 'cse_alife_anomalous_zone',
-	zone_isparenie			=> 'cse_alife_anomalous_zone',
-
-	torrid_zone				=> 'cse_alife_torrid_zone',
-	fireball_zone				=> 'se_zone_torrid',
-	fireball_electric_zone			=> 'se_zone_torrid',
-	zone_sarcofag				=> 'cse_alife_anomalous_zone',
-
-	zone_witches_galantine			=> 'se_zone_anom',
-	zone_witches_galantine_weak		=> 'se_zone_anom',
-	zone_witches_galantine_average		=> 'se_zone_anom',
-	zone_witches_galantine_strong		=> 'se_zone_anom',
-	zone_witches_galantine_safe		=> 'se_zone_anom',
-
-	zone_zharka_static			=> 'se_zone_anom',
-	zone_zharka_static_weak			=> 'se_zone_anom',
-	zone_zharka_static_average		=> 'se_zone_anom',
-	zone_zharka_static_strong		=> 'se_zone_anom',
-
-	zone_mine_acidic			=> 'se_zone_anom',
-	zone_mine_acidic_weak			=> 'se_zone_anom',
-	zone_mine_acidic_average		=> 'se_zone_anom',
-	zone_mine_acidic_strong			=> 'se_zone_anom',
-
-	zone_mine_electric			=> 'se_zone_anom',
-	zone_mine_electric_weak			=> 'se_zone_anom',
-	zone_mine_electric_average		=> 'se_zone_anom',
-	zone_mine_electric_strong		=> 'se_zone_anom',
-
-	zone_mine_thermal			=> 'se_zone_anom',
-	zone_mine_thermal_weak			=> 'se_zone_anom',
-	zone_mine_thermal_average		=> 'se_zone_anom',
-	zone_mine_thermal_strong		=> 'se_zone_anom',
-	zone_mine_thermal_firetube		=> 'se_zone_anom',
-
-	zone_mine_gravitational_weak		=> 'se_zone_anom',
-	zone_mine_gravitational_average		=> 'se_zone_anom',
-	zone_mine_gravitational_strong		=> 'se_zone_anom',
-
-	zone_field_acidic			=> 'se_zone_anom',
-	zone_field_acidic_weak			=> 'se_zone_anom',
-	zone_field_acidic_average		=> 'se_zone_anom',
-	zone_field_acidic_strong		=> 'se_zone_anom',
-
-	zone_field_psychic			=> 'se_zone_anom',
-	zone_field_psychic_weak			=> 'se_zone_anom',
-	zone_field_psychic_average		=> 'se_zone_anom',
-	zone_field_psychic_strong		=> 'se_zone_anom',
-
-	zone_field_radioactive			=> 'se_zone_anom',
-	zone_field_radioactive_weak		=> 'se_zone_anom',
-	zone_field_radioactive_average		=> 'se_zone_anom',
-	zone_field_radioactive_strong		=> 'se_zone_anom',
-
-	zone_field_thermal			=> 'se_zone_anom',
-	zone_field_thermal_weak			=> 'se_zone_anom',
-	zone_field_thermal_average		=> 'se_zone_anom',
-	zone_field_thermal_strong		=> 'se_zone_anom',
-
-	af_quest_b14_twisted			=> 'cse_alife_item_artefact',
-	af_oasis_heart				=> 'cse_alife_item_artefact',
-
-	af_ameba_mica				=> 'cse_alife_item_artefact',
-	af_ameba_slime				=> 'cse_alife_item_artefact',
-	af_ameba_slug				=> 'cse_alife_item_artefact',
-	af_blood				=> 'cse_alife_item_artefact',
-	af_cristall_flower			=> 'cse_alife_item_artefact',
-	af_dummy_battery			=> 'cse_alife_item_artefact',
-	af_dummy_dummy				=> 'cse_alife_item_artefact',
-	af_dummy_glassbeads			=> 'cse_alife_item_artefact',
-	af_dummy_pellicle			=> 'cse_alife_item_artefact',
-	af_dummy_spring				=> 'cse_alife_item_artefact',
-	af_electra_flash			=> 'cse_alife_item_artefact',
-	af_electra_moonlight			=> 'cse_alife_item_artefact',
-	af_electra_sparkler			=> 'cse_alife_item_artefact',
-	af_fireball				=> 'cse_alife_item_artefact',
-	af_fuzz_kolobok				=> 'cse_alife_item_artefact',
-	af_gold_fish				=> 'cse_alife_item_artefact',
-	af_gravi				=> 'cse_alife_item_artefact',
-	af_medusa				=> 'cse_alife_item_artefact',
-	af_mincer_meat				=> 'cse_alife_item_artefact',
-	af_night_star				=> 'cse_alife_item_artefact',
-	'af_rusty_sea-urchin'			=> 'cse_alife_item_artefact',
-	af_rusty_kristall			=> 'cse_alife_item_artefact',
-	af_rusty_thorn			=> 'cse_alife_item_artefact',
-	af_vyvert				=> 'cse_alife_item_artefact',
-	af_compass				=> 'cse_alife_item_artefact',
-	bar_ameba_spore				=> 'cse_alife_item_artefact',
-	af_soul				=> 'cse_alife_item_artefact',
-	af_drops				=> 'cse_alife_item_artefact',
-	af_mercury_ball			=> 'cse_alife_item_artefact',
-	af_cristall				=> 'cse_alife_item_artefact',
-	af_ameba_slime				=> 'cse_alife_item_artefact',
-	af_magnet				=> 'cse_alife_item_artefact',
-
-	flesh_group				=> 'cse_alife_flesh_group',
-
-	drug_radioprotector			=> 'cse_alife_item',
-	drug_booster				=> 'cse_alife_item',
-	drug_coagulant				=> 'cse_alife_item',
-	drug_antidot				=> 'cse_alife_item',
-	drug_anabiotic				=> 'cse_alife_item',
-	drug_psy_blockade			=> 'cse_alife_item',
-
-	toolkit_1				=> 'cse_alife_item_pda',
-	toolkit_2				=> 'cse_alife_item_pda',
-	toolkit_3				=> 'cse_alife_item_pda',
-	jup_b205_sokolov_note			=> 'cse_alife_item_pda',
-	pri_a19_american_experiment_info	=> 'cse_alife_item_pda',
-	pri_a19_lab_x7_info			=> 'cse_alife_item_pda',
-	pri_a19_lab_x10_info			=> 'cse_alife_item_pda',
-	pri_a19_lab_x16_info			=> 'cse_alife_item_pda',
-	pri_a19_lab_x18_info			=> 'cse_alife_item_pda',
-	lx8_service_instruction			=> 'cse_alife_item_pda',
-
-	museum_svd				=> 'cse_alife_object_physic',
-	museum_ak74u				=> 'cse_alife_object_physic',
-	museum_groza				=> 'cse_alife_object_physic',
-
-	taburet_wood_01				=> 'cse_alife_object_physic',
-	taburet_village				=> 'cse_alife_object_physic',
-	stul_wood_01				=> 'cse_alife_object_physic',
-	ventilator_01				=> 'cse_alife_object_physic',
-	ventilator_02				=> 'cse_alife_object_physic',
-
-	bread					=> 'cse_alife_item',
-	bread_a					=> 'cse_alife_item',
-	kolbasa					=> 'cse_alife_item',
-	vodka					=> 'cse_alife_item',
-	vodka_a					=> 'cse_alife_item',
-	medkit					=> 'cse_alife_item',
-	conserva				=> 'cse_alife_item',
-	energy_drink				=> 'cse_alife_item',
-	antirad					=> 'cse_alife_item',
-	bandage					=> 'cse_alife_item',
-	medkit					=> 'cse_alife_item',
-	medkit_army				=> 'cse_alife_item',
-	medkit_scientic				=> 'cse_alife_item',
-	guitar_a				=> 'cse_alife_item',
-	harmonica_a				=> 'cse_alife_item',
-	hand_radio				=> 'cse_alife_item',
-	dynamite				=> 'cse_alife_item',
-	device_torch				=> 'cse_alife_item_torch',
-	good_psy_helmet				=> 'cse_alife_item',
-	bad_psy_helmet				=> 'cse_alife_item',
-
-	af_blood_tutorial			=> 'cse_alife_item_artefact',
-	quest_case_01				=> 'cse_alife_item',
-	quest_case_02				=> 'cse_alife_item',
-	pri_decoder_documents			=> 'cse_alife_item',
-	cit_killers_documents			=> 'cse_alife_item',
-	document			=> 'cse_alife_item_document',
-	dar_pass_document				=> 'cse_alife_item',
-	bar_darklab_documents				=> 'cse_alife_item',
-	bar_decoding_documents				=> 'cse_alife_item',
-	agr_nii_security_shedule_file				=> 'cse_alife_item',
-	agr_nii_security_plan_flash				=> 'cse_alife_item',
-	dolg_arhive_documents				=> 'cse_alife_item',
-	dar_document1				=> 'cse_alife_item',
-	dar_document2				=> 'cse_alife_item',
-	dar_document3				=> 'cse_alife_item',
-	dar_document4				=> 'cse_alife_item',
-	dar_document5				=> 'cse_alife_item',
-	lab_x16_documents				=> 'cse_alife_item',
-	gunslinger_flash			=> 'cse_alife_item',
-	decoder					=> 'cse_alife_item',
-	device_pda					=> 'cse_alife_item_pda',
-	mil_svoboda_leader_pda					=> 'cse_alife_item',
-	detector_simple					=> 'cse_alife_item_detector',
-	detector_advances					=> 'cse_alife_item_detector',
-	detector_elite					=> 'cse_alife_item_detector',
-	binocular_a				=> 'cse_alife_item',
-	device_atifact_merger				=> 'cse_alife_item',
-	cit_deadcity_maps				=> 'cse_alife_item',
-	borov_flash				=> 'cse_alife_item',
-	crazy_flash				=> 'cse_alife_item',
-	max_flash				=> 'cse_alife_item',
-	ugrum_flash				=> 'cse_alife_item',
-	agroprom_notebook				=> 'cse_alife_item',
-	garbage_letter				=> 'cse_alife_item',
-	bolt					=> 'cse_alife_item_bolt',
-
-	novice_outfit				=> 'cse_alife_item_custom_outfit',
-	outfit_novice_m1			=> 'cse_alife_item_custom_outfit',
-	bandit_outfit				=> 'cse_alife_item_custom_outfit',
-	outfit_bandit_m1			=> 'cse_alife_item_custom_outfit',
-	outfit_bandit_m2			=> 'cse_alife_item_custom_outfit',
-	outfit_bandit_anom			=> 'cse_alife_item_custom_outfit',
-	dolg_outfit				=> 'cse_alife_item_custom_outfit',
-	outfit_dolg_m1				=> 'cse_alife_item_custom_outfit',
-	dolg_scientific_outfit			=> 'cse_alife_item_custom_outfit',
-	scientific_outfit			=> 'cse_alife_item_custom_outfit',
-	exo_outfit				=> 'cse_alife_item_custom_outfit',
-	outfit_exo_m1				=> 'cse_alife_item_custom_outfit',
-	killer_outfit				=> 'cse_alife_item_custom_outfit',
-	outfit_killer_m1			=> 'cse_alife_item_custom_outfit',
-	outfit_killer_m2			=> 'cse_alife_item_custom_outfit',
-	monolit_outfit				=> 'cse_alife_item_custom_outfit',
-	outfit_monolith_m1				=> 'cse_alife_item_custom_outfit',
-	outfit_military_m1				=> 'cse_alife_item_custom_outfit',
-	outfit_military_m2				=> 'cse_alife_item_custom_outfit',
-	specops_outfit				=> 'cse_alife_item_custom_outfit',
-	outfit_specnaz_m1			=> 'cse_alife_item_custom_outfit',
-	outfit_specops_m1			=> 'cse_alife_item_custom_outfit',
-	military_outfit				=> 'cse_alife_item_custom_outfit',
-	stalker_outfit				=> 'cse_alife_item_custom_outfit',
-	outfit_stalker_m1			=> 'cse_alife_item_custom_outfit',
-	outfit_stalker_m2			=> 'cse_alife_item_custom_outfit',
-	svoboda_heavy_outfit			=> 'cse_alife_item_custom_outfit',
-	svoboda_light_outfit			=> 'cse_alife_item_custom_outfit',
-	outfit_svoboda_m1			=> 'cse_alife_item_custom_outfit',
-	protection_outfit			=> 'cse_alife_item_custom_outfit',
-	ecolog_outfit				=> 'cse_alife_item_custom_outfit',
-	outfit_stalker_anom			=> 'cse_alife_item_custom_outfit',
-	outfit_stalker_anom2			=> 'cse_alife_item_custom_outfit',
-	outfit_bandit_anom			=> 'cse_alife_item_custom_outfit',
-	scientific_outfit			=> 'cse_alife_item_custom_outfit',
-	soldier_outfit			=> 'cse_alife_item_custom_outfit',
-	military_stalker_outfit				=> 'cse_alife_item_custom_outfit',
-
-	wpn_addon_scope				=> 'cse_alife_item',
-	wpn_addon_scope_susat			=> 'cse_alife_item',
-	wpn_addon_silencer			=> 'cse_alife_item',
-	wpn_addon_grenade_launcher		=> 'cse_alife_item',
-	wpn_addon_grenade_launcher_m203		=> 'cse_alife_item',
-	scope_m1		=> 'cse_alife_item',
-	susat_anom		=> 'cse_alife_item',
-	torch_m1		=> 'cse_alife_item_torch',
-
-	grenade_f1				=> 'cse_alife_item_grenade',
-	grenade_rgd5				=> 'cse_alife_item_grenade',
-	'grenade_gd-05'				=> 'cse_alife_item_grenade',
-	ammo_pkm_100				=> 'cse_alife_item_ammo',
-
-	'ammo_11.43x23_fmj'			=> 'cse_alife_item_ammo',
-	'ammo_11.43x23_hydro'			=> 'cse_alife_item_ammo',
-	ammo_12x70_buck				=> 'cse_alife_item_ammo',
-	ammo_12x76_dart				=> 'cse_alife_item_ammo',
-	ammo_12x76_zhekan			=> 'cse_alife_item_ammo',
-	ammo_12x76_zhekan_heli			=> 'cse_alife_item_ammo',
-	ammo_16x70_buck				=> 'cse_alife_item_ammo',
-	ammo_16x70_kart				=> 'cse_alife_item_ammo',
-	ammo_16x70_zhekan			=> 'cse_alife_item_ammo',
-	'ammo_5.45x39_ap'			=> 'cse_alife_item_ammo',
-	'ammo_5.45x39_fmj'			=> 'cse_alife_item_ammo',
-	'ammo_5.56x45_ap'			=> 'cse_alife_item_ammo',
-	'ammo_5.56x45_ss190'			=> 'cse_alife_item_ammo',
-	'ammo_5.7x28_fmj'			=> 'cse_alife_item_ammo',
-	'ammo_5.7x28_ap'			=> 'cse_alife_item_ammo',
-	'ammo_7.62x54_7h1'			=> 'cse_alife_item_ammo',
-	'ammo_7.62x54_7h14'			=> 'cse_alife_item_ammo',
-	'ammo_7.62x54_ap'			=> 'cse_alife_item_ammo',
-	'ammo_7.62x39_fmj'			=> 'cse_alife_item_ammo',
-	'ammo_7.62x39_ap'			=> 'cse_alife_item_ammo',
-	ammo_9x18_fmj				=> 'cse_alife_item_ammo',
-	ammo_9x18_pmm				=> 'cse_alife_item_ammo',
-	ammo_9x18_pbp				=> 'cse_alife_item_ammo',
-	ammo_9x19_fmj				=> 'cse_alife_item_ammo',
-	ammo_9x19_pbp				=> 'cse_alife_item_ammo',
-	ammo_9x39_pab9				=> 'cse_alife_item_ammo',
-	ammo_9x39_sp5				=> 'cse_alife_item_ammo',
-	ammo_9x39_ap				=> 'cse_alife_item_ammo',
-	'ammo_vog-25'				=> 'cse_alife_item_ammo',
-	'ammo_vog-25p'				=> 'cse_alife_item_ammo',
-	ammo_m209				=> 'cse_alife_item_ammo',
-	'ammo_og-7b'				=> 'cse_alife_item_ammo',
-	ammo_gauss				=> 'cse_alife_item_ammo',
-
-	explosive_barrel			=> 'cse_alife_item_explosive',
-	explosive_barrel_low			=> 'cse_alife_item_explosive',
-	explosive_dinamit			=> 'cse_alife_item_explosive',
-	explosive_fuelcan			=> 'cse_alife_item_explosive',
-	explosive_mobiltank			=> 'cse_alife_item_explosive',
-	explosive_tank				=> 'cse_alife_item_explosive',
-	explosive_hide				=> 'cse_alife_item_explosive',
-	explosive_grenade			=> 'cse_alife_item_explosive',
-	explosive_gaz_balon			=> 'cse_alife_item_explosive',
-
-	mounted_weapon				=> 'cse_alife_mounted_weapon',
-	stationary_mgun				=> 'cse_alife_stationary_mgun',
-
-	wpn_knife				=> 'cse_alife_item_weapon',
-	wpn_binoc				=> 'cse_alife_item_weapon_magazined',
-	wpn_rpg7				=> 'cse_alife_item_weapon_magazined',
-	wpn_pm					=> 'cse_alife_item_weapon_magazined',
-	wpn_pb					=> 'cse_alife_item_weapon_magazined',
-	wpn_fort				=> 'cse_alife_item_weapon_magazined',
-	wpn_fort_m1				=> 'cse_alife_item_weapon_magazined',
-	wpn_walther				=> 'cse_alife_item_weapon_magazined',
-	wpn_walther_m1			=> 'cse_alife_item_weapon_magazined',
-	wpn_beretta				=> 'cse_alife_item_weapon_magazined',
-	wpn_hpsa				=> 'cse_alife_item_weapon_magazined',
-	wpn_sig220				=> 'cse_alife_item_weapon_magazined',
-	wpn_usp					=> 'cse_alife_item_weapon_magazined',
-	wpn_desert_eagle		=> 'cse_alife_item_weapon_magazined',
-	wpn_eagle_m1				=> 'cse_alife_item_weapon_magazined',
-	wpn_colt1911				=> 'cse_alife_item_weapon_magazined',
-	wpn_colt_m1				=> 'cse_alife_item_weapon_magazined',
-	wpn_mp5					=> 'cse_alife_item_weapon_magazined',
-	wpn_mp5_m1				=> 'cse_alife_item_weapon_magazined',
-	wpn_mp5_m2				=> 'cse_alife_item_weapon_magazined',
-	wpn_val					=> 'cse_alife_item_weapon_magazined',
-	wpn_val_m1				=> 'cse_alife_item_weapon_magazined',
-	wpn_vintorez			=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_vintorec			=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_svd					=> 'cse_alife_item_weapon_magazined',
-	wpn_svd_m1				=> 'cse_alife_item_weapon_magazined',
-	wpn_svu					=> 'cse_alife_item_weapon_magazined',
-	wpn_ak74u				=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_ak74u_m1			=> 'cse_alife_item_weapon_magazined',
-	wpn_pkm					=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_gauss				=> 'cse_alife_item_weapon_magazined',
-	wpn_groza				=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_groza1				=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_groza_m1			=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_l85					=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_l85_m1				=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_l85_m2				=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_g36					=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_lr300				=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_lr300_m1			=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_sig550				=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_sig_m1				=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_sig_m2				=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_ak74				=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_ak74_m1				=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_abakan				=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_abakan_m1			=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_abakan_m2			=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_fn2000				=> 'cse_alife_item_weapon_magazined_w_gl',
-	wpn_toz34				=> 'cse_alife_item_weapon_shotgun',
-	wpn_spas12				=> 'cse_alife_item_weapon_shotgun',
-	wpn_spas12_m1				=> 'cse_alife_item_weapon_shotgun',
-	wpn_wincheaster1300			=> 'cse_alife_item_weapon_shotgun',
-	wpn_winchester_m1			=> 'cse_alife_item_weapon_shotgun',
-	wpn_bm16				=> 'cse_alife_item_weapon_shotgun',
-	wpn_bm16_full				=> 'cse_alife_item_weapon_shotgun',
-	'wpn_rg-6'				=> 'cse_alife_item_weapon_shotgun',
-	wpn_rg6_m1				=> 'cse_alife_item_weapon_shotgun',
-	wpn_protecta				=> 'cse_alife_item_weapon_shotgun',
-	hunters_toz				=> 'cse_alife_item_weapon_shotgun',
-	wpn_knife_m1				=> 'cse_alife_item_weapon',
-
-	m_car					=> 'cse_alife_car',
-	helicopter				=> 'cse_alife_helicopter',
-
-	turret_mgun				=> 'se_turret_mgun',
-		
-	mar_csky_commander			=> 'se_stalker',
-	mar_csky_trader				=> 'se_stalker',
-	mar_csky_tech				=> 'se_stalker',
-	mar_csky_scientist			=> 'se_stalker',
-	mar_csky_barman				=> 'se_stalker',
-	mar_csky_tutorial_man			=> 'se_stalker',
-	mar_csky_tactic				=> 'se_stalker',
-	
-	esc_stalker_guard_east_bridge				=> 'se_stalker',
-	esc_stalker_guard_west_bridge				=> 'se_stalker',
-	esc_leader_stalkerbase				=> 'se_stalker',
-	esc_trader_stalkerbase				=> 'se_stalker',
-	esc_tech_stalkerbase				=> 'se_stalker',
-	esc_wolf				=> 'se_stalker',
-	esc_zak_stalkerbase				=> 'se_stalker',
-	esc_driver				=> 'se_stalker',
-	esc_military_secret_trader				=> 'se_stalker',
-	esc_story_military				=> 'se_stalker',
-	esc_zak_stalkerbase_2				=> 'se_stalker',
-	esc_military_general				=> 'se_stalker',
-	esc_wolf_brother				=> 'se_stalker',
-	
-	agr_duty_base_trader				=> 'se_stalker',
-	agr_stalker_base_trader				=> 'se_stalker',
-	agr_secret_trader				=> 'se_stalker',
-	agr_holeman				=> 'se_stalker',
-	agr_snork_hole_1				=> 'se_monster',
-	agr_snork_hole_2				=> 'se_monster',
-	agr_snork_hole_3				=> 'se_monster',
-	agr_snork_hole_4				=> 'se_monster',
-	agr_snork_hole_5				=> 'se_monster',
-	agr_snork_hole_6				=> 'se_monster',
-	agr_snork_hole_7				=> 'se_monster',
-	agr_snork_hole_8				=> 'se_monster',
-	agr_snork_hole_9				=> 'se_monster',
-	agr_snork_jumper_1				=> 'se_monster',
-	agr_snork_jumper_2				=> 'se_monster',
-	agr_snork_jumper_3				=> 'se_monster',
-	agr_stalker_base_mechanic				=> 'se_stalker',
-	agr_stalker_base_leader				=> 'se_stalker',
-	agr_stalker_zombied_1_default				=> 'se_stalker',
-	agr_bloodsucker_home				=> 'se_monster',
-	agr_scientists_bloodsucker				=> 'se_monster',
-	agr_weaponmaster				=> 'se_stalker',
-	agr_barman				=> 'se_stalker',
-	agr_bar_stalker_1				=> 'se_stalker',
-	agr_bar_stalker_2				=> 'se_stalker',
-	agr_bar_stalker_3				=> 'se_stalker',
-	agr_bar_stalker_4				=> 'se_stalker',
-	agr_bar_stalker_5				=> 'se_stalker',
-	agr_stalker_commander_1				=> 'se_stalker',
-	agr_stalker_commander_2				=> 'se_stalker',
-	agr_dog_01				=> 'se_monster',
-	agr_dog_02				=> 'se_monster',
-	agr_dog_03				=> 'se_monster',
-	agr_dog_04				=> 'se_monster',
-	agr_dog_05				=> 'se_monster',
-	agr_dog_06				=> 'se_monster',
-	agr_dog_07				=> 'se_monster',
-	agr_dog_08				=> 'se_monster',
-	agr_dog_09				=> 'se_monster',
-	agr_dog_10				=> 'se_monster',
-	agr_dolg_blockpost_commander				=> 'se_stalker',
-
-	gar_digger_conc_camp_searcher_1		=> 'se_stalker',
-	gar_digger_conc_camp_searcher_2		=> 'se_stalker',
-	gar_digger_conc_camp_searcher_3		=> 'se_stalker',
-	gar_digger_conc_camp_prisoner_1		=> 'se_stalker',
-	gar_digger_conc_camp_prisoner_2		=> 'se_stalker',
-	gar_digger_messenger_man				=> 'se_stalker',
-	gar_bandit_barman				=> 'se_stalker',
-	gar_bandit_fixer				=> 'se_stalker',
-	gar_bandit_leader				=> 'se_stalker',
-	gar_bandit_trader				=> 'se_stalker',
-	gar_bandit_minigame				=> 'se_stalker',
-	gar_bandit_senya				=> 'se_stalker',
-	gar_bandit_ambush_1				=> 'se_stalker',
-	gar_bandit_ambush_2				=> 'se_stalker',
-	gar_bandit_robber_1				=> 'se_stalker',
-	gar_bandit_robber_2				=> 'se_stalker',
-	gar_digger_fighter_1				=> 'se_stalker',
-	gar_digger_fighter_2				=> 'se_stalker',
-	gar_digger_fighter_3				=> 'se_stalker',
-	gar_digger_fighter_4				=> 'se_stalker',
-	gar_digger_fighter_5				=> 'se_stalker',
-	gar_digger_quester				=> 'se_stalker',
-	gar_digger_traitor				=> 'se_stalker',
-	gar_digger_smuggler				=> 'se_stalker',
-	gar_bandit_digger_traitor				=> 'se_stalker',
-	gar_dead_camp_snork				=> 'se_monster',
-	
-	default_duty				=> 'se_stalker',
-	default_freedom				=> 'se_stalker',
-	default_bandit				=> 'se_stalker',
-	default_stalker				=> 'se_stalker',
-	stalker_regular				=> 'se_stalker',
-	sim_faction					=> 'se_sim_faction',
-	sim_default_duty_0				=> 'se_stalker',
-	sim_default_duty_1				=> 'se_stalker',
-	sim_default_duty_2				=> 'se_stalker',
-	sim_default_duty_3				=> 'se_stalker',
-	sim_default_duty_4				=> 'se_stalker',
-	sim_default_monolith_0				=> 'se_stalker',
-	sim_default_monolith_1				=> 'se_stalker',
-	sim_default_monolith_2				=> 'se_stalker',
-	sim_default_monolith_3				=> 'se_stalker',
-	sim_default_monolith_4				=> 'se_stalker',
-	sim_default_freedom_0				=> 'se_stalker',
-	sim_default_freedom_1				=> 'se_stalker',
-	sim_default_freedom_2				=> 'se_stalker',
-	sim_default_freedom_3				=> 'se_stalker',
-	sim_default_freedom_4				=> 'se_stalker',
-	sim_default_bandit_0				=> 'se_stalker',
-	sim_default_bandit_1				=> 'se_stalker',
-	sim_default_bandit_2				=> 'se_stalker',
-	sim_default_bandit_3				=> 'se_stalker',
-	sim_default_bandit_4				=> 'se_stalker',
-	sim_default_renegade_0				=> 'se_stalker',
-	sim_default_renegade_1				=> 'se_stalker',
-	sim_default_renegade_2				=> 'se_stalker',
-	sim_default_csky_0				=> 'se_stalker',
-	sim_default_csky_1				=> 'se_stalker',
-	sim_default_csky_2				=> 'se_stalker',
-	sim_default_csky_3				=> 'se_stalker',
-	sim_default_csky_4				=> 'se_stalker',
-	sim_default_stalker_0				=> 'se_stalker',
-	sim_default_stalker_1				=> 'se_stalker',
-	sim_default_stalker_2				=> 'se_stalker',
-	sim_default_stalker_3				=> 'se_stalker',
-	sim_default_stalker_4				=> 'se_stalker',
-	sim_default_military_0				=> 'se_stalker',
-	sim_default_military_1				=> 'se_stalker',
-	sim_default_military_2				=> 'se_stalker',
-	sim_default_military_3				=> 'se_stalker',
-	sim_default_military_3_sniper				=> 'se_stalker',
-	sim_default_military_4				=> 'se_stalker',
-	sim_default_killer_0				=> 'se_stalker',
-	sim_default_killer_1				=> 'se_stalker',
-	sim_default_killer_2				=> 'se_stalker',
-	sim_default_killer_3				=> 'se_stalker',
-	sim_default_killer_4				=> 'se_stalker',
-	sim_default_digger_0				=> 'se_stalker',
-	sim_default_digger_1				=> 'se_stalker',
-	sim_default_digger_2				=> 'se_stalker',
-	sim_default_digger_3				=> 'se_stalker',
-	sim_default_digger_4				=> 'se_stalker',
-	arena_first_battle_stalker_1				=> 'se_stalker',
-	arena_first_battle_ally_stalker_1				=> 'se_stalker',
-	arena_second_battle_stalker_1				=> 'se_stalker',
-	arena_second_battle_stalker_1_boss				=> 'se_stalker',
-	arena_third_battle_stalker_1				=> 'se_stalker',
-	arena_third_battle_stalker_1_boss				=> 'se_stalker',
-	arena_fourth_battle_stalker_1				=> 'se_stalker',
-	arena_fourth_battle_stalker_2				=> 'se_stalker',
-	arena_fourth_battle_stalker_3				=> 'se_stalker',
-	arena_fourth_battle_stalker_4				=> 'se_stalker',
-	arena_fourth_battle_stalker_5				=> 'se_stalker',
-	arena_survival_spawn				=> 'se_stalker',
-	arena_survival_spawn1				=> 'se_stalker',
-	arena_survival_spawn2				=> 'se_stalker',
-	pl_test_sect				=> 'se_stalker',
-	pl_test_sect1				=> 'se_stalker',
-	
-	val_freedom_blockpost_guard_north_1				=> 'se_stalker',
-	val_freedom_blockpost_guard_north_2				=> 'se_stalker',
-	val_freedom_blockpost_guard_leader_north				=> 'se_stalker',
-	val_freedom_blockpost_guard_south_1				=> 'se_stalker',
-	val_freedom_blockpost_guard_south_2				=> 'se_stalker',
-	val_freedom_blockpost_guard_leader_south				=> 'se_stalker',
-	val_freedom_deadblockpost_guard_1				=> 'se_stalker',
-	val_freedom_deadblockpost_guard_2				=> 'se_stalker',
-	val_freedom_deadblockpost_guard_3				=> 'se_stalker',
-	val_freedom_deadblockpost_guard_4				=> 'se_stalker',
-	val_freedom_deadblockpost_guard_5				=> 'se_stalker',
-	sim_default_freedom_sniper				=> 'se_stalker',
-	val_killer_sniper_1				=> 'se_stalker',
-	val_killer_sniper_2				=> 'se_stalker',
-	val_killer_sniper_3				=> 'se_stalker',
-	val_killer_sniper_4				=> 'se_stalker',
-	val_killer_sniper_5				=> 'se_stalker',
-	val_killer_sniper_6				=> 'se_stalker',
-	val_killer_sniper_7				=> 'se_stalker',
-	val_killer_sniper_8				=> 'se_stalker',
-	val_killer_sniper_9				=> 'se_stalker',
-	val_killer_sniper_10				=> 'se_stalker',
-	val_killer_1				=> 'se_stalker',
-	val_killer_2				=> 'se_stalker',
-	val_killer_3				=> 'se_stalker',
-	val_killer_4				=> 'se_stalker',
-	val_killer_5				=> 'se_stalker',
-	val_killer_6				=> 'se_stalker',
-	val_killer_7				=> 'se_stalker',
-	val_killer_8				=> 'se_stalker',
-	val_killer_9				=> 'se_stalker',
-	val_killer_10				=> 'se_stalker',
-	val_freedom_attack_1				=> 'se_stalker',
-	val_freedom_attack_2				=> 'se_stalker',
-	val_freedom_attack_3				=> 'se_stalker',
-	val_freedom_attack_4				=> 'se_stalker',
-	val_freedom_attack_commander				=> 'se_stalker',
-	val_freedom_attack_6				=> 'se_stalker',
-	val_freedom_attack_7				=> 'se_stalker',
-	val_freedom_attack_8				=> 'se_stalker',
-	val_freedom_attack_9				=> 'se_stalker',
-	val_freedom_attack_10				=> 'se_stalker',
-	val_freedom_trader				=> 'se_stalker',
-	val_freedom_barmen				=> 'se_stalker',
-	val_bandit_spy_1				=> 'se_stalker',
-	val_bandit_spy_2				=> 'se_stalker',
-	val_bandit_spy_3				=> 'se_stalker',
-	val_bandit_spy_4				=> 'se_stalker',
-	
-	device_pda_fang	=> 'cse_alife_item_pda',
-	esc_trader_habar	=> 'cse_alife_item_pda',
-	device_pda_military	=> 'cse_alife_item_pda',
-	device_pda_old	=> 'cse_alife_item_pda',
-	device_pda_garbage_traitor	=> 'cse_alife_item_pda',
-	device_pda_comendant	=> 'cse_alife_item_pda',
-	device_pda_freedom	=> 'cse_alife_item_pda',
-	device_pda_bloodsucker	=> 'cse_alife_item_pda',
-	device_pda_digger	=> 'cse_alife_item_pda',
-	red_forest_pda_map	=> 'cse_alife_item_pda',
-	mar_quest_scout_pda	=> 'cse_alife_item_pda',
-	mil_device_pda_lost_squard	=> 'cse_alife_item_pda',
-	esc_quest_magic_vodka	=> 'cse_alife_item_pda',
-	esc_quest_spec_medkit	=> 'cse_alife_item_pda',
-	esc_device_pda_driver	=> 'cse_alife_item_pda',
-	esc_mechanic_flash_card_1	=> 'cse_alife_item_pda',
-	esc_mechanic_flash_card_2	=> 'cse_alife_item_pda',
-	esc_mechanic_flash_card_3	=> 'cse_alife_item_pda',
-	esc_mechanic_flash_card_4	=> 'cse_alife_item_pda',
-	gar_quest_vodka_2	=> 'cse_alife_item_pda',
-	agr_quest_duty_secret_pda	=> 'cse_alife_item_pda',
-	agr_quest_duty_case	=> 'cse_alife_item_pda',
-	agr_pda_for_secret_trader	=> 'cse_alife_item_pda',
-	agr_map_animals	=> 'cse_alife_item_pda',
-	agr_mechanic_pda	=> 'cse_alife_item_pda',
-	yan_quest_granade	=> 'cse_alife_item_pda',
-	red_forest_pda_map_2	=> 'cse_alife_item_pda',
-	red_quest_prototipe_device	=> 'cse_alife_item_pda',
-	
-	museum_ammo_12x70_buck				=> 'cse_alife_object_physic',
-	museum_ammo_545x39_fmj				=> 'cse_alife_object_physic',	
-	museum_ammo_762x54_7h14				=> 'cse_alife_object_physic',	
-	museum_abakan				=> 'cse_alife_object_physic',
-	museum_ak74				=> 'cse_alife_object_physic',
-	museum_ak74u				=> 'cse_alife_object_physic',
-	museum_groza				=> 'cse_alife_object_physic',
-	museum_lr300				=> 'cse_alife_object_physic',
-	museum_rg6				=> 'cse_alife_object_physic',
-	museum_rpg7				=> 'cse_alife_object_physic',
-	museum_sig550				=> 'cse_alife_object_physic',
-	museum_spas12				=> 'cse_alife_object_physic',
-	museum_svd				=> 'cse_alife_object_physic',
-	museum_bm16				=> 'cse_alife_object_physic',
-	museum_toz34				=> 'cse_alife_object_physic',
-	museum_val				=> 'cse_alife_object_physic',
-	museum_vintorez				=> 'cse_alife_object_physic',
-	museum_winchester1300				=> 'cse_alife_object_physic',
-	
-	agru_door				=> 'cse_alife_object_physic',
-	red_forest_bridge				=> 'cse_alife_object_physic',
-	
-	flesh_up_ac_mp5	=> 'cse_alife_item_pda',
-	flesh_up_bd_mp5	=> 'cse_alife_item_pda',
-	flesh_up_a_novice_outfit	=> 'cse_alife_item_pda',
-	flesh_up_ac_wincheaster1300	=> 'cse_alife_item_pda',
-	flesh_up_bd_wincheaster1300	=> 'cse_alife_item_pda',
-	flesh_up_ac_ak74u	=> 'cse_alife_item_pda',
-	flesh_up_fh_scientific_outfit	=> 'cse_alife_item_pda',
-	flesh_up_aceg_scientific_outfit	=> 'cse_alife_item_pda',
-	flesh_up_bdfh_scientific_outfit	=> 'cse_alife_item_pda',
-	flesh_up_ab_svu	=> 'cse_alife_item_pda',
-	flesh_up_cd_svu	=> 'cse_alife_item_pda',
-	flesh_up_abcd_svu	=> 'cse_alife_item_pda',
-	flesh_up_ab_pkm	=> 'cse_alife_item_pda',
-	flesh_up_cd_pkm	=> 'cse_alife_item_pda',
-	flesh_up_abcd_pkm	=> 'cse_alife_item_pda',
-	flesh_up_ac_desert_eagle	=> 'cse_alife_item_pda',
-	flesh_up_bd_desert_eagle	=> 'cse_alife_item_pda',
-	flesh_up_ac_spas12	=> 'cse_alife_item_pda',
-};
+use stkutils::scan;
 sub new {
 	my $class = shift;
 	my $self = {};
@@ -6451,14 +5466,14 @@ sub new {
 }
 sub spawn_read {
 	my $self = shift;
-	my ($cf, $version) = @_;
+	my ($cf, $version, $ini) = @_;
 	while (1) {
 		my ($index, $size) = $cf->r_chunk_open();
 		defined($index) or last;
 		my $id;
 		if ($index == 0) {
 			if ($version <= 0x5E) {
-				$self->read_common($cf);
+				$self->read_common($cf, $ini);
 			} else {
 				$id = unpack('v', $cf->r_chunk_data());
 			}
@@ -6466,7 +5481,7 @@ sub spawn_read {
 			if ($version <= 0x5E) {
 				$id = unpack('v', $cf->r_chunk_data());
 			} else {
-				$self->read_common($cf);
+				$self->read_common($cf, $ini);
 			}
 		}
 		$cf->r_chunk_close();
@@ -6474,7 +5489,7 @@ sub spawn_read {
 }
 sub read_common {
 	my $self = shift;
-	my ($cf) = @_;
+	my ($cf, $ini) = @_;
 	while (1) {
 		my ($index, $size) = $cf->r_chunk_open();
 		defined($index) or last;
@@ -6484,11 +5499,14 @@ sub read_common {
 		my $packet = stkutils::data_packet->new(substr($data, 2));
 		if ($index == 0) {
 			cse_abstract::state_read($self->{cse_object}, $packet);
-			my $class_name = section_to_class->{$self->{cse_object}->{section_name}};
+			my $class_name = stkutils::scan->get_class($self->{cse_object}->{section_name});
+			if (!defined $class_name && (::with_scan())) {
+				$class_name = $ini->value('sections', $self->{cse_object}->{section_name});
+			}
 			defined $class_name or die "unknown $self->{cse_object}->{section_name}";
 			bless $self->{cse_object}, $class_name;
 			$self->{cse_object}->state_read($packet);
-			$packet->length() == 0 or die "state data left [".$packet->length()."] in $self->{cse_object}->{name}";
+			$packet->length() == 0 or print "state data left [".$packet->length()."] in $self->{cse_object}->{name}\n";
 		} elsif ($index == 1) {
 			cse_abstract::update_read($self->{cse_object}, $packet);
 			UNIVERSAL::can($self->{cse_object}, 'update_read') && do {
@@ -6501,7 +5519,7 @@ sub read_common {
 }
 sub spawn_read_1935 {
 	my $self = shift;
-	my ($cf) = @_;
+	my ($cf, $ini) = @_;
 	my ($index, $size) = $cf->r_chunk_open();
 	
 	my $data = $cf->r_chunk_data();
@@ -6509,11 +5527,14 @@ sub spawn_read_1935 {
 	my $update_packet_offset = $size16 + 4;
 	my $state_packet = stkutils::data_packet->new(substr($data, 2, $size16));
 	cse_abstract::state_read($self->{cse_object}, $state_packet);
-	my $class_name = section_to_class->{$self->{cse_object}->{section_name}};
+	my $class_name = stkutils::scan->get_class($self->{cse_object}->{section_name});
+	if (!defined $class_name && (::with_scan())) {
+		$class_name = $ini->value('sections', $self->{cse_object}->{section_name});
+	}
 	defined $class_name or die "unknown $self->{cse_object}->{section_name}";
 	bless $self->{cse_object}, $class_name;
 	$self->{cse_object}->state_read($state_packet);
-	$state_packet->length() == 0 or die "state data left [".$state_packet->length()."] in $self->{cse_object}->{name}";
+	$state_packet->length() == 0 or die "state data left [".$state_packet->length()."] in $self->{cse_object}->{name}\n";
 	my $update_packet = stkutils::data_packet->new(substr($data, $update_packet_offset));
 	my $update_packet_length = $size - $update_packet_offset;
 	cse_abstract::update_read($self->{cse_object}, $update_packet);
@@ -6525,11 +5546,14 @@ sub spawn_read_1935 {
 }
 sub spawn_read_level {
 	my $self = shift;
-	my ($cf, $size) = @_;
+	my ($cf, $size, $ini) = @_;
 	my $data = $cf->r_chunk_data();
 	my $state_packet = stkutils::data_packet->new($data);
 	cse_abstract::state_read($self->{cse_object}, $state_packet);
-	my $class_name = section_to_class->{$self->{cse_object}->{section_name}};
+	my $class_name = stkutils::scan->get_class($self->{cse_object}->{section_name});
+	if (!defined $class_name && (::with_scan())) {
+		$class_name = $ini->value('sections', $self->{cse_object}->{section_name});
+	}
 	defined $class_name or die "unknown $self->{cse_object}->{section_name}";
 	bless $self->{cse_object}, $class_name;
 	$self->{cse_object}->state_read($state_packet);
@@ -6537,7 +5561,7 @@ sub spawn_read_level {
 }
 sub spawn_write {
 	my $self = shift;
-	my ($cf, $object_id) = @_;
+	my ($cf, $object_id, $ini) = @_;
 	if ($self->{cse_object}->{version} > 94) {
 		$cf->w_chunk(0, pack('v', $object_id));
 		$cf->w_chunk_open(1);
@@ -6577,7 +5601,6 @@ sub spawn_write_1935 {
 	my $self = shift;
 	my ($cf, $object_id) = @_;
 	my $packet2 = stkutils::data_packet->new('');
-	my $class_name = section_to_class->{$self->{cse_object}->{section_name}};
 	$self->{cse_object}->state_write($packet2);
 	my $packet1 = stkutils::data_packet->new('');
 	cse_abstract::state_write($self->{cse_object}, $packet1, $object_id, $packet2->length() + 2);
@@ -6585,7 +5608,7 @@ sub spawn_write_1935 {
 	$cf->w_chunk_data($packet1->data());
 	$cf->w_chunk_data($packet2->data());
 	my $upd_packet2 = stkutils::data_packet->new('');
-	if ($class_name eq 'cse_alife_trader_shop') {
+	if (ref $self->{cse_object} eq 'cse_alife_trader_shop') {
 		cse_alife_trader::update_write($self->{cse_object}, $upd_packet2);
 	} else {
 		UNIVERSAL::can($self->{cse_object}, 'update_write') && do {
@@ -6602,7 +5625,6 @@ sub spawn_write_level {
 	my $self = shift;
 	my ($cf, $object_id) = @_;
 	my $packet2 = stkutils::data_packet->new('');
-	my $class_name = section_to_class->{$self->{cse_object}->{section_name}};
 	$self->{cse_object}->state_write($packet2);
 	my $packet1 = stkutils::data_packet->new('');
 	cse_abstract::state_write($self->{cse_object}, $packet1, $object_id, $packet2->length());
@@ -6611,10 +5633,13 @@ sub spawn_write_level {
 }
 sub state_import {
 	my $self = shift;
-	my ($if, $section) = @_;
+	my ($if, $section, $ini) = @_;
 
 	cse_abstract::state_import($self->{cse_object}, $if, $section);
-	my $class_name = section_to_class->{$self->{cse_object}->{section_name}};
+	my $class_name = stkutils::scan->get_class($self->{cse_object}->{section_name});
+	if (!defined $class_name && (::with_scan())) {
+		$class_name = $ini->value('sections', $self->{cse_object}->{section_name});
+	}
 	defined $class_name or die "unknown section '$self->{cse_object}->{section_name}'";
 	bless $self->{cse_object}, $class_name;
 	$self->{cse_object}->state_import($if, $section);
@@ -7237,7 +6262,7 @@ sub new {
 sub read {
 	my $self = shift;
 	my ($fn, $version) = @_;
-
+	my $ini = stkutils::ini_file->new('sections.ini', 'r') if ::with_scan();
 	my $cf = stkutils::chunked_file->new($fn, 'r') or die;
 	if (not(::level()) && ($version > 0x4F)) {
 		while (1) {
@@ -7248,7 +6273,7 @@ sub read {
 				$self->read_header($cf, $version);
 			} elsif ($index == 1) {
 				print "reading alife objects...\n";
-				$self->read_alife($cf, $version);
+				$self->read_alife($cf, $version, $ini);
 			} elsif ($index == 2) {
 				print "reading artefact spawn places...\n";
 				$self->read_section2($cf);
@@ -7257,7 +6282,7 @@ sub read {
 				$self->read_way($cf);
 			} elsif ($index == 4) {
 				print "reading game graph...\n";
-				$self->read_graph($cf);
+				$self->read_graph($cf, $ini);
 			} else {
 				die;
 			}
@@ -7268,16 +6293,17 @@ sub read {
 		my ($index, $size) = $cf->r_chunk_open();
 		$self->read_header($cf, $version);
 		$cf->r_chunk_close();
-		$self->read_alife($cf, $version);
+		$self->read_alife($cf, $version, $ini);
 		if ($version > 16) {
 			($count, $size) = $cf->r_chunk_open();
 			$self->read_section2($cf);
 			$cf->r_chunk_close();	
 		}
 	} else {
-		$self->read_alife_level($cf);
+		$self->read_alife_level($cf, $ini);
 	}
 	$cf->close();
+	$ini->close() if ::with_scan();
 }
 sub write {
 	my $self = shift;
@@ -7287,7 +6313,7 @@ sub write {
 	if (not(::level())) {
 		$self->write_header($cf, $version);
 		$self->write_alife($cf, $version);
-		$self->write_section2($cf);
+		$self->write_section2($cf, $version);
 		$self->write_way($cf);
 		$self->write_graph($cf);
 	} else {
@@ -7308,9 +6334,9 @@ sub read_header {
 		) = unpack('Va[16]a[16]VV', $cf->r_chunk_data());
 	} else {
 		(
-			$self->{level_count},
-			$self->{count},
 			$self->{version},
+			$self->{count},
+			$self->{unknown},
 		) = unpack('VVV', $cf->r_chunk_data());	
 	}
 }
@@ -7328,9 +6354,9 @@ sub write_header {
 		$cf->w_chunk(0, $data);
 	} else {
 		my $data = pack('VVV',
-			$self->{level_count},
+			$self->{version},
 			$#{$self->{alife_objects}} + 1,
-			$self->{version},);
+			$self->{unknown},);
 		if ($version > 79) {
 			$cf->w_chunk(0, $data);	
 		} else {
@@ -7340,8 +6366,9 @@ sub write_header {
 }
 sub read_alife {
 	my $self = shift;
-	my ($cf, $version) = @_;
+	my ($cf, $version, $ini) = @_;
 	my $i = 0;
+	
 	if ($version > 0x4F) {
 		while (1) {
 			my ($index, $size) = $cf->r_chunk_open();
@@ -7355,7 +6382,7 @@ sub read_alife {
 					($index, $size) = $cf->r_chunk_open();
 					defined($index) or last;
 					my $object = alife_object->new();
-					$object->spawn_read($cf, $version);
+					$object->spawn_read($cf, $version, $ini);
 					push @{$self->{alife_objects}}, $object;
 					$cf->r_chunk_close();
 				}
@@ -7367,7 +6394,7 @@ sub read_alife {
 	} else {
 		while ($i < $self->{count}) {
 			my $object = alife_object->new();
-			$object->spawn_read_1935($cf);
+			$object->spawn_read_1935($cf, $ini);
 			$i++;
 			push @{$self->{alife_objects}}, $object;
 		}
@@ -7375,14 +6402,14 @@ sub read_alife {
 }
 sub read_alife_level {
 	my $self = shift;
-	my ($cf) = @_;
+	my ($cf, $ini) = @_;
 	my $i = 0;
 	while (1) {
 		my $object = alife_object->new();
 		my	($index, $size) = $cf->r_chunk_open();
 		defined $index or last;
 		die unless $i == $index;
-		$object->spawn_read_level($cf, $size);
+		$object->spawn_read_level($cf, $size, $ini);
 		$cf->r_chunk_close();
 		$i++;
 		push @{$self->{alife_objects}}, $object;
@@ -7447,10 +6474,14 @@ sub read_section2 {
 }
 sub write_section2 {
 	my $self = shift;
-	my ($cf) = @_;
+	my ($cf, $version) = @_;
 	if (defined $self->{section2_raw_data}){
 		print "writing artefact spawn places...\n";
-		$cf->w_chunk(2, $self->{section2_raw_data});
+		if ($version > 0x4F) {
+			$cf->w_chunk(2, $self->{section2_raw_data});
+		} else {
+			$cf->w_chunk($#{$self->{alife_objects}} + 1, $self->{section2_raw_data});
+		}
 	}
 }
 sub read_way {
@@ -7497,7 +6528,7 @@ sub write_way {
 }
 sub read_graph {
 	my $self = shift;
-	my ($cf) = @_;
+	my ($cf, $ini) = @_;
 #	if (not (::split_spawns())) {
 		$self->{section4_raw_data} = $cf->r_chunk_data();
 	if (2 == 3) {
@@ -7515,7 +6546,7 @@ sub read_graph {
 		my $lp_offset = $self->{graph}->{edge_count} * 0x06;
 		my $packet = stkutils::data_packet->new(substr($data, 28));
 		my $tr_packet = stkutils::data_packet->new($packet->trunk($edges_offset + $lp_offset + 8192));
-		#delete $packet;
+
 		print "	reading levels...\n";
 		my $i = 0;
 		while ($i < $self->{graph}->{level_count}) {
@@ -7573,12 +6604,14 @@ sub read_graph {
 			$object->{cse_object}->{version} = 0x80;
 			$object->{cse_object}->{cse_abstract__unk1_h16} = 0xffff;
 			$object->{cse_object}->{script_version} = 12;
-#			$object->{cse_object}->{unused} = 0;
-#			$object->{cse_object}->{spawn_id} = 0xffff;
-#			$object->{cse_object}->{extended_size} = 0x31;
 			$object->{cse_object}->{game_vertex_id} = $vertex->{game_vertex_id};
 			
-			my $class_name = alife_object::section_to_class->{$object->{cse_object}->{section_name}};
+			my $class_name;
+			if (::with_scan()) {
+				$class_name = $ini->value('sections', $object->{cse_object}->{section_name});
+			} else {
+				$class_name = stkutils::scan->get_class($object->{cse_object}->{section_name});
+			}
 			bless $object->{cse_object}, $class_name;
 			for (my $i = 0; $i < $vertex->{edge_count}; $i++) {
 				my $edge = $self->{graph_edges}[$vertex->{edge_index} + $i];
@@ -7616,17 +6649,18 @@ sub import {
 	my $self = shift;
 	my ($fn) = @_;
 	my $if = stkutils::ini_file->new($fn, 'r') or die;
-
+	my $ini = stkutils::ini_file->new('sections.ini', 'r') if ::with_scan();
 	if (not(::level())) {
 		$self->import_header($if);
-		$self->import_alife($if);
+		$self->import_alife($if, $ini);
 		$self->import_section2($if);
 		$self->import_way($if);
 		$self->import_graph($if);
 	} else {
-		$self->import_level($fn);
+		$self->import_level($fn, $ini);
 	}
 	$if->close();
+	$ini->close() if ::with_scan();
 }
 sub import_header {
 	my $self = shift;
@@ -7636,11 +6670,12 @@ sub import_header {
 	$self->{guid} = pack 'H*', $if->value('header', 'guid') if ($if->is_value_exists('header', 'guid'));
 	$self->{graph_guid} = pack 'H*', $if->value('header', 'graph_guid') if ($if->is_value_exists('header', 'graph_guid'));
 	$self->{level_count} = $if->value('header', 'level_count');
+	$self->{unknown} = $if->value('header', 'unknown');
 }
 sub import_alife {
 	my $self = shift;
-	my ($if) = @_;
-
+	my ($if, $ini) = @_;
+	
 	foreach my $fn (split /,/, ($if->value('alife', 'source_files') or die)) {
 		$fn =~ s/^\s*|\s*$//g;
 		my $lif;
@@ -7652,7 +6687,7 @@ sub import_alife {
 		print "importing alife objects from file $fn...\n";
 		foreach my $section (@{$lif->{sections_list}}) {
 			my $object = alife_object->new();
-			$object->state_import($lif, $section);
+			$object->state_import($lif, $section, $ini);
 			push @{$self->{alife_objects}}, $object;
 		}
 		$lif->close();
@@ -7660,12 +6695,12 @@ sub import_alife {
 }
 sub import_level {
 	my $self = shift;
-	my ($if) = @_;
+	my ($if, $ini) = @_;
 	my ($lif) = stkutils::ini_file->new($if, 'r') or die;
 	print "importing alife objects from level_spawn.ltx\n";
 	foreach my $section (@{$lif->{sections_list}}) {
 		my $object = alife_object->new();
-		$object->state_import($lif, $section);
+		$object->state_import($lif, $section, $ini);
 		push @{$self->{alife_objects}}, $object;
 	}
 	$lif->close();
@@ -7736,7 +6771,9 @@ sub export_header {
 	print $fh "version = $self->{version}\n";
 	print $fh 'guid = ', unpack('H*', $self->{guid}), "\n" if (defined $self->{guid});
 	print $fh 'graph_guid = ', unpack('H*', $self->{graph_guid}), "\n" if (defined $self->{graph_guid});
-	print $fh "level_count = $self->{level_count}\n\n";
+	print $fh "level_count = $self->{level_count}\n" if (defined $self->{level_count});
+	print $fh "unknown = $self->{unknown}\n" if (defined $self->{unknown});
+	print $fh "\n";
 }
 sub export_alife {
 	my $self = shift;
@@ -7945,13 +6982,15 @@ package main;
 use strict;
 use Getopt::Long;
 use File::Path;
+use stkutils::scan;
+use diagnostics;
 
 #local $SIG{__WARN__} = sub {die};
 
 sub usage {
 	return <<END
 S.T.A.L.K.E.R. all.spawn compiler/decompiler
-Usage: acdc -d all.spawn [-o outdir]
+Usage: acdc -d all.spawn [-o outdir] [-scan scandir]
        acdc -c all.ltx [-f flag1[,...]] [-a level:point] [-o outfile]
 END
 }
@@ -7978,10 +7017,10 @@ my $level_spawn;
 my $use_2942;
 my $use_hack;
 my $convert;
-my $game1;
-my $game2;
+my ($game1, $game2);
 my $parse;
 my $way;
+my $sc;
 
 GetOptions(
 	'd=s' => \$spawn_file,
@@ -7997,6 +7036,7 @@ GetOptions(
 	'hack' => \$use_hack,
 	'parse=s' => \$parse,		
 	'way' => \$way,	
+	'scan=s' => \$sc		
 ) or die usage();
 
 if (defined $flags) {
@@ -8004,6 +7044,10 @@ if (defined $flags) {
 		die "bad flag '$flag'\n" unless $flag =~ /\s*(\w+)\s*/;
 		$flags_hash{$1} = 1;
 	}
+}
+
+if ((defined $sc) && !(::is_alredy_scanned())) {
+	stkutils::scan->launch($sc);
 }
 
 if (defined $convert) {
@@ -8139,14 +7183,16 @@ if (defined $convert) {
 	die usage();
 }
 
-sub is_convert {return defined $convert}
-sub way {return defined $way}
+sub with_scan {return ((defined $sc) || (-e 'sections.ini'));}
+sub is_alredy_scanned {return (-e 'sections.ini');}
+sub is_convert {return defined $convert;}
+sub way {return defined $way;}
 sub is_flag_defined {
 	return (defined $flags_hash{$_[0]}) ? 1 : 0;
 }
-sub level {return defined $level_spawn}
-sub use_2942 {return defined $use_2942}
-sub use_hack {return defined $use_hack}
+sub level {return defined $level_spawn;}
+sub use_2942 {return defined $use_2942;}
+sub use_hack {return defined $use_hack;}
 sub edge_block_size {
 	if ($_[0] eq 'soc' or $_[0] eq 'cop') {
 		return 0x06;
