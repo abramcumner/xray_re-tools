@@ -1,6 +1,6 @@
 #!perl -w
 #
-#v 0.2 Last Edited: 05 June 2011
+#v 0.3 Last Edited: 12 June 2011
 ###########################################################
 package level;
 use strict;
@@ -33,6 +33,7 @@ sub read {
 	while (1) {
 		my ($index, $size) = $fh->r_chunk_open();
 		defined $index or last;
+		last unless $index != 0;
 		my $data = $fh->r_chunk_data();
 #		if ($index & 0x80000000) {
 #			print "chunk compressed!\n"; 
@@ -42,7 +43,6 @@ sub read {
 #			$data = $dec_data;
 #		}
 		SWITCH: {
-			$index == 0x0 && do {last SWITCH;};
 			$index == 0x1 && do {$self->fsl_header::read($data); last SWITCH;};
 			(chunks::get_name($index, $self->{fsl_header}->{xrlc_version}) eq 'FSL_TEXTURES') && do {$self->fsl_textures::read($data); last SWITCH;};
 			(chunks::get_name($index, $self->{fsl_header}->{xrlc_version}) eq 'FSL_SHADERS') && do {$self->fsl_shaders::read($data); last SWITCH;};
@@ -452,7 +452,7 @@ sub read {
 sub write {
 	my $self = shift;
 	my ($cf) = @_;
-	my $index = chunks::get_index('FSL_SHADERS', $self->{fsl_header}->{xrlc_version});
+	my $index = chunks::get_index('FSL_CFORM', $self->{fsl_header}->{xrlc_version});
 	$cf->w_chunk($index, $self->{fsl_cform}->{raw_data});	
 }
 sub export {
