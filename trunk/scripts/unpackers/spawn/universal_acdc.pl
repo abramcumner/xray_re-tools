@@ -1,6 +1,6 @@
 #!perl -w -I \temp\1\bin
 #
-# last edited: 9 June 2011
+# last edited: 20 June 2011
 #
 #######################################################################
 package cse_abstract;
@@ -3096,7 +3096,7 @@ use constant properties_info => (
 	{ name => 'enter_min_enemy_distance',	type => 'f32',	default => 0.0 },	# 0xf4
 	{ name => 'exit_min_enemy_distance',	type => 'f32',	default => 0.0 },	# 0xf8
 	{ name => 'is_combat_cover',		type => 'u8',	default => 0 },		# 0xfc
-	{ name => 'MP respawn',	type => 'u8',	default => 0 },		# 0x100
+	{ name => 'MP_respawn',	type => 'u8',	default => 0 },		# 0x100
 );
 sub state_read {
 	cse_alife_dynamic_object::state_read(@_);
@@ -5667,30 +5667,64 @@ sub state_export {
 sub convert_spawn {
 	my $self = shift;
 	my ($new_version, $new_script_version, $old_gvid, $new_gvid) = @_;
-	if ((ref $self->{cse_object} eq 'se_actor') and (($new_version >= 122) && ($new_version < 128)) and (($self->{cse_object}->{version} < 122) || ($self->{cse_object}->{version} >= 128))) {
-		$self->{cse_object}->{dumb} = [0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,15,0,0,0,0,0,0,0,0,0,8,0,2,0,116,101,115,116,95,99,114,111,119,107,105,108,108,101,114,0,67,77,71,67,114,111,119,75,105,108,108,101,114,0,118,97,108,105,97,98,108,101,0,0,60,0,0,4,0,0,0,0,10,0,100,0,0,0,0,0,0,10,0,0,0,22,0,116,101,115,116,95,115,104,111,111,116,105,110,103,0,67,77,71,83,104,111,111,116,105,110,103,0,118,97,108,105,97,98,108,101,0,0,0,110,105,108,0,110,105,108,0,110,105,108,0,110,105,108,0,110,105,108,0,1,0,0,0,0,0,0,0,0,0,0,0,110,105,108,0,38,0,140,0,169,0];
+	if ($new_version >= 122 && $self->{cse_object}->{version} < 122) {
+		$self->{cse_object}->{cse_abstract__unk1_u16} = 0xffff;
+		$self->{cse_object}->{cse_alife_object_hanging_lamp__unk6_f32} = 0.;
+		$self->{cse_object}->{cse_alife_object_hanging_lamp__unk7_f32} = 0.;
+		$self->{cse_object}->{cse_alife_object_hanging_lamp__unk8_f32} = 0.;
+		$self->{cse_object}->{cse_alife_item_weapon__unk1_u8} = 0;
+		$self->{cse_object}->{squad_id} = 'nil' if (ref $self->{cse_object} eq 'se_stalker' || ref $self->{cse_object} eq 'se_monster');
+		$self->{cse_object}->{sim_forced_online} = 0 if (ref $self->{cse_object} eq 'se_stalker' || ref $self->{cse_object} eq 'se_monster');
+		$self->{cse_object}->{dumb} = [0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,15,0,0,0,0,0,0,0,0,0,8,0,2,0,116,101,115,116,95,99,114,111,119,107,105,108,108,101,114,0,67,77,71,67,114,111,119,75,105,108,108,101,114,0,118,97,108,105,97,98,108,101,0,0,60,0,0,4,0,0,0,0,10,0,100,0,0,0,0,0,0,10,0,0,0,22,0,116,101,115,116,95,115,104,111,111,116,105,110,103,0,67,77,71,83,104,111,111,116,105,110,103,0,118,97,108,105,97,98,108,101,0,0,0,110,105,108,0,110,105,108,0,110,105,108,0,110,105,108,0,110,105,108,0,1,0,0,0,0,0,0,0,0,0,0,0,110,105,108,0,38,0,140,0,169,0] if ref $self->{cse_object} eq 'se_actor';
+		if (ref $self->{cse_object} eq 'se_smart_terrain') {
+			$self->{cse_object}->{actor_defence_come} = 0;
+			$self->{cse_object}->{combat_quest} = 'nil';
+			$self->{cse_object}->{task} = 0xFFFF;
+			$self->{cse_object}->{see_actor_enemy} = 'nil';
+			$self->{cse_object}->{flag} = 0;
+			$self->{cse_object}->{squads_count} = 0;
+			$self->{cse_object}->{force_online} = 0;
+			$self->{cse_object}->{force_online_squads_count} = 0;
+			$self->{cse_object}->{cover_manager_is_valid} = 0;
+			$self->{cse_object}->{cover_manager_cover_table_count} = 0;		
+			$self->{cse_object}->{npc_info_count} = 0;
+			$self->{cse_object}->{dead_time_count} = 0;	
+		}
 	}
-	if ((ref $self->{cse_object} eq 'se_smart_cover') and ($new_version >= 128)) {
-		$self->{cse_object}->{last_description} = $self->{cse_object}->{description};
-		$self->{cse_object}->{loopholes} = [$self->{cse_object}->{description}, 1];
+	if ($new_version >= 124 && $self->{cse_object}->{version} < 124) {
+		$self->{cse_object}->{se_sim_faction__marker} = 0 if ref $self->{cse_object} eq 'se_sim_faction';
+		$self->{cse_object}->{upgrades} = [0];
+		if (ref $self->{cse_object} eq 'se_level_changer') {
+			$self->{cse_object}->{enabled} = 1;
+			$self->{cse_object}->{hint} = 'level_changer_invitation';
+		} elsif (ref $self->{cse_object} eq 'se_smart_terrain') {
+			$self->{cse_object}->{se_smart_terrain_combat_manager_cover_manager__marker} = 2;
+			$self->{cse_object}->{se_smart_terrain_combat_manager__marker} = 19;			
+		}
 	}
-	if ((ref $self->{cse_object} eq 'se_smart_terrain') and (($new_version >= 122) && ($new_version < 128)) and (($self->{cse_object}->{version} < 122) || ($self->{cse_object}->{version} >= 128))) {
-		$self->{cse_object}->{actor_defence_come} = 0;
-		$self->{cse_object}->{combat_quest} = 'nil';
-		$self->{cse_object}->{task} = 0xFFFF;
-		$self->{cse_object}->{see_actor_enemy} = 'nil';
-		$self->{cse_object}->{flag} = 0;
-		$self->{cse_object}->{squads_count} = 0;
-		$self->{cse_object}->{force_online} = 0;
-		$self->{cse_object}->{force_online_squads_count} = 0;
-		$self->{cse_object}->{cover_manager_is_valid} = 0;
-		$self->{cse_object}->{cover_manager_cover_table_count} = 0;		
-	}
-	if ((substr(ref $self->{cse_object}, 0, 14) eq 'cse_alife_item') and ($new_version >= 124) and ($self->{cse_object}->{version} < 124)) {
-		$self->{cse_object}->{upgrades} = 0;
+	if ($new_version >= 128 && $self->{cse_object}->{version} < 128) {
+		$self->{cse_object}->{game_material} = 'materials\\fake_ladders';
+		$self->{cse_object}->{cse_alive_inventory_box__unk1_u8} = 1;
+		$self->{cse_object}->{cse_alive_inventory_box__unk2_u8} = 0;
+		$self->{cse_object}->{tip} = '';
+		$self->{cse_object}->{cse_alife_trader_abstract__unk2_u8} = 0;
+		$self->{cse_object}->{cse_alife_trader_abstract__unk3_u8} = 0;
+		$self->{cse_object}->{start_position_filled} = 0;
+		$self->{cse_object}->{last_spawn_time_present} = 0 if ref $self->{cse_object} eq 'se_zone_torrid';
+		if (ref $self->{cse_object} eq 'se_smart_cover') {
+			$self->{cse_object}->{MP_respawn} = 0 if ref $self->{cse_object} eq 'se_smart_cover';
+			$self->{cse_object}->{last_description} = $self->{cse_object}->{description};
+			$self->{cse_object}->{loopholes} = [$self->{cse_object}->{description}, 1];
+		} elsif (ref $self->{cse_object} eq 'se_smart_terrain') {
+			$self->{cse_object}->{arriving_npc_count} = 0;
+			$self->{cse_object}->{base_on_actor_control_present} = 0;
+			$self->{cse_object}->{is_respawn_point} = 0;
+			$self->{cse_object}->{population} = 0;
+		}
 	}
 	if (not ::level()) {
 		if ((substr(ref $self->{cse_object}, 0, 14) eq 'cse_alife_item') and ($new_version >= 122) and ($self->{cse_object}->{version} < 122)) {
+			$self->{cse_object}->{'upd:num_items'} = 0 if ref $self->{cse_object} eq 'cse_alife_object_physic';
 			if ($self->{cse_object}->{'upd:num_items'} != 0) {
 				$self->{cse_object}->{'upd:force'} = [0,0,0];
 				$self->{cse_object}->{'upd:torque'} = [0,0,0];
@@ -5946,7 +5980,7 @@ sub import {
 	
 	if (not(::level())) {
 		$self->import_alife($fn);
-		$self->import_way($fn);
+		$self->import_way($fn) if ::way();
 	} else {
 		$self->import_level($fn);
 	}
@@ -6046,26 +6080,58 @@ sub import_way {
 }
 sub export {
 	my $self = shift;
-	my ($version, $script_version, $old_gvid, $new_gvid, $graph) = @_;
+	my ($version, $script_version, $old_gvid, $new_gvid, $convert, $ini) = @_;
 
 	if (not(::level())) {
-		$self->export_alife($version, $script_version, $old_gvid, $new_gvid, $graph);
-		$self->export_way($old_gvid, $new_gvid, $graph);
+		$self->export_alife($version, $script_version, $old_gvid, $new_gvid, $convert, $ini);
+		$self->export_way($old_gvid, $new_gvid, $convert) if ::way();
 	} else {
 		$self->export_level($version, $script_version, 0, 0);
 	}		
 }
 sub export_alife {
 	my $self = shift;
-	my ($version, $script_version, $old_gvid, $new_gvid, $graph) = @_;
-
+	my ($version, $script_version, $old_gvid, $new_gvid, $convert, $ini) = @_;
+	my @temp;
+	if ($ini->value('sections', 'to_exclude') =~ /^\w+,\w+/) {
+		@temp = split /,/, $ini->{sections_hash}{'sections'}{'to_exclude'};
+	} else {
+		$temp[0] = $ini->{sections_hash}{'sections'}{'to_exclude'};
+	}
+	my %exclude;
+	foreach my $sect (@temp) {
+		$exclude{$sect} = 1;
+	}
 	my $id = 0;
 	my %if_by_level;
 	my @levels;
-	foreach my $object (@{$self->{alife_objects}}) {
+	foreach my $object (sort sort_sub @{$self->{alife_objects}}) {
+		next if defined $exclude{$object->{cse_object}->{section_name}};
+		my %add;
+		my %rep;
+		if (defined $ini->{sections_hash}{$object->{cse_object}->{section_name}}) {
+			foreach my $param (keys %{$ini->{sections_hash}{$object->{cse_object}->{section_name}}}) {
+				my @temp = split /:/, $param;
+				$add{$temp[1]} = $ini->{sections_hash}{$object->{cse_object}->{section_name}}{$param} if $temp[0] eq 'add';
+				$rep{$temp[1]} = $ini->{sections_hash}{$object->{cse_object}->{section_name}}{$param} if $temp[0] eq 'rep';
+			}
+			foreach my $param (keys %{$object->{cse_object}}) {
+				if (defined $add{$param}) {
+					if ($add{$param} =~ /^[0-9]$/) {
+						$object->{cse_object}->{$param} += $add{$param};
+					} else {
+						$object->{cse_object}->{$param} = join ('', $object->{cse_object}->{$param}, $add{$param});
+					}
+				}
+				if (defined $rep{$param}) {
+					$object->{cse_object}->{$param} = $rep{$param};
+				}
+			}
+		}
 		$object->convert_spawn($version, $script_version, $old_gvid, $new_gvid);
 		my $cse_object = $object->{cse_object};
-		my $level = $graph->level_name($cse_object->{game_vertex_id});
+#		my $level = $graph->level_name($cse_object->{game_vertex_id});
+		my $level = $convert;
 #		print "$cse_object->{game_vertex_id}\n";
 		die "unknown location of the alife object\n" unless defined $level;
 		my $lif = $if_by_level{$level};
@@ -6143,6 +6209,9 @@ sub export_way {
 			$info->{lif}->close();
 		}
 	}
+}
+sub sort_sub {
+	$a->{cse_object}->{section_name} cmp $b->{cse_object}->{section_name};
 }
 ############################################################
 package parsing ;
@@ -7074,16 +7143,18 @@ if (defined $convert) {
 	$params->{new_game}->{script_version},
 	$params->{new_game}->{build}) = build_version::version_by_build($params->{new_game}->{short_build});
 	print "converting from $params->{old_game}->{build} spawn format to $params->{new_game}->{build} spawn format...\n";
-	my $graph = vertex_table->new();
-	$graph->{build_version} = build_version::graph_build($params->{old_game}->{version}, $params->{old_game}->{script_version});
-	if (not ::level()) {
-		$graph->read();
-	}
+#	my $graph = vertex_table->new();
+#	$graph->{build_version} = build_version::graph_build($params->{old_game}->{version}, $params->{old_game}->{script_version});
+#	if (not ::level()) {
+#		$graph->read();
+#	}
 	my $spawn = converting->new();
 	$spawn->import($convert);
+	my $ini = stkutils::ini_file->new('convert.ini', 'r') or die $!;
 	File::Path::mkpath('converted_spawn', 0);
 	chdir 'converted_spawn' or die "cannot change path to converted_spawn\n";
-	$spawn->export($params->{new_game}->{version}, $params->{new_game}->{script_version}, $params->{old_game}->{gvid}, $params->{new_game}->{gvid});
+	$spawn->export($params->{new_game}->{version}, $params->{new_game}->{script_version}, $params->{old_game}->{gvid}, $params->{new_game}->{gvid}, $convert, $ini);
+	$ini->close();
 	print "done!\n";
 } elsif (defined $spawn_file) {
 	die "bad params\n" if (defined $src_file or defined $actor_pos);
