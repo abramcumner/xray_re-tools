@@ -64,7 +64,7 @@ static void reschedule(void)
 static void create_thread(const DEBUG_EVENT* event)
 {
 //	printf("create_thread: %lu\n", event->dwThreadId);
-	struct thread_info* thread = malloc(sizeof(struct thread_info));
+	struct thread_info* thread = (struct thread_info*)malloc(sizeof(struct thread_info));
 	list_init(&thread->link);
 	thread->worker = FALSE;
 	thread->id = event->dwThreadId;
