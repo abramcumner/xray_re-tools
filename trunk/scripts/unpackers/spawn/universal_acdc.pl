@@ -7052,7 +7052,7 @@ use strict;
 use Getopt::Long;
 use File::Path;
 use stkutils::scan;
-use diagnostics;
+#use diagnostics;
 
 #local $SIG{__WARN__} = sub {die};
 
