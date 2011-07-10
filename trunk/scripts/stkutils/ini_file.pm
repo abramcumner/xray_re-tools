@@ -2,7 +2,7 @@ package stkutils::ini_file;
 
 use strict;
 use IO::File;
-
+use stkutils::debug;
 sub new {
 	my $class = shift;
 	my ($fn, $mode) = @_;
@@ -27,7 +27,7 @@ sub new {
 				next;
 			}
 			$section = $1;
-			die if defined $self->{sections_hash}->{$section};
+			stkutils::debug::fail(__PACKAGE__.'::new', __LINE__, 'defined $self->{sections_hash}->{$section}', 'duplicate section found while reading '.$fn) if defined $self->{sections_hash}->{$section};
 			push @{$self->{sections_list}}, $section;
 			my %tmp = ();
 			$self->{sections_hash}{$section} = \%tmp;
@@ -48,7 +48,7 @@ sub new {
 				substr ($value, 0, 1) = '';
 			}
 			$skip_section == 1 and next;
-			die unless defined $section;
+			stkutils::debug::fail(__PACKAGE__.'::new', __LINE__, 'defined $section', 'undefined section found while reading '.$fn) unless defined $section;
 			$self->{sections_hash}{$section}{$name} = $value;
 		}
 	}
@@ -89,7 +89,7 @@ sub export_properties {
 		if ($p->{type} eq 'f32' or $p->{type} eq 'q8') {
 			print $fh "$p->{name} = $container->{$p->{name}}\n";
 		} elsif (defined $format) {
-die "undefined field $p->{name}\n" unless defined $container->{$p->{name}};
+stkutils::debug::fail(__PACKAGE__.'::export_properties', __LINE__, 'defined $container->{$p->{name}}', 'undefined field '.$p->{name}) unless defined $container->{$p->{name}};
 			next if defined($p->{default}) && $container->{$p->{name}} == $p->{default};
 			printf $fh "$p->{name} = $format\n", $container->{$p->{name}};
 		} elsif ($p->{type} eq "sz") {
@@ -216,7 +216,7 @@ sub import_properties {
 	my $container = shift;
 
 #	print "$section\n";
-	die unless defined $self->{sections_hash}{$section};
+	stkutils::debug::fail('ini_file::import_properties', __LINE__, "$section is undefined") unless defined $self->{sections_hash}{$section};
 	foreach my $p (@_) {
 #	print "$p->{name}\n";
 		my $value = $self->value($section, $p->{name});
@@ -267,17 +267,17 @@ sub import_shape_properties {
 
 	my %shape;
 
-	my $type = $self->value($section, "$id:type") or die "no shape type in $section";
+	my $type = $self->value($section, "$id:type") or stkutils::debug::fail('ini_file::import_shape_properties', __LINE__, "no shape type in $section");
 	my $offset = $self->value($section, "$id:offset");
 	if ($type eq "sphere") {
-		my $radius = $self->value($section, "$id:radius") or die "no radius in $section\n";
+		my $radius = $self->value($section, "$id:radius") or stkutils::debug::fail('ini_file::import_shape_properties', __LINE__, "no radius in $section\n");
 		$shape{type} = 0;
 		@{$shape{sphere}} = (split(/,/, $offset), $radius);
 	} elsif ($type eq "box") {
 		$shape{type} = 1;
-		my $axis_x = $self->value($section, "$id:axis_x") or die "no axis_x in $section\n";
-		my $axis_y = $self->value($section, "$id:axis_y") or die "no axis_y in $section\n";
-		my $axis_z = $self->value($section, "$id:axis_z") or die "no axis_z in $section\n";
+		my $axis_x = $self->value($section, "$id:axis_x") or stkutils::debug::fail('ini_file::import_shape_properties', __LINE__, "no axis_x in $section\n");
+		my $axis_y = $self->value($section, "$id:axis_y") or stkutils::debug::fail('ini_file::import_shape_properties', __LINE__, "no axis_y in $section\n");
+		my $axis_z = $self->value($section, "$id:axis_z") or stkutils::debug::fail('ini_file::import_shape_properties', __LINE__, "no axis_z in $section\n");
 		push @{$shape{box}}, split(/,/, $axis_x), split(/,/, $axis_y);
 		push @{$shape{box}}, split(/,/, $axis_z), split(/,/, $offset);
 	} else {
@@ -291,10 +291,10 @@ sub import_suppl_properties {
 
 	my %item;
 
-	$item{section_name} = $self->value($section, "$id:section_name") or die "no section_name in $section\n";
-	$item{item_count} = $self->value($section, "$id:item_count") or die "no item_count in $section\n";
-	$item{min_factor} = $self->value($section, "$id:min_factor") or die "no min_factor in $section\n";
-	$item{max_factor} = $self->value($section, "$id:max_factor") or die "no max_factor in $section\n";
+	$item{section_name} = $self->value($section, "$id:section_name") or stkutils::debug::fail('ini_file::import_suppl_properties', __LINE__, "no section_name in $section\n");
+	$item{item_count} = $self->value($section, "$id:item_count") or stkutils::debug::fail('ini_file::import_suppl_properties', __LINE__, "no item_count in $section\n");
+	$item{min_factor} = $self->value($section, "$id:min_factor") or stkutils::debug::fail('ini_file::import_suppl_properties', __LINE__, "no min_factor in $section\n");
+	$item{max_factor} = $self->value($section, "$id:max_factor") or stkutils::debug::fail('ini_file::import_suppl_properties', __LINE__, "no max_factor in $section\n");
 
 	return \%item;
 }
@@ -304,8 +304,8 @@ sub import_afspawns_properties {
 
 	my %item;
 
-	$item{section_name} = $self->value($section, "$id:section_name") or die "no section_name in $section\n";
-	$item{weight} = $self->value($section, "$id:weight") or die "no weight in $section\n";
+	$item{section_name} = $self->value($section, "$id:section_name") or stkutils::debug::fail('ini_file::import_afspawns_properties', __LINE__, "no section name in $section\n");
+	$item{weight} = $self->value($section, "$id:weight") or stkutils::debug::fail('ini_file::import_afspawns_properties', __LINE__, "no weight in $section\n");
 
 	return \%item;
 }
@@ -333,7 +333,7 @@ sub import_afspawns_properties {
 sub value {
 	my $self = shift;
 	my ($section, $name) = @_;
-	die unless defined $self->{sections_hash}{$section};
+	stkutils::debug::fail('ini_file::value', __LINE__, "$section is undefined") unless defined $self->{sections_hash}{$section};
 	return $self->{sections_hash}{$section}{$name};
 }
 sub is_value_exists {

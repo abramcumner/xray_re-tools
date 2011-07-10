@@ -5,6 +5,7 @@
 #######################################################################
 package cse_abstract;
 use strict;
+use stkutils::debug;
 ####	enum s_gameid
 #use constant	GAME_ANY		=> 0;
 #use constant	GAME_SINGLE		=> 0x01;
@@ -51,8 +52,10 @@ use constant properties_info => (
 sub state_read {
 	my $self = shift;
 	my ($packet) = @_;
-	$packet->unpack_properties($self, (properties_info)[0..11]);
-	if ($self->{s_flags} >> 5 == 1) {
+	$packet->unpack_properties($self, (properties_info)[0]);
+	fail(__PACKAGE__.'::state_read', __LINE__, 'M_SPAWN == dummy16', 'cannot open M_SPAWN!') if $self->{'dummy16'} != 1;
+	$packet->unpack_properties($self, (properties_info)[1..11]);
+	if ($self->{s_flags} & 0x20) {
 		$packet->unpack_properties($self, (properties_info)[12]);
 	}
 	if ($self->{version} > 120) {
@@ -63,29 +66,24 @@ sub state_read {
 	}
 	my ($unused, $spawn_id);
 	if (($self->{version} > 70) && ($self->{version} <= 79)) {
-		$unused = $packet->unpack('C');
+		$unused = $packet->unpack($self, 'C');
 	} elsif (($self->{version} > 79) && ($self->{version} <= 93)) {
-		($unused, $spawn_id) = $packet->unpack('Cv');
+		($unused, $spawn_id) = $packet->unpack($self, 'Cv');
 	} elsif ($self->{version} > 93) {
-		($unused, $spawn_id) = $packet->unpack('vv');
+		($unused, $spawn_id) = $packet->unpack($self, 'vv');
 	}
 	if ($self->{version} < 112) {
 		if ($self->{version} > 82) {
 			$packet->unpack_properties($self, (properties_info)[15]);
 		}
 		if ($self->{version} > 83) {
-			$packet->unpack_properties($self, (properties_info)[16]);
-			$packet->unpack_properties($self, (properties_info)[17]);
-			$packet->unpack_properties($self, (properties_info)[18]);
-			$packet->unpack_properties($self, (properties_info)[19]);
-			$packet->unpack_properties($self, (properties_info)[20]);
+			$packet->unpack_properties($self, (properties_info)[16..20]);
 		}		
 		if ($self->{version} > 84) {
-			$packet->unpack_properties($self, (properties_info)[21]);
-			$packet->unpack_properties($self, (properties_info)[22]);
+			$packet->unpack_properties($self, (properties_info)[21..22]);
 		}	
 	}
-	my $extended_size = $packet->unpack('v');
+	my $extended_size = $packet->unpack($self, 'v');
 }
 sub state_write {
 	my $self = shift;
@@ -142,7 +140,7 @@ sub state_write {
 	}
 }
 sub update_read {
-	my ($size) = $_[1]->unpack('v');
+	my ($size) = $_[1]->unpack($_[0], 'v');
 	die "unexpected size in cse_abstract::update_read\n" unless $size == 0;
 }
 sub update_write {
@@ -3853,7 +3851,9 @@ sub state_read {
 	return if (($_[0]->{version} < 128) && (substr($_[0]->{section_name}, 0, 10) eq 'zone_field'));
 	if ($_[0]->{version} >= 118) {
 		$_[1]->unpack_properties($_[0], properties_info);
-		$_[0]->{last_spawn_time_present} == 0 or die;
+		if (ref($_[0]) eq 'se_zone_anom') {
+			$_[0]->{last_spawn_time_present} == 0 or die;
+		}
 	}
 }
 sub state_write {
@@ -5061,7 +5061,7 @@ sub state_export {
 	}
 }
 #######################################################################
-package cse_target_cs_cask; 																#CONFIRMED
+package cse_target_cs_cask; 																
 use strict;
 use constant properties_info => (
 	{ name => 'cse_target_cs_cask__unk1_u8',	type => 'u8',	default => 0 },
@@ -5079,7 +5079,7 @@ sub state_export {
 	$_[1]->export_properties(__PACKAGE__, $_[0], properties_info);
 }
 #######################################################################
-package cse_target_cs_base; 																#CONFIRMED
+package cse_target_cs_base; 																
 use strict;
 use constant properties_info => (
 	{ name => 'cse_target_cs_base__unk1_f32',	type => 'f32',	default => 0 },
@@ -5819,11 +5819,11 @@ sub read_links {
 	my $packet = stkutils::data_packet->new($cf->r_chunk_data());
 	while (1) {
 		$packet->length() > 0 or last;
-		my ($from, $to_count) = $packet->unpack('VV');
+		my ($from, $to_count) = $packet->unpack($self, 'VV');
 		my $point = $self->{points}[$from];
 		while ($to_count--) {
 			my %link;
-			($link{to}, $link{weight}) = $packet->unpack('Vf');
+			($link{to}, $link{weight}) = $packet->unpack($self, 'Vf');
 			push @{$point->{links}}, \%link;
 		}
 	}

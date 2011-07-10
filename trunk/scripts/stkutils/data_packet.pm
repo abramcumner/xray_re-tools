@@ -2,6 +2,9 @@
 
 package stkutils::data_packet;
 use strict;
+use stkutils::debug;
+use IO::File;
+use stkutils::ini_file;
 
 sub new {
 	my $class = shift;
@@ -14,24 +17,25 @@ sub new {
 }
 sub unpack {
 	my $self = shift;
+	my $container = shift;
 	my $template = shift;
-die if !(defined $self);
-die if !(defined $self->{data});
-die if !(defined $template);
-die if CORE::length($self->{data}) == 0;
+stkutils::debug::fail('data_packet::unpack', __LINE__, 'defined $self', "packet is not defined") if !(defined $self);
+stkutils::debug::fail('data_packet::unpack', __LINE__, 'defined $self->{data}', "there is no data in packet") if !(defined $self->{data});
+stkutils::debug::fail('data_packet::unpack', __LINE__, 'defined $template', "template is not defined") if !(defined $template);
+$self->error_handler($container, $template) if CORE::length($self->{data}) == 0;
 	my @values = CORE::unpack($template.'a*', $self->{data});
-die if $#values == -1;
+stkutils::debug::fail('data_packet::unpack', __LINE__, '$#values != -1', "cannot unpack requested data") if $#values == -1;
 	$self->{data} = splice(@values, -1);
-die if !(defined $self->{data});
+stkutils::debug::fail('data_packet::unpack', __LINE__, 'defined $self->{data}', "data container is empty") if !(defined $self->{data});
 #print "@values\n";
 	return @values;
 }
 sub pack {
 	my $self = shift;
 	my $template = shift;
-die if !(defined($template));
-die if !(defined(@_));
-die unless defined $_[0];
+stkutils::debug::fail('data_packet::pack', __LINE__, 'defined $template', "template is not defined") if !(defined $template);
+stkutils::debug::fail('data_packet::pack', __LINE__, 'defined @_', "data is not defined") if !(defined @_);
+stkutils::debug::fail('data_packet::pack', __LINE__, '!defined $_[0]', "packet is not defined") unless defined $_[0];
 #print "@_\n";
 	$self->{data} .= CORE::pack($template, @_);
 }
@@ -74,44 +78,44 @@ sub unpack_properties {
 	foreach my $p (@_) {
 #print "$p->{name} = ";
 		if ($p->{type} eq 'shape') {
-			my ($count) = $self->unpack('C');
+			my ($count) = $self->unpack($container, 'C');
 			while ($count--) {
 				my %shape;
-				($shape{type}) = $self->unpack('C');
+				($shape{type}) = $self->unpack($container, 'C');
 				if ($shape{type} == 0) {
-					@{$shape{sphere}} = $self->unpack('f4');
+					@{$shape{sphere}} = $self->unpack($container, 'f4');
 				} elsif ($shape{type} == 1) {
-					@{$shape{box}} = $self->unpack('f12');
+					@{$shape{box}} = $self->unpack($container, 'f12');
 				} else {
-					die;
+					stkutils::debug::fail('data_packet::unpack_properties', __LINE__, '$shape{type} == 0 or $shape{type} == 1', "shape has undefined type ($shape{type})");
 				}
 				push @{$container->{$p->{name}}}, \%shape;
 			}
 #		} elsif ($p->{type} eq 'ordaf') {
-#			my ($count) = $self->unpack('V');
+#			my ($count) = $self->unpack($container, 'V');
 #			if ($count == 0) {
 #				($container->{$p->{name}}) = 0;
 #			}
 #			while ($count--) {
 #				my %obj;
-#				($obj{name}, $obj{number}) = $self->unpack('Z*V');
-#				my ($inner_count) = $self->unpack('V');
+#				($obj{name}, $obj{number}) = $self->unpack($container, 'Z*V');
+#				my ($inner_count) = $self->unpack($container, 'V');
 #				while ($inner_count--) {
 #					my %afs; 
-#					($afs{af_section}) = $self->unpack('Z*VV');
+#					($afs{af_section}) = $self->unpack($container, 'Z*VV');
 #					push @{$obj{af_sects}}, \%afs;
 #				}
 #				push @{$container->{$p->{name}}}, \%obj;
 #			}
 		} elsif ($p->{type} eq 'suppl') {
-			my ($count) = $self->unpack('V');
+			my ($count) = $self->unpack($container, 'V');
 			while ($count--) {
 				my %obj;
-				($obj{section_name}, $obj{item_count}, $obj{min_factor}, $obj{max_factor}) = $self->unpack('Z*Vff');
+				($obj{section_name}, $obj{item_count}, $obj{min_factor}, $obj{max_factor}) = $self->unpack($container, 'Z*Vff');
 				push @{$container->{$p->{name}}}, \%obj;
 			}
 		} elsif ($p->{type} eq 'f32v4') {				#let's shut up #QNAN warnings.
-			my @buf = $self->unpack('f4');
+			my @buf = $self->unpack($container, 'f4');
 			my $i = 0;
 			while ($i < 4) {
 				if (!defined ($buf[$i] <=> 9**9**9)) {
@@ -122,7 +126,7 @@ sub unpack_properties {
 			}
 			@{$container->{$p->{name}}} = @buf;
 		} elsif ($p->{type} eq 'f32v3') {				
-			my @buf = $self->unpack('f3');
+			my @buf = $self->unpack($container, 'f3');
 			my $i = 0;
 			while ($i < 3) {
 				if (!defined ($buf[$i] <=> 9**9**9)) {
@@ -133,51 +137,51 @@ sub unpack_properties {
 			}
 			@{$container->{$p->{name}}} = @buf;
 		} elsif ($p->{type} eq 'afspawns' or $p->{type} eq 'afspawns_u32') {
-			my ($count) = $self->unpack('v');
+			my ($count) = $self->unpack($container, 'v');
 			while ($count--) {
 				my %obj;
 				if ($p->{type} eq 'afspawns') {
-					($obj{section_name}, $obj{weight}) = $self->unpack('Z*f');
+					($obj{section_name}, $obj{weight}) = $self->unpack($container, 'Z*f');
 				} else {
-					($obj{section_name}, $obj{weight}) = $self->unpack('Z*V');
+					($obj{section_name}, $obj{weight}) = $self->unpack($container, 'Z*V');
 				}
 				push @{$container->{$p->{name}}}, \%obj;
 			}
 		} else {
 			my $template = template_for_scalar->{$p->{type}};
 			if (defined $template) {
-				($container->{$p->{name}}) = $self->unpack($template);
+				($container->{$p->{name}}) = $self->unpack($container, $template);
 				if ($p->{type} eq 'sz') {
 					chomp $container->{$p->{name}};
 					$container->{$p->{name}} =~ s/\r//g;
 				}
 			} elsif ($p->{type} eq 'u24') {
-				($container->{$p->{name}}) = CORE::unpack('V', CORE::pack('CCCC', $self->unpack('C3'), 0));
+				($container->{$p->{name}}) = CORE::unpack('V', CORE::pack('CCCC', $self->unpack($container, 'C3'), 0));
 			} elsif ($p->{type} eq 'q16') {
-				my ($qf) = $self->unpack('v');
+				my ($qf) = $self->unpack($container, 'v');
 				($container->{$p->{name}}) = convert_q16($qf);
 			} elsif ($p->{type} eq 'q16_old') {
-				my ($qf) = $self->unpack('v');
+				my ($qf) = $self->unpack($container, 'v');
 				($container->{$p->{name}}) = convert_q16_old($qf);
 			} elsif ($p->{type} eq 'q8') {
-				my ($q8) = $self->unpack('C');
+				my ($q8) = $self->unpack($container, 'C');
 				($container->{$p->{name}}) = convert_q8($q8);
 			} elsif ($p->{type} eq 'q8v3') {
-				my (@q8) = $self->unpack('C3');
+				my (@q8) = $self->unpack($container, 'C3');
 				my $i = 0;
 				while ($i < 3) {
 					@{$container->{$p->{name}}}[$i] = convert_q8($q8[$i]);
 					$i++;
 				}
 			} elsif ($p->{type} eq 'q8v4') {
-				my (@q8) = $self->unpack('C4');
+				my (@q8) = $self->unpack($container, 'C4');
 				my $i = 0;
 				while ($i < 4) {
 					@{$container->{$p->{name}}}[$i] = convert_q8($q8[$i]);
 					$i++;
 				}
 			} else {
-				@{$container->{$p->{name}}} = $self->unpack(template_for_vector->{$p->{type}});
+				@{$container->{$p->{name}}} = $self->unpack($container, template_for_vector->{$p->{type}});
 			}
 		}
 	}
@@ -252,39 +256,19 @@ sub pack_properties {
 				$self->pack("V(Z*)$n", $n, @{$container->{$p->{name}}});
 			} elsif ($p->{type} eq 'l8u8v') {
 				$self->pack("CC$n", $n, @{$container->{$p->{name}}});
-			} elsif ($p->{type} eq 'u8v8' or $p->{type} eq 'u8v4') {
-				$self->pack("C$n", @{$container->{$p->{name}}});
-			} elsif ($p->{type} eq 'f32v3') {
-				$self->pack('f3', @{$container->{$p->{name}}});
-			} elsif ($p->{type} eq 'f32v4') {
-				$self->pack('f4', @{$container->{$p->{name}}});
-			} elsif ($p->{type} eq 's32v3') {
-				$self->pack('l3', @{$container->{$p->{name}}});
-			} elsif ($p->{type} eq 's32v4') {
-				$self->pack('l4', @{$container->{$p->{name}}});
 			} elsif ($p->{type} eq 'q8v') {
 				$self->pack("C$n", @{$container->{$p->{name}}});
 			} elsif ($p->{type} eq 'q8v3' or $p->{type} eq 'q8v4') {
 				foreach my $u8 (@{$container->{$p->{name}}}) {
 					$self->pack('C', convert_u8($u8));
 				}
-			} elsif ($p->{type} eq 'actorData') {
-				$self->pack('C171', @{$container->{$p->{name}}});	
-			} elsif ($p->{type} eq 'ha1') {
-				$self->pack('C12', @{$container->{$p->{name}}});	
-			} elsif ($p->{type} eq 'ha2') {
-				$self->pack('C8', @{$container->{$p->{name}}});	
 			} elsif ($p->{type} eq 'l8szbv') {
 				$n = $n/2;
 				$self->pack("C(Z*C)$n", $n, @{$container->{$p->{name}}});
-			} elsif ($p->{type} eq 'h32v3') {
-				$self->pack('V3', @{$container->{$p->{name}}});	
-			} elsif ($p->{type} eq 'h32v4') {
-				$self->pack('V4', @{$container->{$p->{name}}});					
-			} elsif ($p->{type} eq 'actorData') {
-				$self->pack('C171', @{$container->{$p->{name}}});						
+			} elsif (exists (template_for_vector->{$p->{type}})) {
+				$self->pack(template_for_vector->{$p->{type}}, @{$container->{$p->{name}}});
 			} else {
-				die;
+				stkutils::debug::fail('data_packet::pack_properties', __LINE__, '', "cannot find proper template for type $p->{type}");
 			}
 		}
 	}
@@ -330,5 +314,27 @@ sub convert_u16_old {
 	my ($q) = @_;
 	my $u = (($q + 1000.0) * 32.77);
 	return $u;
+}
+sub error_handler {
+	my $self = shift;
+	my ($container, $template) = @_;
+	if (($template eq 'C') || (ref($container) eq 'se_zone_anom')) {
+		bless $container, 'cse_alife_anomalous_zone';
+		my $ini = stkutils::ini_file->new('sections.ini', 'r');
+		$ini->{sections_hash}{'sections'}{$container->{section_name}} = 'cse_alife_anomalous_zone';
+		my $ini_new = IO::File->new('sections.new.ini', 'w');
+		print $ini_new "[sections]\n";
+		foreach my $section (keys %{$ini->{sections_hash}{'sections'}}) {
+			my $val = $ini->{sections_hash}{'sections'}{$section};
+			print $ini_new "$section = $val\n";
+		}
+		$ini->close();
+		$ini_new->close();
+		unlink 'sections.ini';
+		rename 'sections.new.ini', 'sections.ini';
+		unlink 'sections.new.ini';
+	} else {
+		stkutils::debug::fail(__PACKAGE__.'::error_handler', __LINE__, '', "cannot fix NarSol problem\n");
+	}
 }
 1;

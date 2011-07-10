@@ -1064,7 +1064,7 @@ sub scan_system {
 	my @folder = split /\\/, $_[1];
 	splice @folder, $#folder;
 	foreach my $path (@{$system->{sections_paths}}) {
-		temp_funct($stalker_path, join('\\', @folder).'\\'.substr($path, 1, -1), $obj) if -e ($stalker_path.join('\\', @folder).'\\'.substr($path, 1, -1));
+		temp_funct($stalker_path, join('\\', @folder).'\\'.$path, $obj) if -e ($stalker_path.join('\\', @folder).'\\'.$path);
 	}
 }
 sub temp_funct {
@@ -1112,7 +1112,7 @@ sub read_ini {
 				$self->{sections_hash}{$section}{$name} = $value;
 			}
 		}
-		if (/^(#include)\s*(.*)\s*$/) {
+		if (/^(#include)\s*"(.*)"\s*$/) {
 			push @{$self->{sections_paths}}, $2;
 		}
 	}
