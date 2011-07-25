@@ -1,7 +1,6 @@
 #!perl -w -I \temp\1\bin
 #
-# last edited: 20 June 2011
-#
+# last edited: 25 Jule 2011
 #######################################################################
 package cse_abstract;
 use strict;
@@ -141,7 +140,7 @@ sub state_write {
 }
 sub update_read {
 	my ($size) = $_[1]->unpack($_[0], 'v');
-	die "unexpected size in cse_abstract::update_read\n" unless $size == 0;
+	stkutils::debug::fail(__PACKAGE__.'::update_read', __LINE__, '$size == 0', 'unexpected size of CSE_Abstract M_UPDATE packet') unless $size == 0;
 }
 sub update_write {
 	$_[1]->pack('v', 0);
@@ -603,7 +602,6 @@ sub state_read {
 	cse_alife_object::state_read(@_) if ($_[0]->{version} > 99);
 	cse_shape::state_read(@_);
 	$_[1]->unpack_properties($_[0], properties_info) if ($_[0]->{version} >= 128);
-	die unless $_[1]->length == 0;
 }
 sub state_write {
 	cse_alife_object::state_write(@_) if ($_[0]->{version} > 99);
@@ -670,7 +668,6 @@ sub state_read {
 			$_[1]->unpack_properties($_[0], (properties_info)[5]);
 		}
 	}
-die unless $_[1]->length == 0;
 }
 sub state_write {
 	if ($_[0]->{version} >= 14) {
@@ -718,7 +715,6 @@ sub update_read {
 				if ($_[1]->length() != 0) {
 					$_[1]->unpack_properties($_[0], (upd_properties_info)[7]);  #actually bool. Dunno how to make better yet.
 				}
-				die unless $_[1]->length == 0;
 			}
 		}
 	}
@@ -928,7 +924,6 @@ sub state_read {
 	if ($_[0]->{version} > 118) {
 		$_[1]->unpack_properties($_[0], (properties_info)[23..25]);
 	}
-die unless $_[1]->length == 0;
 }
 sub state_write {
 	if ($_[0]->{version} > 20) {
@@ -1158,7 +1153,6 @@ sub state_read {
 	if ($_[0]->{version} >= 128) {
 		$_[1]->unpack_properties($_[0], properties_info);
 	}
-die unless $_[1]->length == 0;
 }
 sub state_write {
 	cse_alife_dynamic_object_visual::state_write(@_);
@@ -2207,6 +2201,7 @@ sub state_export {
 #######################################################################
 package se_stalker;
 use strict;
+use stkutils::debug;
 use constant properties_info => (
 	{ name => 'job_online',			type => 'u8',	default => 2 },
 	{ name => 'was_in_smart_terrain',	type => 'u8',	default => 0 },
@@ -2219,7 +2214,7 @@ sub state_read {
 	if ($_[0]->{version} > 94) {
 		$_[1]->unpack_properties($_[0], (properties_info)[0]);
 		if ($_[0]->{version} >= 128) {
-			$_[1]->length() == 2 or die;
+			$_[1]->length() == 2 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[1]->length() == 2', 'unexpected size');
 			$_[1]->unpack_properties($_[0], (properties_info)[1..2]);
 		} elsif ($_[0]->{version} >= 122) {
 			$_[1]->unpack_properties($_[0], (properties_info)[2..4]);	
@@ -2249,7 +2244,6 @@ sub state_write {
 }
 sub update_read {
 	cse_alife_human_stalker::update_read(@_);
-	die unless $_[1]->length == 0;
 }
 sub update_write {
 	cse_alife_human_stalker::update_write(@_);
@@ -2369,6 +2363,7 @@ sub state_export {
 #######################################################################
 package cse_alife_creature_actor;
 use strict;
+use stkutils::debug;
 use constant properties_info => (
 	{ name => 'g_team',			type => 'u8',	default => 0xff },	# 0xe8
 	{ name => 'g_squad',			type => 'u8',	default => 0xff },	# 0xe9
@@ -2427,8 +2422,9 @@ sub update_read {
 	if ($_[0]->{version} > 39) {
 		$_[1]->unpack_properties($_[0], (upd_properties_info)[9]);
 	}
-	if (defined $_[0]->{'upd:num_items'}) {die unless $_[0]->{'upd:num_items'} == 0;}
-	die unless $_[1]->length == 0;
+	if (defined $_[0]->{'upd:num_items'}) {
+		stkutils::debug::fail(__PACKAGE__.'::update_read', __LINE__, '$_[0]->{upd:num_items} == 0', 'unexpected upd:num_items') unless $_[0]->{'upd:num_items'} == 0;
+	}
 }
 sub update_write {
 	cse_alife_creature_abstract::update_write(@_);
@@ -2692,6 +2688,7 @@ sub state_export {
 #######################################################################
 package se_monster;
 use strict;
+use stkutils::debug;
 use constant properties_info => (
 	{ name => 'job_online',			type => 'u8',	default => 2 },
 	{ name => 'was_in_smart_terrain',	type => 'u8',	default => 0 },
@@ -2707,7 +2704,7 @@ sub state_read {
 			if ((($_[0]->{version} >= 116) && ($_[0]->{script_version} > 3)) || ($_[0]->{script_version} == 2)) {
 				$_[1]->unpack_properties($_[0], (properties_info)[0]);
 				if ($_[0]->{version} >= 128) {
-					$_[1]->length() == 1 or die;
+					$_[1]->length() == 1 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[1]->length() == 1', 'unexpected size');
 					$_[1]->unpack_properties($_[0], (properties_info)[1]);
 				} elsif ($_[0]->{version} >= 122) {
 					$_[1]->unpack_properties($_[0], (properties_info)[2..3]);	
@@ -2743,7 +2740,6 @@ sub update_read {
 	} else {
 		cse_alife_monster_base::update_read(@_);
 	}
-	die unless $_[1]->length == 0;
 }
 sub update_write {
 	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 101)) {
@@ -3186,6 +3182,7 @@ sub state_export {
 #######################################################################
 package se_anomaly_field;
 use strict;
+use stkutils::debug;
 use constant properties_info => (
 	{ name => 'startup',		type => 'u8',	default => 1 },
 	{ name => 'update_time_present',type => 'u8',	default => 0 },
@@ -3193,13 +3190,13 @@ use constant properties_info => (
 );
 sub state_read {
 	cse_alife_space_restrictor::state_read(@_);
-$_[1]->length() == 3 or die;
+$_[1]->length() == 3 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[1]->length() == 3', 'unexpected size');
 	$_[1]->unpack_properties($_[0], (properties_info)[0]);
-	$_[0]->{startup} == 0 or die;
+	$_[0]->{startup} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{startup} == 0', 'unexpected value');
 	$_[1]->unpack_properties($_[0], (properties_info)[1]);
-	$_[0]->{update_time_present} == 0 or die;
+	$_[0]->{update_time_present} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{update_time_present} == 0', 'unexpected value');
 	$_[1]->unpack_properties($_[0], (properties_info)[2]);
-	$_[0]->{zone_count} == 0 or die;
+	$_[0]->{zone_count} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{zone_count} == 0', 'unexpected value');
 }
 sub state_write {
 	cse_alife_space_restrictor::state_write(@_);
@@ -3242,15 +3239,16 @@ sub state_export {
 #######################################################################
 package se_respawn;
 use strict;
+use stkutils::debug;
 use constant properties_info => (
 	{ name => 'spawned_obj_count', type => 'u8', default => 0 },
 );
 sub state_read {
 	cse_alife_smart_zone::state_read(@_);
 	if ($_[0]->{version} >= 116) {
-	$_[1]->length() == 1 or die;
+	$_[1]->length() == 1 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[1]->length() == 1', 'unexpected size');
 		$_[1]->unpack_properties($_[0], properties_info);
-		$_[0]->{spawned_obj_count} == 0 or die;
+		$_[0]->{spawned_obj_count} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{spawned_obj_count} == 0', 'unexpected value');
 	}
 }
 sub state_write {
@@ -3274,6 +3272,7 @@ sub state_export {
 #######################################################################
 package se_sim_faction;
 use strict;
+use stkutils::debug;
 use constant properties_info => (
 	{ name => 'community_player', type => 'u8' },
 	{ name => 'start_position_filled', type => 'u8' },
@@ -3289,11 +3288,11 @@ sub state_read {
 	cse_alife_smart_zone::state_read(@_);
 	if ($_[0]->{version} >= 122) {
 		$_[1]->unpack_properties($_[0], (properties_info)[0..7]);
-		$_[0]->{last_spawn_time_marker} == 255 or die;
-		$_[0]->{squad_target_cache_count} == 0 or die;
-		$_[0]->{random_tasks_count} == 0 or die;
-		$_[0]->{current_attack_quantity_count} == 0 or die;
-		$_[0]->{squads_count} == 0 or die;
+		$_[0]->{last_spawn_time_marker} == 255 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{last_spawn_time_marker} == 255', 'unexpected value');
+		$_[0]->{squad_target_cache_count} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{squad_target_cache_count} == 0', 'unexpected value');
+		$_[0]->{random_tasks_count} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{random_tasks_count} == 0', 'unexpected value');
+		$_[0]->{current_attack_quantity_count} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{current_attack_quantity_count} == 0', 'unexpected value');
+		$_[0]->{squads_count} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{squads_count} == 0', 'unexpected value');
 		if (($_[0]->{version} >= 124) || (($_[0]->{version} == 123) && (::level()))) {
 			$_[1]->unpack_properties($_[0], (properties_info)[8]);
 		}
@@ -3329,6 +3328,7 @@ sub state_export {
 #######################################################################
 package se_smart_terrain;
 use strict;
+use stkutils::debug;
 use constant properties_info => (
 ###SOC
 	{ name => 'duration_end_present',	type => 'u8',	default => 0 },
@@ -3361,11 +3361,11 @@ sub state_read {
 	cse_alife_smart_zone::state_read(@_);
 	if ($_[0]->{version} < 122) {
 		$_[1]->unpack_properties($_[0], (properties_info)[0]);
-		$_[0]->{duration_end_present} == 0 or die;
+		$_[0]->{duration_end_present} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{duration_end_present} == 0', 'unexpected value');
 		$_[1]->unpack_properties($_[0], (properties_info)[1]);
-		$_[0]->{idle_end_present} == 0 or die;
+		$_[0]->{idle_end_present} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{idle_end_present} == 0', 'unexpected value');
 		$_[1]->unpack_properties($_[0], (properties_info)[2]);
-		$_[0]->{gulag_working} == 0 or die;
+		$_[0]->{gulag_working} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{gulag_working} == 0', 'unexpected value');
 		if ($_[0]->{script_version} <= 2) {
 			$_[1]->unpack_properties($_[0], (properties_info)[21]);
 		}
@@ -3379,15 +3379,15 @@ sub state_read {
 	} else {
 		::set_save_marker($_[1], 'load', 0, 'se_smart_terrain');
 		$_[1]->unpack_properties($_[0], (properties_info)[18]);
-		$_[0]->{arriving_npc_count} == 0 or die;
+		$_[0]->{arriving_npc_count} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{arriving_npc_count} == 0', 'unexpected value');
 		$_[1]->unpack_properties($_[0], (properties_info)[15]);
-		$_[0]->{npc_info_count} == 0 or die;
+		$_[0]->{npc_info_count} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{npc_info_count} == 0', 'unexpected value');
 		$_[1]->unpack_properties($_[0], (properties_info)[16]);
-		$_[0]->{dead_time_count} == 0 or die;
+		$_[0]->{dead_time_count} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{dead_time_count} == 0', 'unexpected value');
 		$_[1]->unpack_properties($_[0], (properties_info)[19]);
-		$_[0]->{base_on_actor_control_present} == 0 or die;
+		$_[0]->{base_on_actor_control_present} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{base_on_actor_control_present} == 0', 'unexpected value');
 		$_[1]->unpack_properties($_[0], (properties_info)[20]);
-		$_[0]->{is_respawn_point} == 0 or die;
+		$_[0]->{is_respawn_point} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{is_respawn_point} == 0', 'unexpected value');
 		$_[1]->unpack_properties($_[0], (properties_info)[21]);
 		::set_save_marker($_[1], 'load', 1, 'se_smart_terrain');
 	}
@@ -3843,6 +3843,7 @@ sub state_export {
 #######################################################################
 package se_zone_anom;
 use strict;
+use stkutils::debug;
 use constant properties_info => (
 	{ name => 'last_spawn_time_present', type => 'u8', default => 0 },
 );
@@ -3852,7 +3853,7 @@ sub state_read {
 	if ($_[0]->{version} >= 118) {
 		$_[1]->unpack_properties($_[0], properties_info);
 		if (ref($_[0]) eq 'se_zone_anom') {
-			$_[0]->{last_spawn_time_present} == 0 or die;
+			$_[0]->{last_spawn_time_present} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{last_spawn_time_present} == 0', 'unexpected value');
 		}
 	}
 }
@@ -3927,15 +3928,16 @@ sub state_export {
 #######################################################################
 package se_zone_visual;
 use strict;
+use stkutils::debug;
 use constant properties_info => (
 	{ name => 'last_spawn_time_present', type => 'u8', default => 0 },
 );
 sub state_read {
 	cse_alife_zone_visual::state_read(@_);
 	if ($_[0]->{version} >= 118) {
-	$_[1]->length() == 1 or die;
+	$_[1]->length() == 1 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[1]->length() == 1', 'unexpected size');
 		$_[1]->unpack_properties($_[0], properties_info);
-		$_[0]->{last_spawn_time_present} == 0 or die;
+		$_[0]->{last_spawn_time_present} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{last_spawn_time_present} == 0', 'unexpected value');
 	}
 }
 sub state_write {
@@ -3990,6 +3992,7 @@ sub state_export {
 #######################################################################
 package se_zone_torrid;
 use strict;
+use stkutils::debug;
 use constant properties_info => (
 	{ name => 'last_spawn_time_present', type => 'u8', default => 0 },
 );
@@ -3997,7 +4000,7 @@ sub state_read {
 	cse_alife_torrid_zone::state_read(@_);
 	if ($_[0]->{version} >= 128) {
 		$_[1]->unpack_properties($_[0], properties_info);
-		$_[0]->{last_spawn_time_present} == 0 or die;
+		$_[0]->{last_spawn_time_present} == 0 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[0]->{last_spawn_time_present} == 0', 'unexpected value');
 	}
 }
 sub state_write {
@@ -4041,6 +4044,7 @@ sub state_write {
 #######################################################################
 package cse_alife_inventory_item;
 use strict;
+use stkutils::debug;
 #use constant FLAG_NO_POSITION => 0x8000,
 use constant properties_info => (
 	{ name => 'condition', type => 'f32', default => 0.0 },		# 0xec
@@ -4102,11 +4106,11 @@ sub update_read {
 			$_[1]->unpack_properties($_[0], (upd_properties_info)[8]);
 			my $flags = $_[0]->{'upd:num_items'} >> 5;
 			if ((::use_2942()) || (($flags & 0x02) == 0)) {
-				die unless $_[1]->length() >= 3;
+				stkutils::debug::fail(__PACKAGE__.'::update_read', __LINE__, '[1]->length() >= 3', 'unexpected size') unless $_[1]->length() >= 3;
 				$_[1]->unpack_properties($_[0], (upd_properties_info)[9]);
 			}
 			if ((::use_2942()) || (($flags & 0x04) == 0)) {
-				die unless $_[1]->length() >= 3;
+				stkutils::debug::fail(__PACKAGE__.'::update_read', __LINE__, '[1]->length() >= 3', 'unexpected size') unless $_[1]->length() >= 3;
 				$_[1]->unpack_properties($_[0], (upd_properties_info)[10]);
 			}
 		}
@@ -4988,10 +4992,8 @@ sub update_read {
 		$_[1]->unpack_properties($_[0], upd_properties_info);
 	}
 	cse_alife_item_weapon_magazined::update_read(@_);
-#	if (($_[0]->{version} == 118) && ($_[0]->{script_version} == 6)) {
 	if ($_[1]->length() != 0) {
 		$_[1]->unpack_properties($_[0], upd_properties_info);
-		die unless $_[1]->length == 0;
 	}
 }
 sub update_write {
@@ -5022,6 +5024,7 @@ sub state_export {
 #######################################################################
 package cse_alife_item_weapon_shotgun;
 use strict;
+use stkutils::debug;
 use constant upd_properties_info => (
 	{ name => 'upd:ammo_ids', type => 'u8' },	# 0x1c0 (0x1e0)
 );
@@ -5036,7 +5039,7 @@ sub update_read {
 	if ($_[1]->length() != 0) {
 		$_[1]->unpack_properties($_[0], upd_properties_info);
 	}
-die unless $_[1]->length() == 0;
+stkutils::debug::fail(__PACKAGE__.'::update_read', __LINE__, '[1]->length() == 0', 'unexpected size') unless $_[1]->length() == 0;
 }
 sub update_write {
 	cse_alife_item_weapon_magazined::update_write(@_);
@@ -5101,56 +5104,56 @@ sub state_export {
 package build_version;
 use strict;
 use constant build_verions => (
-	{ version => 128, script_version => 12, build => 'Call Of Pripyat (any patch)', 		short_build => 'cop',  graph_build => 'cop'},	# 0x1c0 (0x1e0)
-	{ version => 124, script_version => 8, build => 'Clear Sky (patch 1.5.04 or higher)', 	short_build => 'cs4',  graph_build => 'cop'},	# 0x1c0 (0x1e0)
-	{ version => 123, script_version => 8, build => 'Clear Sky (patch 1.5.03)', 			short_build => 'cs3',  graph_build => 'cop'},	# 0x1c0 (0x1e0)
-	{ version => 122, script_version => 8, build => 'Clear Sky (patch 1.5.00 - 1.5.02)', 	short_build => 'cs0',  graph_build => 'cop'},	# 0x1c0 (0x1e0)
+	{ version => 128, script_version => 12, build => 'Call Of Pripyat (any patch)', 		short_build => 'cop',  graph_build => 'cop'},
+	{ version => 124, script_version => 8, build => 'Clear Sky (patch 1.5.04 or higher)', 	short_build => 'cs4',  graph_build => 'cop'},
+	{ version => 123, script_version => 8, build => 'Clear Sky (patch 1.5.03)', 			short_build => 'cs3',  graph_build => 'cop'},
+	{ version => 122, script_version => 8, build => 'Clear Sky (patch 1.5.00 - 1.5.02)', 	short_build => 'cs0',  graph_build => 'cop'},
 	{ version => 118, script_version => 6, build => 'Shadow Of Chernobyl (patch 1.0001 or higher) or xrCore build 3120', short_build => 'soc1',  graph_build => 'soc'},
-	{ version => 118, script_version => 5, build => 'xrCore build 2559-2947', 				short_build => 'soc0', graph_build => 'soc'},	# 0x1c0 (0x1e0)
-	{ version => 117, script_version => 4, build => 'xrCore build 2571', graph_build => 'soc'},	# 0x1c0 (0x1e0)
-	{ version => 115, script_version => 3, build => 'xrCore build 2365', graph_build => 'soc'},	# 0x1c0 (0x1e0)
-	{ version => 109, script_version => 2, build => 'xrCore build 2307', graph_build => '2215'},	# 0x1c0 (0x1e0)
-	{ version => 104, script_version => 2, build => 'xrCore build 2217, 2232', graph_build => '2215'},	# 0x1c0 (0x1e0)
-	{ version => 103, script_version => 2, build => 'xrCore build 2198, 2191', graph_build => '2215'},	# 0x1c0 (0x1e0)
-	{ version => 102, script_version => 2, build => 'xrCore build 2221', graph_build => '2215'},	# 0x1c0 (0x1e0)
-	{ version => 101, script_version => 2, build => 'xrCore build 2205, 2215', graph_build => '2215'},	# 0x1c0 (0x1e0)
-	{ version => 95, script_version => 1, build => 'xrCore build 2218-2201', graph_build => '2215'},	# 0x1c0 (0x1e0)
-	{ version => 94, script_version => 1, build => 'xrCore build 2212-2217', graph_build => '2215'},	# 0x1c0 (0x1e0)
-	{ version => 93, script_version => 0, build => 'xrCore build 2202', graph_build => '1935'},	# 0x1c0 (0x1e0)
-	{ version => 92, script_version => 0, build => 'xrCore build 1994', graph_build => '1935'},	# 0x1c0 (0x1e0)
-	{ version => 90, script_version => 0, build => 'xrCore build 1964-1971', graph_build => '1935'},	# 0x1c0 (0x1e0)
-	{ version => 89, script_version => 0, build => 'xrCore build 1957', graph_build => '1935'},	# 0x1c0 (0x1e0)
-	{ version => 85, script_version => 0, build => 'xrCore build 1936', graph_build => '1935'},	# 0x1c0 (0x1e0)
-	{ version => 79, script_version => 0, build => 'xrCore build 1935', graph_build => '1935'},	# 0x1c0 (0x1e0)
-	{ version => 77, script_version => 0, build => 'xrCore build 1925', graph_build => '1935'},	# 0x1c0 (0x1e0)
-	{ version => 76, script_version => 0, build => 'xrCore build 1902-1917', graph_build => '1935'},	# 0x1c0 (0x1e0)
-	{ version => 75, script_version => 0, build => 'xrCore build 1893', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 73, script_version => 0, build => 'xrCore build 1875', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 72, script_version => 0, build => 'xrCore build 1865', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 65, script_version => 0, build => 'xrCore build 1850', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 63, script_version => 0, build => 'xrCore build 1842', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 60, script_version => 0, build => 'xrCore build 1844 (19 May 2005)', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 59, script_version => 0, build => 'xrCore build 1833-1835', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 56, script_version => 0, build => 'xrCore build 1834 (09 April 2005)', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 51, script_version => 0, build => 'xrCore build 1844-1849', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 49, script_version => 0, build => 'xrCore build 1835', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 47, script_version => 0, build => 'xrCore build 1834 (09 Feb 2005)', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 46, script_version => 0, build => 'xrCore build 1829', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 45, script_version => 0, build => 'xrCore build 1828', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 44, script_version => 0, build => 'xrCore build 1851', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 41, script_version => 0, build => 'xrCore build 1837', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 40, script_version => 0, build => 'xrCore build 1610-1638', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 39, script_version => 0, build => 'xrCore build 1511-1580', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 38, script_version => 0, build => 'xrCore build 1510', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 35, script_version => 0, build => 'xrCore build 1475', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 34, script_version => 0, build => 'xrCore build 1475', graph_build => '1510'},	# 0x1c0 (0x1e0)
-	{ version => 16, script_version => 0, build => 'xrCore build 1472', graph_build => '1472'},	# 0x1c0 (0x1e0)
-	{ version => 14, script_version => 0, build => 'xrCore build 1472', graph_build => '1472'},	# 0x1c0 (0x1e0)
-	{ version => 13, script_version => 0, build => 'xrCore build 1472', graph_build => '1472'},	# 0x1c0 (0x1e0)
-	{ version => 8, script_version => 0, build => 'xrCore build 1469', graph_build => '1469'},	# 0x1c0 (0x1e0)
-	{ version => 7, script_version => 0, build => 'xrCore build 1465', graph_build => '1469'},	# 0x1c0 (0x1e0)
-	{ version => 3, script_version => 0, build => 'xrCore build 1233-1265'},	# 0x1c0 (0x1e0)
-	{ version => 2, script_version => 0, build => 'xrCore build 1230-1254'},	# 0x1c0 (0x1e0)
+	{ version => 118, script_version => 5, build => 'xrCore build 2559-2947', 				short_build => 'soc0', graph_build => 'soc'},
+	{ version => 117, script_version => 4, build => 'xrCore build 2571', graph_build => 'soc'},
+	{ version => 115, script_version => 3, build => 'xrCore build 2365', graph_build => 'soc'},
+	{ version => 109, script_version => 2, build => 'xrCore build 2307', graph_build => '2215'},
+	{ version => 104, script_version => 2, build => 'xrCore build 2217, 2232', graph_build => '2215'},
+	{ version => 103, script_version => 2, build => 'xrCore build 2198, 2191', graph_build => '2215'},
+	{ version => 102, script_version => 2, build => 'xrCore build 2221', graph_build => '2215'},
+	{ version => 101, script_version => 2, build => 'xrCore build 2205, 2215', graph_build => '2215'},
+	{ version => 95, script_version => 1, build => 'xrCore build 2218-2201', graph_build => '1935'},
+	{ version => 94, script_version => 1, build => 'xrCore build 2212-2217', graph_build => '1935'},
+	{ version => 93, script_version => 0, build => 'xrCore build 2202', graph_build => '1935'},
+	{ version => 92, script_version => 0, build => 'xrCore build 1994', graph_build => '1935'},
+	{ version => 90, script_version => 0, build => 'xrCore build 1964-1971', graph_build => '1935'},
+	{ version => 89, script_version => 0, build => 'xrCore build 1957', graph_build => '1935'},
+	{ version => 85, script_version => 0, build => 'xrCore build 1936', graph_build => '1935'},
+	{ version => 79, script_version => 0, build => 'xrCore build 1935', graph_build => '1935'},
+	{ version => 77, script_version => 0, build => 'xrCore build 1925', graph_build => '1935'},
+	{ version => 76, script_version => 0, build => 'xrCore build 1902-1917', graph_build => '1510'},
+	{ version => 75, script_version => 0, build => 'xrCore build 1893', graph_build => '1510'},
+	{ version => 73, script_version => 0, build => 'xrCore build 1875', graph_build => '1510'},
+	{ version => 72, script_version => 0, build => 'xrCore build 1865', graph_build => '1510'},
+	{ version => 65, script_version => 0, build => 'xrCore build 1850', graph_build => '1510'},
+	{ version => 63, script_version => 0, build => 'xrCore build 1842', graph_build => '1510'},
+	{ version => 60, script_version => 0, build => 'xrCore build 1844 (19 May 2005)', graph_build => '1510'},
+	{ version => 59, script_version => 0, build => 'xrCore build 1833-1835', graph_build => '1510'},
+	{ version => 56, script_version => 0, build => 'xrCore build 1834 (09 April 2005)', graph_build => '1510'},
+	{ version => 51, script_version => 0, build => 'xrCore build 1844-1849', graph_build => '1510'},
+	{ version => 49, script_version => 0, build => 'xrCore build 1835', graph_build => '1510'},
+	{ version => 47, script_version => 0, build => 'xrCore build 1834 (09 Feb 2005)', graph_build => '1510'},
+	{ version => 46, script_version => 0, build => 'xrCore build 1829', graph_build => '1510'},
+	{ version => 45, script_version => 0, build => 'xrCore build 1828', graph_build => '1510'},
+	{ version => 44, script_version => 0, build => 'xrCore build 1851', graph_build => '1510'},
+	{ version => 41, script_version => 0, build => 'xrCore build 1837', graph_build => '1510'},
+	{ version => 40, script_version => 0, build => 'xrCore build 1610-1638', graph_build => '1510'},
+	{ version => 39, script_version => 0, build => 'xrCore build 1511-1580', graph_build => '1510'},
+	{ version => 38, script_version => 0, build => 'xrCore build 1510', graph_build => '1510'},
+	{ version => 35, script_version => 0, build => 'xrCore build 1475', graph_build => '1510'},
+	{ version => 34, script_version => 0, build => 'xrCore build 1475', graph_build => '1510'},
+	{ version => 16, script_version => 0, build => 'xrCore build 1472', graph_build => '1472'},
+	{ version => 14, script_version => 0, build => 'xrCore build 1472', graph_build => '1472'},
+	{ version => 13, script_version => 0, build => 'xrCore build 1472', graph_build => '1472'},
+	{ version => 8, script_version => 0, build => 'xrCore build 1469', graph_build => '1469'},
+	{ version => 7, script_version => 0, build => 'xrCore build 1465', graph_build => '1469'},
+	{ version => 3, script_version => 0, build => 'xrCore build 1233-1265'},
+	{ version => 2, script_version => 0, build => 'xrCore build 1230-1254'},
 );
 sub build_by_version {
 	foreach my $info (build_verions) {
@@ -5177,286 +5180,11 @@ sub graph_build {
 	return undef;
 }
 #######################################################################
-package gg_header;
-use strict;
-use constant header_1472 => (
-	{ name => 'version',		type => 'u32' },
-	{ name => 'vertex_count',	type => 'u32' },
-	{ name => 'level_count',	type => 'u32' },
-);
-use constant header_1935 => (
-	{ name => 'version',		type => 'u32' },
-	{ name => 'level_count',	type => 'u32' },
-	{ name => 'vertex_count',	type => 'u32' },
-	{ name => 'edge_count',		type => 'u32' },
-	{ name => 'level_point_count',	type => 'u32' },
-);
-use constant header_2215 => (
-	{ name => 'version',		type => 'u32' },
-	{ name => 'level_count',	type => 'u32' },
-	{ name => 'vertex_count',	type => 'u32' },
-	{ name => 'edge_count',		type => 'u32' },
-	{ name => 'level_point_count',	type => 'u32' },
-	{ name => 'guid',	type => 'guid' },
-);
-use constant header_SOC => (
-	{ name => 'version',		type => 'u8' },
-	{ name => 'vertex_count',	type => 'u16' },
-	{ name => 'edge_count',		type => 'u32' },
-	{ name => 'level_point_count',	type => 'u32' },
-	{ name => 'guid',		type => 'guid' },
-	{ name => 'level_count',	type => 'u8' },
-);
-sub new {
-	my $class = shift;
-	my $self = {};
-	bless($self, $class);
-	return $self;
-}
-sub read {
-	if ($_[2] eq '1469' or $_[2] eq '1472') {
-		$_[1]->unpack_properties($_[0], header_1472);
-	} elsif ($_[2] eq '1510' or $_[2] eq '1935') {
-		$_[1]->unpack_properties($_[0], header_1935);	
-	} elsif ($_[2] eq '2215') {
-		$_[1]->unpack_properties($_[0], (header_2215)[0..5]);	
-	} else {
-		$_[1]->unpack_properties($_[0], header_SOC);		
-	}
-}
-#######################################################################
-package gg_level;
-use strict;
-use constant level_1469 => (
-	{ name => 'level_name',		type => 'sz' },
-	{ name => 'offset',		type => 'f32v3' },
-);
-use constant level_1472 => (
-	{ name => 'level_name',		type => 'sz' },
-	{ name => 'offset',		type => 'f32v3' },
-	{ name => 'level_id',		type => 'u32' },
-);
-use constant level_1935 => (
-	{ name => 'level_name',		type => 'sz' },
-	{ name => 'offset',		type => 'f32v3' },
-	{ name => 'level_id',		type => 'u32' },
-	{ name => 'section_name',	type => 'sz' },
-);
-use constant level_2215 => (
-	{ name => 'level_name',		type => 'sz' },
-	{ name => 'offset',		type => 'f32v3' },
-	{ name => 'level_id',		type => 'u32' },
-	{ name => 'section_name',	type => 'sz' },
-	{ name => 'guid',	type => 'guid' },
-);
-use constant level_SOC => (
-	{ name => 'level_name',		type => 'sz' },
-	{ name => 'offset',		type => 'f32v3' },
-	{ name => 'level_id',		type => 'u8' },
-	{ name => 'section_name',	type => 'sz' },
-	{ name => 'guid',	type => 'guid' },
-);
-sub new {
-	my $class = shift;
-	my $self = {};
-	bless($self, $class);
-	return $self;
-}
-sub read {
-	if ($_[2] eq '1469') {
-		$_[1]->unpack_properties($_[0], level_1469);
-		if ($_[0]->{level_name} eq 'level2_test') {
-			$_[0]->{level_id} = 0;
-		} elsif ($_[0]->{level_name} eq 'occ_part') {
-			$_[0]->{level_id} = 1;
-		} else {
-			$_[0]->{level_id} = 2;
-		}
-	} elsif ($_[2] eq '1472' or $_[2] eq '1510') {
-		$_[1]->unpack_properties($_[0], level_1472);
-	} elsif ($_[2] eq '1935') {
-		$_[1]->unpack_properties($_[0], level_1935);	
-	} elsif ($_[2] eq '2215') {
-		$_[1]->unpack_properties($_[0], level_2215);	
-	} else {
-		$_[1]->unpack_properties($_[0], level_SOC);		
-	}
-}
-#######################################################################
-package gg_vertex;
-use strict;
-use constant vertex_1472 => (
-	{ name => 'level_point',	type => 'f32v3' },
-	{ name => 'game_point',		type => 'f32v3' },
-	{ name => 'level_id',	type => 'u8' },
-	{ name => 'level_vertex_id',	type => 'u24' },
-	{ name => 'vertex_type',	type => 'u8v4' },
-	{ name => 'edge_count',	type => 'u8' },
-	{ name => 'edge_offset',	type => 'u24' },
-);
-use constant vertex_1935 => (
-	{ name => 'level_point',	type => 'f32v3' },
-	{ name => 'game_point',		type => 'f32v3' },
-	{ name => 'level_id',	type => 'u8' },
-	{ name => 'level_vertex_id',	type => 'u24' },
-	{ name => 'vertex_type',	type => 'u8v4' },
-	{ name => 'edge_count',	type => 'u8' },		#1
-	{ name => 'edge_offset',	type => 'u24' },		#4
-	{ name => 'level_point_count',		type => 'u8' },			#1
-	{ name => 'level_point_offset',	type => 'u24' },	#4
-);
-use constant vertex_SOC => (
-	{ name => 'level_point',	type => 'f32v3' },
-	{ name => 'game_point',		type => 'f32v3' },
-	{ name => 'level_id',	type => 'u8' },
-	{ name => 'level_vertex_id',	type => 'u24' },
-	{ name => 'vertex_type',	type => 'u8v4' },
-	{ name => 'edge_offset',	type => 'u32' },
-	{ name => 'level_point_offset',	type => 'u32' },
-	{ name => 'edge_count',		type => 'u8' },
-	{ name => 'level_point_count',	type => 'u8' },
-);
-sub new {
-	my $class = shift;
-	my $self = {};
-	bless($self, $class);
-	return $self;
-}
-sub read {
-	if (!defined $_[4]) {
-		$_[1]->unpack_properties($_[0], vertex_1472);
-	} elsif ($_[4] eq '1510' or $_[4] eq '1935' or $_[4] eq '2215') {
-		$_[1]->unpack_properties($_[0], vertex_1935);
-	} else {
-		$_[1]->unpack_properties($_[0], vertex_SOC);
-	}
-	if (defined $_[4]) {
-		$_[0]->{edge_index} = ($_[0]->{edge_offset} - $_[2]) / (::edge_block_size($_[4]));
-		$_[0]->{level_point_index} = ($_[0]->{level_point_offset} - $_[3]) / 0x14;
-	} else {
-		$_[0]->{edge_index} = ($_[0]->{edge_offset} - $_[2]) / (::edge_block_size($_[3]));
-	}
-}
-#######################################################################
-package gg_edge;
-use strict;
-use constant edge_builds => (
-	{ name => 'game_vertex_id',	type => 'u32' },
-	{ name => 'distance',		type => 'f32' },
-);
-use constant edge_SOC => (
-	{ name => 'game_vertex_id',	type => 'u16' },
-	{ name => 'distance',		type => 'f32' },
-);
-sub new {
-	my $class = shift;
-	my $self = {};
-	bless($self, $class);
-	return $self;
-}
-sub read {
-	if ($_[2] eq 'soc' or $_[2] eq 'cop') {
-		$_[1]->unpack_properties($_[0], edge_SOC);
-	} else {
-		$_[1]->unpack_properties($_[0], edge_builds);
-	}
-}
-#######################################################################
-package vertex_table;
-use strict;
-use IO::File;
-use stkutils::data_packet;
-use stkutils::chunked_file;
-
-sub new {
-	my $class = shift;
-	my $self = {};
-	bless($self, $class);
-	return $self;
-}
-sub read {
-	my $self = shift;
-	my ($version, $spawn) = @_;
-	my $data;
-	my $packet;
-
-	print "reading graph...\n";
-	if ($version < 122) {
-		my $fh = IO::File->new('game.graph', 'r') or die "cannot open game.graph\n";
-		binmode $fh;
-		$fh->read($data, 225000);
-		$packet = stkutils::data_packet->new($data);
-	} else {
-		$data = substr($spawn->{section4_raw_data}, 0, 225000);
-		$packet = stkutils::data_packet->new($data);
-	}
-	my $hs = ::header_size($self->{build_version});
-	my $vbs = ::vertex_block_size($self->{build_version});
-	my $ebs = ::edge_block_size($self->{build_version});
-	print "	reading header...\n";
-#	$fh->read($data, $hs) or die;
-	my $data_h = substr($data, 0, $hs);
-	$self->{header} = gg_header->new();
-	$self->{header}->read(stkutils::data_packet->new($data_h), $self->{build_version});
-	my $edges_offset = $self->{header}->{vertex_count} * $vbs;
-	my $level_points_offset;
-	if (not ($self->{build_version} eq '1469' or $self->{build_version} eq '1472')) {
-		$level_points_offset = $edges_offset + $self->{header}->{edge_count} * $ebs;
-	}
-	print "	reading levels...\n";	
-	# 4KB should be enough for the level
-#	$fh->read($data, 0x1000) or die;
-	my $data_l = substr($data, 0, 0x1000);
-	my $packet_l = stkutils::data_packet->new(substr($data_l, $hs));
-	for (my $i = 0; $i < $self->{header}->{level_count}; $i++) {
-		my $level = gg_level->new();			
-		$level->read($packet_l, $self->{build_version});
-		push @{$self->{levels}}, $level;
-	}	
-	my %level_by_id = ();
-	foreach my $level (@{$self->{levels}}) {
-		$level_by_id{$level->{level_id}} = \$level;
-	}
-	print "	reading vertices...\n";	
-#	$fh->seek(-$packet->length(), SEEK_CUR);
-	my $packet_v = stkutils::data_packet->new(substr($data, 0x1000 - $packet_l->length()));
-	for (my $i = 0; $i < $self->{header}->{vertex_count}; $i++) {
-#		$fh->read($data, $vbs) or die;
-		my $vertex = gg_vertex->new();
-		if ($self->{build_version} eq '1469' or $self->{build_version} eq '1472') {
-			$vertex->read($packet_v, $edges_offset, $self->{build_version});
-		} else {
-			$vertex->read($packet_v, $edges_offset, $level_points_offset, $self->{build_version});
-		}
-		my $level_name = $level_by_id{$vertex->{level_id}};
-		die "no such level for vertice!!!" if (not defined $level_name);
-		push @{$self->{vertices}}, $vertex;
-	}
-	my $game_vertex_id = 0;
-	my $level_id = -1;
-	foreach my $vertex (@{$self->{vertices}}) {
-		if ($vertex->{level_id} != $level_id) {
-			my $level = $level_by_id{$vertex->{level_id}};
-			$level_id = $vertex->{level_id};
-			$self->{level_by_guid}{$game_vertex_id} = $$level->{level_name};
-		}
-		$game_vertex_id++;
-	}
-}
-sub level_name {
-	my $self = shift;
-	foreach my $table (sort {$b <=> $a} keys %{$self->{level_by_guid}}) {
-		if ($_[0] >= $table) {
-			return $self->{level_by_guid}{$table};
-		}
-	}
-	return undef;
-}
-#####################################################################
 package alife_object;
 use strict;
 use stkutils::data_packet;
 use stkutils::scan;
+use stkutils::debug;
 sub new {
 	my $class = shift;
 	my $self = {};
@@ -5495,7 +5223,7 @@ sub read_common {
 		defined($index) or last;
 		my $data = $cf->r_chunk_data();
 		my $size16 = unpack('v', $data);
-		$size16 == ($size - 2) or die "alife object size mismatch\n";
+		$size16 == ($size - 2) or stkutils::debug::fail(__PACKAGE__.'::read_common', __LINE__, '$size16 == ($size - 2)', 'alife object size mismatch');
 		my $packet = stkutils::data_packet->new(substr($data, 2));
 		if ($index == 0) {
 			cse_abstract::state_read($self->{cse_object}, $packet);
@@ -5503,16 +5231,16 @@ sub read_common {
 			if (!defined $class_name && (::with_scan())) {
 				$class_name = $ini->value('sections', $self->{cse_object}->{section_name});
 			}
-			defined $class_name or die "unknown $self->{cse_object}->{section_name}";
+			defined $class_name or stkutils::debug::fail(__PACKAGE__.'::read_common', __LINE__, 'defined $class_name', 'unknown class for section '.$self->{cse_object}->{section_name});
 			bless $self->{cse_object}, $class_name;
 			$self->{cse_object}->state_read($packet);
-			$packet->length() == 0 or print "state data left [".$packet->length()."] in $self->{cse_object}->{name}\n";
+			$packet->length() == 0 or stkutils::debug::warn(__PACKAGE__.'::read_common', __LINE__, '$packet->length() == 0', 'state data left ['.$packet->length().'] in entity '.$self->{cse_object}->{name});
 		} elsif ($index == 1) {
 			cse_abstract::update_read($self->{cse_object}, $packet);
 			UNIVERSAL::can($self->{cse_object}, 'update_read') && do {
 				$self->{cse_object}->update_read($packet);
 			};
-			$packet->length() == 0 or die "update data left [".$packet->length()."] in $self->{cse_object}->{name}";
+			$packet->length() == 0 or stkutils::debug::fail(__PACKAGE__.'::read_common', __LINE__, '$packet->length() == 0', 'update data left ['.$packet->length().'] in entity '.$self->{cse_object}->{name});
 		}
 		$cf->r_chunk_close();
 	}
@@ -5531,17 +5259,17 @@ sub spawn_read_1935 {
 	if (!defined $class_name && (::with_scan())) {
 		$class_name = $ini->value('sections', $self->{cse_object}->{section_name});
 	}
-	defined $class_name or die "unknown $self->{cse_object}->{section_name}";
+	defined $class_name or stkutils::debug::fail(__PACKAGE__.'::spawn_read_1935', __LINE__, 'defined $class_name', 'unknown class for section '.$self->{cse_object}->{section_name});
 	bless $self->{cse_object}, $class_name;
 	$self->{cse_object}->state_read($state_packet);
-	$state_packet->length() == 0 or die "state data left [".$state_packet->length()."] in $self->{cse_object}->{name}\n";
+	$state_packet->length() == 0 or stkutils::debug::fail(__PACKAGE__.'::spawn_read_1935', __LINE__, '$state_packet->length() == 0', 'state data left ['.$state_packet->length().'] in entity '.$self->{cse_object}->{name});
 	my $update_packet = stkutils::data_packet->new(substr($data, $update_packet_offset));
 	my $update_packet_length = $size - $update_packet_offset;
 	cse_abstract::update_read($self->{cse_object}, $update_packet);
 	UNIVERSAL::can($self->{cse_object}, 'update_read') && do {
 		$self->{cse_object}->update_read($update_packet);
 	};
-	$update_packet->length() == 0 or die "update data left [".$update_packet->length()."] in $self->{cse_object}->{name}";
+	$update_packet->length() == 0 or stkutils::debug::fail(__PACKAGE__.'::spawn_read_1935', __LINE__, '$update_packet->length() == 0', 'update data left ['.$update_packet->length().'] in entity '.$self->{cse_object}->{name});
 	$cf->r_chunk_close();
 }
 sub spawn_read_level {
@@ -5554,10 +5282,10 @@ sub spawn_read_level {
 	if (!defined $class_name && (::with_scan())) {
 		$class_name = $ini->value('sections', $self->{cse_object}->{section_name});
 	}
-	defined $class_name or die "unknown $self->{cse_object}->{section_name}";
+	defined $class_name or stkutils::debug::fail(__PACKAGE__.'::spawn_read_level', __LINE__, 'defined $class_name', 'unknown class for section '.$self->{cse_object}->{section_name});
 	bless $self->{cse_object}, $class_name;
 	$self->{cse_object}->state_read($state_packet);
-	$state_packet->length() == 0 or die "state data left [".$state_packet->length()."] in $self->{cse_object}->{name}";
+	$state_packet->length() == 0 or stkutils::debug::fail(__PACKAGE__.'::spawn_read_level', __LINE__, '$state_packetf->length() == 0', 'state data left ['.$state_packet->length().'] in entity '.$self->{cse_object}->{name});
 }
 sub spawn_write {
 	my $self = shift;
@@ -5640,7 +5368,7 @@ sub state_import {
 	if (!defined $class_name && (::with_scan())) {
 		$class_name = $ini->value('sections', $self->{cse_object}->{section_name});
 	}
-	defined $class_name or die "unknown section '$self->{cse_object}->{section_name}'";
+	defined $class_name or stkutils::debug::fail(__PACKAGE__.'::state_import', __LINE__, 'defined $class_name', 'unknown class for section '.$self->{cse_object}->{section_name});
 	bless $self->{cse_object}, $class_name;
 	$self->{cse_object}->state_import($if, $section);
 	my $update_raw_data = $if->value($section, 'update_raw_data');
@@ -5749,6 +5477,7 @@ sub convert_spawn {
 #######################################################################
 package way_object;
 use strict;
+use stkutils::debug;
 sub new {
 	my $class = shift;
 	my $self = {};
@@ -5768,7 +5497,7 @@ sub spawn_read {
 				($index, $size) = $cf->r_chunk_open();
 				defined($index) or last;
 				if ($index == 0) {
-					$size == 4 or die;
+					$size == 4 or stkutils::debug::fail(__PACKAGE__.'::spawn_read', __LINE__, '$size == 4', 'point count size mismatch');
 					$self->{point_count} = unpack('V', $cf->r_chunk_data());
 				} elsif ($index == 1) {
 					$self->read_points($cf);
@@ -5778,7 +5507,7 @@ sub spawn_read {
 				$cf->r_chunk_close();
 			}
 		} else {
-			die;
+			stkutils::debug::fail(__PACKAGE__.'::spawn_read', __LINE__, '$index == 0 || $index == 1', 'unexpected index '.$index);
 		}
 		$cf->r_chunk_close();
 	}
@@ -5793,7 +5522,7 @@ sub read_points {
 			($index, $size) = $cf->r_chunk_open();
 			defined($index) or last;
 			if ($index == 0) {
-				$size == 4 or die;
+				$size == 4 or stkutils::debug::fail(__PACKAGE__.'::spawn_read', __LINE__, '$size == 4', 'point index size mismatch');
 				my $point_index = unpack('V', $cf->r_chunk_data());
 			} elsif ($index == 1) {
 				my %point;
@@ -5878,7 +5607,7 @@ sub state_import {
 	$self->{name} = $section;
 
 	my $points = $if->value($section, 'points');
-	die "no points in path $section" unless defined $points;
+	stkutils::debug::fail(__PACKAGE__.'::spawn_read', __LINE__, 'defined $points', 'no points in path '.$section) unless defined $points;
 	my %index_by_id;
 	my $i = 0;
 	foreach my $id (split /,/, $points) {
@@ -5958,6 +5687,7 @@ use strict;
 use IO::File;
 use stkutils::ini_file;
 use stkutils::chunked_file;
+use stkutils::debug;
 
 sub new {
 	my $class = shift;
@@ -5989,14 +5719,14 @@ sub import_alife {
 	my $self = shift;
 	my ($if) = @_;
 	if ($if eq 'all.ltx') {
-		my $nif = stkutils::ini_file->new($if, 'r') or die;
-		foreach my $fn (split /,/, ($nif->value('alife', 'source_files') or die)) {
+		my $nif = stkutils::ini_file->new($if, 'r') or stkutils::debug::fail(__PACKAGE__.'::import_alife', __LINE__, '', 'cannot open '.$if);
+		foreach my $fn (split /,/, ($nif->value('alife', 'source_files') or stkutils::debug::fail(__PACKAGE__.'::import_alife', __LINE__, '', 'cannot open '.$if))) {
 			$fn =~ s/^\s*|\s*$//g;
 			my $lif;
 			if ($fn eq 'alife_$debug$\y_selo.ltx') {
-				$lif = stkutils::ini_file->new('alife_debug_y_selo.ltx', 'r') or die;
+				$lif = stkutils::ini_file->new('alife_debug_y_selo.ltx', 'r') or stkutils::debug::fail(__PACKAGE__.'::import_alife', __LINE__, '', 'cannot open alife_debug_y_selo.ltx');
 			} else {
-				$lif = stkutils::ini_file->new($fn, 'r') or die;
+				$lif = stkutils::ini_file->new($fn, 'r') or stkutils::debug::fail(__PACKAGE__.'::import_alife', __LINE__, '', 'cannot open '.$fn);
 			}
 			print "importing alife objects from file $fn...\n";
 			foreach my $section (@{$lif->{sections_list}}) {
@@ -6012,9 +5742,9 @@ sub import_alife {
 			my $location = 'alife_'.$fn.'.ltx';
 			my $lif;
 			if ($location eq 'alife_$debug$\y_selo.ltx') {
-				$lif = stkutils::ini_file->new('alife_debug_y_selo.ltx', 'r') or die;
+				$lif = stkutils::ini_file->new('alife_debug_y_selo.ltx', 'r') or stkutils::debug::fail(__PACKAGE__.'::import_alife', __LINE__, '', 'cannot open alife_debug_y_selo.ltx');
 			} else {
-				$lif = stkutils::ini_file->new($location, 'r') or die;
+				$lif = stkutils::ini_file->new($location, 'r') or stkutils::debug::fail(__PACKAGE__.'::import_alife', __LINE__, '', 'cannot open '.$location);
 			}
 			print "importing alife objects from file $location...\n";
 			foreach my $section (@{$lif->{sections_list}}) {
@@ -6029,7 +5759,7 @@ sub import_alife {
 sub import_level {
 	my $self = shift;
 	my ($if) = @_;
-	my ($lif) = stkutils::ini_file->new($if, 'r') or die;
+	my ($lif) = stkutils::ini_file->new($if, 'r') or stkutils::debug::fail(__PACKAGE__.'::import_level', __LINE__, '', 'cannot open '.$if);
 	print "importing alife objects from level_spawn.ltx\n";
 	foreach my $section (@{$lif->{sections_list}}) {
 		my $object = alife_object->new();
@@ -6047,9 +5777,9 @@ sub import_way {
 			$fn =~ s/^\s*|\s*$//g;
 			my $lif;
 			if ($fn eq 'way_$debug$\y_selo.ltx') {
-				$lif = stkutils::ini_file->new('way_debug_y_selo.ltx', 'r') or die;
+				$lif = stkutils::ini_file->new('way_debug_y_selo.ltx', 'r') or stkutils::debug::fail(__PACKAGE__.'::import_way', __LINE__, '', 'cannot open way_debug_y_selo.ltx');
 			} else {
-				$lif = stkutils::ini_file->new($fn, 'r') or die;
+				$lif = stkutils::ini_file->new($fn, 'r') or stkutils::debug::fail(__PACKAGE__.'::import_way', __LINE__, '', 'cannot open '.$fn);
 			}
 			print "importing way objects from file $fn...\n";
 			foreach my $section (@{$lif->{sections_list}}) {
@@ -6064,9 +5794,9 @@ sub import_way {
 			my $location = 'way_'.$fn.'.ltx';
 			my $lif;
 			if ($location eq 'way_$debug$\y_selo.ltx') {
-				$lif = stkutils::ini_file->new('way_debug_y_selo.ltx', 'r') or die;
+				$lif = stkutils::ini_file->new('way_debug_y_selo.ltx', 'r') or stkutils::debug::fail(__PACKAGE__.'::import_way', __LINE__, '', 'cannot open way_debug_y_selo.ltx');
 			} else {
-				$lif = stkutils::ini_file->new($location, 'r') or die;
+				$lif = stkutils::ini_file->new($location, 'r') or stkutils::debug::fail(__PACKAGE__.'::import_way', __LINE__, '', 'cannot open '.$location);
 			}
 			print "importing way objects from file $location...\n";
 			foreach my $section (@{$lif->{sections_list}}) {
@@ -6133,13 +5863,13 @@ sub export_alife {
 #		my $level = $graph->level_name($cse_object->{game_vertex_id});
 		my $level = $convert;
 #		print "$cse_object->{game_vertex_id}\n";
-		die "unknown location of the alife object\n" unless defined $level;
+		stkutils::debug::fail(__PACKAGE__.'::export_alife', __LINE__, 'defined $level', 'unknown location of the alife object '.$cse_object->{name}) unless defined $level;
 		my $lif = $if_by_level{$level};
 		if (!defined $lif) {
 			if ($level eq '$debug$\y_selo') {
-				$lif = stkutils::ini_file->new("alife_debug_y_selo.ltx", 'w') or die;
+				$lif = stkutils::ini_file->new("alife_debug_y_selo.ltx", 'w') or stkutils::debug::fail(__PACKAGE__.'::export_alife', __LINE__, '', 'cannot open alife_debug_y_selo.ltx');
 			} else {
-				$lif = stkutils::ini_file->new("alife_$level.ltx", 'w') or die;
+				$lif = stkutils::ini_file->new("alife_$level.ltx", 'w') or stkutils::debug::fail(__PACKAGE__.'::export_alife', __LINE__, '', 'cannot open alife_'.$level.'.ltx');
 			}
 			print "exporting alife objects on level $level...\n";
 			$if_by_level{$level} = $lif;
@@ -6156,7 +5886,7 @@ sub export_level {
 	my ($version, $script_version) = @_;
 
 	my $id = 0;
-	my $lif = stkutils::ini_file->new("level_spawn.ltx", 'w') or die;
+	my $lif = stkutils::ini_file->new("level_spawn.ltx", 'w') or stkutils::debug::fail(__PACKAGE__.'::export_level', __LINE__, '', 'cannot open level_spawn.ltx');
 	foreach my $object (@{$self->{alife_objects}}) {
 		$object->convert_spawn($version, $script_version, 0, 0);
 		my $cse_object = $object->{cse_object};
@@ -6185,14 +5915,14 @@ sub export_way {
 				# or use the current default (i.e. previous) value
 				$level = (way_name_exceptions->{$object->{name}} or $default_level);
 			}
-			die "unknown level of the way object $object->{name}\n" unless defined $level;
+			stkutils::debug::fail(__PACKAGE__.'::export_way', __LINE__, 'defined $level', 'unknown level of the way object '.$object->{name}) unless defined $level;
 			my $info = $info_by_level{$level};
 			if (!defined $info) {
 				$info = {};
 				if ($level eq '$debug$\y_selo') {
-					$info->{lif} = stkutils::ini_file->new("way_debug_y_selo.ltx", 'w') or die;
+					$info->{lif} = stkutils::ini_file->new("way_debug_y_selo.ltx", 'w') or stkutils::debug::fail(__PACKAGE__.'::export_way', __LINE__, '', 'cannot open way_debug_y_selo.ltx');
 				} else {
-					$info->{lif} = stkutils::ini_file->new("way_$level.ltx", 'w') or die;
+					$info->{lif} = stkutils::ini_file->new("way_$level.ltx", 'w') or stkutils::debug::fail(__PACKAGE__.'::export_way', __LINE__, '', 'cannot open way_'.$level.'.ltx');
 				}
 				$info->{way_objects} = ();
 				$info_by_level{$level} = $info;
@@ -6219,7 +5949,7 @@ use strict;
 use IO::File;
 use stkutils::ini_file;
 use stkutils::chunked_file;
-
+use stkutils::debug;
 sub new {
 	my $class = shift;
 	my $self = {};
@@ -6247,7 +5977,7 @@ sub import {
 sub import_alife {
 	my $self = shift;
 	my ($if) = @_;
-	my $lif = stkutils::ini_file->new($if, 'r') or die "cannot open $if\n";
+	my $lif = stkutils::ini_file->new($if, 'r') or stkutils::debug::fail(__PACKAGE__.'::import_alife', __LINE__, '', 'cannot open '.$if);
 	print "importing alife objects from file $if...\n";
 	foreach my $section (@{$lif->{sections_list}}) {
 		my $object = alife_object->new();
@@ -6260,7 +5990,7 @@ sub import_way {
 	my $self = shift;
 	my ($if) = @_;
 
-	my $lif = stkutils::ini_file->new('way'.substr($if, 5), 'r') or die;
+	my $lif = stkutils::ini_file->new('way'.substr($if, 5), 'r') or stkutils::debug::fail(__PACKAGE__.'::import_way', __LINE__, '', 'cannot open way'.substr($if, 5));
 	print "importing way objects from file $if...\n";
 	foreach my $section (@{$lif->{sections_list}}) {
 		my $object = way_object->new();
@@ -6285,7 +6015,7 @@ sub export_alife {
 	my $id = 0;
 	my %if_by_level;
 	my @levels;
-	my $if = stkutils::ini_file->new($fn, 'w') or die;
+	my $if = stkutils::ini_file->new($fn, 'w') or stkutils::debug::fail(__PACKAGE__.'::export_alife', __LINE__, '', 'cannot open '.$fn);
 	print "exporting alife objects...\n";
 	foreach my $object (@{$self->{alife_objects}}) {
 		$object->{cse_object}->{game_vertex_id} += $new_gvid - $old_gvid;
@@ -6305,7 +6035,7 @@ sub export_way {
 			}
 			
 		}
-		my $if = stkutils::ini_file->new('way'.substr($fn, 5), 'w') or die;
+		my $if = stkutils::ini_file->new('way'.substr($fn, 5), 'w') or stkutils::debug::fail(__PACKAGE__.'::export_way', __LINE__, '', 'cannot open way'.substr($fn, 5));
 		my $id = 0;
 		print "exporting way objects...\n";
 		foreach my $object (@{$self->{way_objects}}) {
@@ -6318,10 +6048,9 @@ sub export_way {
 package all_spawn;
 use strict;
 use IO::File;
-#use Scalar::Util 'blessed';
 use stkutils::ini_file;
 use stkutils::chunked_file;
-
+use stkutils::debug;
 sub new {
 	my $class = shift;
 	my $self = {};
@@ -6332,7 +6061,7 @@ sub read {
 	my $self = shift;
 	my ($fn, $version) = @_;
 	my $ini = stkutils::ini_file->new('sections.ini', 'r') if ::with_scan();
-	my $cf = stkutils::chunked_file->new($fn, 'r') or die;
+	my $cf = stkutils::chunked_file->new($fn, 'r') or stkutils::debug::fail(__PACKAGE__.'::read', __LINE__, '', 'cannot open '.$fn);
 	if (not(::level()) && ($version > 0x4F)) {
 		while (1) {
 			my ($index, $size) = $cf->r_chunk_open();
@@ -6353,7 +6082,7 @@ sub read {
 				print "reading game graph...\n";
 				$self->read_graph($cf, $ini);
 			} else {
-				die;
+				stkutils::debug::fail(__PACKAGE__.'::read', __LINE__, '$index <= 4', 'unexpected chunk index '.$index);
 			}
 			$cf->r_chunk_close();
 		}
@@ -6378,7 +6107,7 @@ sub write {
 	my $self = shift;
 	my ($fn) = @_;
 	my $version = (@{$self->{alife_objects}}[0])->{cse_object}->{version};
-	my $cf = stkutils::chunked_file->new($fn, 'w') or die;
+	my $cf = stkutils::chunked_file->new($fn, 'w') or stkutils::debug::fail(__PACKAGE__.'::write', __LINE__, '', 'cannot open '.$fn);
 	if (not(::level())) {
 		$self->write_header($cf, $version);
 		$self->write_alife($cf, $version);
@@ -6443,9 +6172,9 @@ sub read_alife {
 			my ($index, $size) = $cf->r_chunk_open();
 			defined($index) or last;
 			if ($index == 0) {
-				$size == 4 or die;
+				$size == 4 or stkutils::debug::fail(__PACKAGE__.'::read_alife', __LINE__, '$size == 4', 'unexpected alife objects count size');
 				my $alife_count = unpack('V', $cf->r_chunk_data());
-				$alife_count == $self->{count} or die 'alife object count mismatch';
+				$alife_count == $self->{count} or stkutils::debug::fail(__PACKAGE__.'::read_alife', __LINE__, '$alife_count == $self->{count}', 'alife object count mismatch');
 			} elsif ($index == 1) {
 				while (1) {
 					($index, $size) = $cf->r_chunk_open();
@@ -6456,7 +6185,7 @@ sub read_alife {
 					$cf->r_chunk_close();
 				}
 			} elsif ($index == 2) {
-				$size == 0 or die;
+				$size == 0 or stkutils::debug::fail(__PACKAGE__.'::read_alife', __LINE__, '$size == 0', 'unexpected unknown section size');
 			}
 			$cf->r_chunk_close();
 		}
@@ -6560,7 +6289,7 @@ sub read_way {
 		my ($index, $size) = $cf->r_chunk_open();
 		defined($index) or last;
 		if ($index == 0) {
-			$size == 4 or die;
+			$size == 4 or stkutils::debug::fail(__PACKAGE__.'::read_way', __LINE__, '$size == 4', 'unexpected way objects count size');
 			my $way_count = unpack('V', $cf->r_chunk_data());
 		} elsif ($index == 1) {
 			while (1) {
@@ -6572,7 +6301,7 @@ sub read_way {
 				$cf->r_chunk_close();
 			}
 		} else {
-			die;
+			stkutils::debug::fail(__PACKAGE__.'::read_way', __LINE__, '$index <= 1', 'unexpected chunk index '.$index);
 		}
 		$cf->r_chunk_close();
 	}
@@ -6717,7 +6446,7 @@ sub write_graph {
 sub import {
 	my $self = shift;
 	my ($fn) = @_;
-	my $if = stkutils::ini_file->new($fn, 'r') or die;
+	my $if = stkutils::ini_file->new($fn, 'r') or stkutils::debug::fail(__PACKAGE__.'::import', __LINE__, '', 'cannot open '.$fn);
 	my $ini = stkutils::ini_file->new('sections.ini', 'r') if ::with_scan();
 	if (not(::level())) {
 		$self->import_header($if);
@@ -6745,13 +6474,13 @@ sub import_alife {
 	my $self = shift;
 	my ($if, $ini) = @_;
 	
-	foreach my $fn (split /,/, ($if->value('alife', 'source_files') or die)) {
+	foreach my $fn (split /,/, ($if->value('alife', 'source_files') or stkutils::debug::fail(__PACKAGE__.'::import_alife', __LINE__, '$if->value(alife, source_files)', 'cannot find any locations in all.ltx'))) {
 		$fn =~ s/^\s*|\s*$//g;
 		my $lif;
 		if ($fn eq 'alife_$debug$\y_selo.ltx') {
-			$lif = stkutils::ini_file->new('alife_debug_y_selo.ltx', 'r') or die;
+			$lif = stkutils::ini_file->new('alife_debug_y_selo.ltx', 'r') or stkutils::debug::fail(__PACKAGE__.'::import_alife', __LINE__, '', 'cannot open alife_debug_y_selo.ltx');
 		} else {
-			$lif = stkutils::ini_file->new($fn, 'r') or die;
+			$lif = stkutils::ini_file->new($fn, 'r') or stkutils::debug::fail(__PACKAGE__.'::import_alife', __LINE__, '', 'cannot open '.$fn);
 		}
 		print "importing alife objects from file $fn...\n";
 		foreach my $section (@{$lif->{sections_list}}) {
@@ -6765,7 +6494,7 @@ sub import_alife {
 sub import_level {
 	my $self = shift;
 	my ($if, $ini) = @_;
-	my ($lif) = stkutils::ini_file->new($if, 'r') or die;
+	my ($lif) = stkutils::ini_file->new($if, 'r') or stkutils::debug::fail(__PACKAGE__.'::import_level', __LINE__, '', 'cannot open '.$if);
 	print "importing alife objects from level_spawn.ltx\n";
 	foreach my $section (@{$lif->{sections_list}}) {
 		my $object = alife_object->new();
@@ -6778,8 +6507,8 @@ sub import_section2 {
 	my $self = shift;
 	my ($if) = @_;
 	my $fn = $if->is_value_exists('section2', 'binary_files') or return;
-	$fn = $if->value('section2', 'binary_files') or die;
-	my $bin_fh = IO::File->new($fn, 'r') or die "cannot open $fn\n";
+	$fn = $if->value('section2', 'binary_files') or stkutils::debug::fail(__PACKAGE__.'::import_section2', __LINE__, '$if->value(section2, binary_files)', 'cannot find section2.bin record in all.ltx');
+	my $bin_fh = IO::File->new($fn, 'r') or stkutils::debug::fail(__PACKAGE__.'::import_section2', __LINE__, '', 'cannot open '.$fn);
 	binmode $bin_fh;
 	print "importing raw data...\n";
 	$bin_fh->read($self->{section2_raw_data}, ($bin_fh->stat())[7]);
@@ -6792,9 +6521,9 @@ sub import_way {
 		$fn =~ s/^\s*|\s*$//g;
 		my $lif;
 		if ($fn eq 'way_$debug$\y_selo.ltx') {
-			$lif = stkutils::ini_file->new('way_debug_y_selo.ltx', 'r') or die;
+			$lif = stkutils::ini_file->new('way_debug_y_selo.ltx', 'r') or stkutils::debug::fail(__PACKAGE__.'::import_way', __LINE__, '', 'cannot open way_debug_y_selo.ltx');
 		} else {
-			$lif = stkutils::ini_file->new($fn, 'r') or die;
+			$lif = stkutils::ini_file->new($fn, 'r') or stkutils::debug::fail(__PACKAGE__.'::import_way', __LINE__, '', 'cannot open '.$fn);
 		}
 		print "importing way objects from file $fn...\n";
 		foreach my $section (@{$lif->{sections_list}}) {
@@ -6811,7 +6540,7 @@ sub import_graph {
 	my $fn = $if->is_value_exists('graph', 'binary_files') or return;
 	print "importing graph...\n";
 	$fn = $if->value('graph', 'binary_files');
-	my $bin_fh = IO::File->new($fn, 'r') or die "cannot open $fn\n";
+	my $bin_fh = IO::File->new($fn, 'r') or stkutils::debug::fail(__PACKAGE__.'::import_graph', __LINE__, '', 'cannot open '.$fn);
 	binmode $bin_fh;
 	$bin_fh->read($self->{section4_raw_data}, ($bin_fh->stat())[7]);
 }
@@ -6820,7 +6549,7 @@ sub export {
 	my ($fn, $graph) = @_;
 
 	if (not(::level())) {
-		my $if = stkutils::ini_file->new($fn, 'w') or die;
+		my $if = stkutils::ini_file->new($fn, 'w') or stkutils::debug::fail(__PACKAGE__.'::export', __LINE__, '', 'cannot open '.$fn);
 		$self->export_header($if);
 		$self->export_alife($if, $graph);
 		$self->export_section2($if);
@@ -6854,13 +6583,13 @@ sub export_alife {
 	foreach my $object (@{$self->{alife_objects}}) {
 		my $cse_object = $object->{cse_object};
 		my $level = $graph->level_name($cse_object->{game_vertex_id});
-		die "unknown location of the alife object\n" unless defined $level;
+		stkutils::debug::fail(__PACKAGE__.'::export_alife', __LINE__, 'defined $level', 'unknown location of the alife object '.$cse_object->{name}) unless defined $level; 
 		my $lif = $if_by_level{$level};
 		if (!defined $lif) {
 			if ($level eq '$debug$\y_selo') {
-				$lif = stkutils::ini_file->new("alife_debug_y_selo.ltx", 'w') or die;
+				$lif = stkutils::ini_file->new("alife_debug_y_selo.ltx", 'w') or stkutils::debug::fail(__PACKAGE__.'::export_alife', __LINE__, '', 'cannot open alife_alife_debug_y_selo.ltx');
 			} else {
-				$lif = stkutils::ini_file->new("alife_$level.ltx", 'w') or die;
+				$lif = stkutils::ini_file->new("alife_$level.ltx", 'w') or stkutils::debug::fail(__PACKAGE__.'::export_alife', __LINE__, '', 'cannot open alife_'.$level.'.ltx');
 			}
 			print "exporting alife objects on level $level...\n";
 			$if_by_level{$level} = $lif;
@@ -6879,7 +6608,7 @@ sub export_level {
 	my ($if) = @_;
 
 	my $id = 0;
-	my $lif = stkutils::ini_file->new("level_spawn.ltx", 'w') or die;
+	my $lif = stkutils::ini_file->new("level_spawn.ltx", 'w') or stkutils::debug::fail(__PACKAGE__.'::export_level', __LINE__, '', 'cannot open level_spawn.ltx');
 	foreach my $object (@{$self->{alife_objects}}) {
 		my $cse_object = $object->{cse_object};
 		$object->state_export($lif, $id++);
@@ -6892,7 +6621,7 @@ sub export_section2 {
 	my ($if) = @_;
 	if (defined $self->{section2_raw_data}) {
 		my $fn = 'section2.bin';
-		my $bin_fh = IO::File->new($fn, 'w') or die "cannot open $fn\n";
+		my $bin_fh = IO::File->new($fn, 'w') or stkutils::debug::fail(__PACKAGE__.'::export_section2', __LINE__, '', 'cannot open '.$fn);
 		binmode $bin_fh;
 		print "exporting raw data...\n";
 		$bin_fh->write($self->{section2_raw_data}, length($self->{section2_raw_data}));
@@ -6907,7 +6636,7 @@ sub export_graph {
 	if (defined $self->{section4_raw_data}) {
 		print "exporting graph...\n";
 		my $fn = 'section4.bin';
-		my $bin_fh = IO::File->new($fn, 'w') or die "cannot open $fn\n";
+		my $bin_fh = IO::File->new($fn, 'w') or stkutils::debug::fail(__PACKAGE__.'::export_graph', __LINE__, '', 'cannot open '.$fn);
 		binmode $bin_fh;
 		$bin_fh->write($self->{section4_raw_data}, length($self->{section4_raw_data}));
 		my $fh = $if->{fh};
@@ -6942,14 +6671,14 @@ sub export_way {
 				# or use the current default (i.e. previous) value
 				$level = (way_name_exceptions->{$object->{name}} or $default_level);
 			}
-			die "unknown level of the way object $object->{name}\n" unless defined $level;
+			stkutils::debug::fail(__PACKAGE__.'::export_way', __LINE__, 'defined $level', 'unknown level of the way object '.$object->{name}) unless defined $level;
 			my $info = $info_by_level{$level};
 			if (!defined $info) {
 				$info = {};
 				if ($level eq '$debug$\y_selo') {
-					$info->{lif} = stkutils::ini_file->new("way_debug_y_selo.ltx", 'w') or die;
+					$info->{lif} = stkutils::ini_file->new("way_debug_y_selo.ltx", 'w') or stkutils::debug::fail(__PACKAGE__.'::export_way', __LINE__, '', 'cannot open way_debug_y_selo.ltx');
 				} else {
-					$info->{lif} = stkutils::ini_file->new("way_$level.ltx", 'w') or die;
+					$info->{lif} = stkutils::ini_file->new("way_$level.ltx", 'w') or stkutils::debug::fail(__PACKAGE__.'::export_way', __LINE__, '', 'cannot open way_'.$level.'.ltx');
 				}
 				$info->{way_objects} = ();
 				$info_by_level{$level} = $info;
@@ -7001,7 +6730,7 @@ sub move_actor {
 		@{$actor->{'upd:o_torso'}}[1] = @{$actor->{direction}}[2];
 		@{$actor->{'upd:o_torso'}}[2] = 0;
 	} else {
-		die "cannot find actor or level_changer\n";
+		stkutils::debug::fail(__PACKAGE__.'::move_actor', __LINE__, 'defined $actor && defined $lchanger', 'cannot find actor or level_changer');
 	}
 }
 #######################################################################
@@ -7052,9 +6781,8 @@ use strict;
 use Getopt::Long;
 use File::Path;
 use stkutils::scan;
+use stkutils::graph;
 #use diagnostics;
-
-#local $SIG{__WARN__} = sub {die};
 
 sub usage {
 	return <<END
@@ -7143,26 +6871,26 @@ if (defined $convert) {
 	$params->{new_game}->{script_version},
 	$params->{new_game}->{build}) = build_version::version_by_build($params->{new_game}->{short_build});
 	print "converting from $params->{old_game}->{build} spawn format to $params->{new_game}->{build} spawn format...\n";
-#	my $graph = vertex_table->new();
+#	my $graph = stkutils::graph->new();
 #	$graph->{build_version} = build_version::graph_build($params->{old_game}->{version}, $params->{old_game}->{script_version});
 #	if (not ::level()) {
 #		$graph->read();
 #	}
 	my $spawn = converting->new();
 	$spawn->import($convert);
-	my $ini = stkutils::ini_file->new('convert.ini', 'r') or die $!;
+	my $ini = stkutils::ini_file->new('convert.ini', 'r') or  stkutils::debug::fail(__PACKAGE__, __LINE__, '', 'cannot open convert.ini');
 	File::Path::mkpath('converted_spawn', 0);
-	chdir 'converted_spawn' or die "cannot change path to converted_spawn\n";
+	chdir 'converted_spawn' or stkutils::debug::fail(__PACKAGE__, __LINE__, '', 'cannot change path to converted_spawn');
 	$spawn->export($params->{new_game}->{version}, $params->{new_game}->{script_version}, $params->{old_game}->{gvid}, $params->{new_game}->{gvid}, $convert, $ini);
 	$ini->close();
 	print "done!\n";
 } elsif (defined $spawn_file) {
-	die "bad params\n" if (defined $src_file or defined $actor_pos);
+	stkutils::debug::fail(__PACKAGE__, __LINE__, '!defined $src_file && !defined $actor_pos', 'bad params') if (defined $src_file or defined $actor_pos);
 	print "checking version of $spawn_file...\n";	
-	my $fh = IO::File->new($spawn_file, 'r') or die "cannot open $spawn_file\n";
+	my $fh = IO::File->new($spawn_file, 'r') or stkutils::debug::fail(__PACKAGE__, __LINE__, '', 'cannot open '.$spawn_file);
 	binmode $fh;
 	my $data;
-	$fh->read($data, 0x12C) or die;
+	$fh->read($data, 0x12C) or stkutils::debug::fail(__PACKAGE__, __LINE__, '$fh->read($data, 0x12C)', 'cannot read '.$spawn_file);
 	my $table = ();
 	if (::level()) {
 			(
@@ -7218,19 +6946,19 @@ if (defined $convert) {
 	my $spawn = all_spawn->new();
 	print "reading $spawn_file...\n";
 	$spawn->read($spawn_file, $table->{version});
-	my $graph = vertex_table->new();
+	my $graph = stkutils::graph->new();
 	$graph->{build_version} = build_version::graph_build($table->{version}, $table->{script_version});
 	if (not ::level()) {
 		$graph->read($table->{version}, $spawn);
 	}
 	defined $out && do {
 		File::Path::mkpath($out, 0);
-		chdir $out or die "cannot change path to $out\n";
+		chdir $out or stkutils::debug::fail(__PACKAGE__, __LINE__, '', 'cannot change path to '.$out);
 	};
 	print "exporting alife objects...\n";	
 	$spawn->export('all.ltx', $graph);
 } elsif (defined $src_file) {
-	die "bad params\n" if defined $spawn_file;
+	stkutils::debug::fail(__PACKAGE__, __LINE__, '!defined $spawn_file', 'bad params') if defined $spawn_file;
 	my $spawn = all_spawn->new();
 	$out = 'all.spawn.new' unless defined $out;
 	print "importing alife objects...\n";
@@ -7247,7 +6975,7 @@ if (defined $convert) {
 	my $spawn = parsing->new();
 	$spawn->import($parse);
 	File::Path::mkpath('parsed_spawn', 0);
-	chdir 'parsed_spawn' or die "cannot change path to parsed_spawn\n";
+	chdir 'parsed_spawn' or die stkutils::debug::fail(__PACKAGE__, __LINE__, '', 'cannot change path to parsed_spawn');
 	$spawn->export($parse, $game1, $game2);
 	print "done!\n";	
 } else {

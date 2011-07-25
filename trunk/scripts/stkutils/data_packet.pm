@@ -19,23 +19,23 @@ sub unpack {
 	my $self = shift;
 	my $container = shift;
 	my $template = shift;
-stkutils::debug::fail('data_packet::unpack', __LINE__, 'defined $self', "packet is not defined") if !(defined $self);
-stkutils::debug::fail('data_packet::unpack', __LINE__, 'defined $self->{data}', "there is no data in packet") if !(defined $self->{data});
-stkutils::debug::fail('data_packet::unpack', __LINE__, 'defined $template', "template is not defined") if !(defined $template);
+stkutils::debug::fail(__PACKAGE__.'::unpack', __LINE__, 'defined $self', "packet is not defined") if !(defined $self);
+stkutils::debug::fail(__PACKAGE__.'::unpack', __LINE__, 'defined $self->{data}', "there is no data in packet") if !(defined $self->{data});
+stkutils::debug::fail(__PACKAGE__.'::unpack', __LINE__, 'defined $template', "template is not defined") if !(defined $template);
 $self->error_handler($container, $template) if CORE::length($self->{data}) == 0;
 	my @values = CORE::unpack($template.'a*', $self->{data});
-stkutils::debug::fail('data_packet::unpack', __LINE__, '$#values != -1', "cannot unpack requested data") if $#values == -1;
+stkutils::debug::fail(__PACKAGE__.'::unpack', __LINE__, '$#values != -1', "cannot unpack requested data") if $#values == -1;
 	$self->{data} = splice(@values, -1);
-stkutils::debug::fail('data_packet::unpack', __LINE__, 'defined $self->{data}', "data container is empty") if !(defined $self->{data});
+stkutils::debug::fail(__PACKAGE__.'::unpack', __LINE__, 'defined $self->{data}', "data container is empty") if !(defined $self->{data});
 #print "@values\n";
 	return @values;
 }
 sub pack {
 	my $self = shift;
 	my $template = shift;
-stkutils::debug::fail('data_packet::pack', __LINE__, 'defined $template', "template is not defined") if !(defined $template);
-stkutils::debug::fail('data_packet::pack', __LINE__, 'defined @_', "data is not defined") if !(defined @_);
-stkutils::debug::fail('data_packet::pack', __LINE__, '!defined $_[0]', "packet is not defined") unless defined $_[0];
+stkutils::debug::fail(__PACKAGE__.'::pack', __LINE__, 'defined $template', "template is not defined") if !(defined $template);
+stkutils::debug::fail(__PACKAGE__.'::pack', __LINE__, 'defined @_', "data is not defined") if !(defined @_);
+stkutils::debug::fail(__PACKAGE__.'::pack', __LINE__, '!defined $_[0]', "packet is not defined") unless defined $_[0];
 #print "@_\n";
 	$self->{data} .= CORE::pack($template, @_);
 }
@@ -87,7 +87,7 @@ sub unpack_properties {
 				} elsif ($shape{type} == 1) {
 					@{$shape{box}} = $self->unpack($container, 'f12');
 				} else {
-					stkutils::debug::fail('data_packet::unpack_properties', __LINE__, '$shape{type} == 0 or $shape{type} == 1', "shape has undefined type ($shape{type})");
+					stkutils::debug::fail(__PACKAGE__.'::unpack_properties', __LINE__, '$shape{type} == 0 or $shape{type} == 1', "shape has undefined type ($shape{type})");
 				}
 				push @{$container->{$p->{name}}}, \%shape;
 			}
@@ -268,7 +268,7 @@ sub pack_properties {
 			} elsif (exists (template_for_vector->{$p->{type}})) {
 				$self->pack(template_for_vector->{$p->{type}}, @{$container->{$p->{name}}});
 			} else {
-				stkutils::debug::fail('data_packet::pack_properties', __LINE__, '', "cannot find proper template for type $p->{type}");
+				stkutils::debug::fail(__PACKAGE__.'::pack_properties', __LINE__, '', "cannot find proper template for type $p->{type}");
 			}
 		}
 	}

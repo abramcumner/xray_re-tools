@@ -40,7 +40,11 @@ sub r_chunk_open {
 sub r_chunk_close {
 	my $self = shift;
 	my $offset = pop @{$self->{end_offsets}};
-	$self->{offset} <= $offset or stkutils::debug::fail('chunked_file::r_chunk_open', __LINE__, 'current position is outside current chunk');
+	$self->{offset} <= $offset or stkutils::debug::fail(
+		__PACKAGE__.'::r_chunk_open',
+		__LINE__, 
+		'$self->{offset} <= $offset', 
+		'current position is outside current chunk');
 	if ($self->{offset} < $offset) {
 		$self->{fh}->seek($offset, SEEK_SET);
 		$self->{offset} = $offset;
@@ -78,7 +82,11 @@ sub close_found_chunk {
 	my $self = shift;
 	my $offset = pop @{$self->{end_offsets}};
 	defined $offset or $offset = tell $self->{fh};
-	$self->{offset} <= $offset or stkutils::debug::fail('chunked_file::close_found_chunk', __LINE__, 'current position is outside current chunk');
+	$self->{offset} <= $offset or stkutils::debug::fail(
+		__PACKAGE__.'::close_found_chunk', 
+		__LINE__, 
+		'$self->{offset} <= $offset', 
+		'current position is outside current chunk');
 	$self->{fh}->seek($self->{glob_pos}[$#{$self->{glob_pos}}], SEEK_SET);
 	$self->{offset} = pop @{$self->{glob_pos}};
 }
@@ -89,7 +97,11 @@ sub r_chunk_safe {
 	if ($size && $size == $dsize) {
 		return $size;
 	} elsif ($size) {
-		stkutils::debug::fail('chunked_file::close_found_chunk', __LINE__, "size of chunk $id ($size) is not match with expected size ($dsize)");
+		stkutils::debug::fail(
+		__PACKAGE__.'::close_found_chunk', 
+		__LINE__, 
+		'$size == $dsize', 
+		"size of chunk $id ($size) is not match with expected size ($dsize)");
 	} else {
 		return undef;
 	}
@@ -99,9 +111,17 @@ sub r_chunk_data {
 	my ($size) = @_;
 	my $offset = $self->{end_offsets}[$#{$self->{end_offsets}}];
 	defined($size) or $size = $offset - $self->{offset};
-	$self->{offset} + $size <= $offset or stkutils::debug::fail('chunked_file::r_chunk_data', __LINE__, 'length of requested data is bigger than one left in chunk');
+	$self->{offset} + $size <= $offset or stkutils::debug::fail(
+		__PACKAGE__.'::r_chunk_data', 
+		__LINE__, 
+		'$self->{offset} + $size <= $offset', 
+		'length of requested data is bigger than one left in chunk');
 	my $data = '';
-	$size > 0 && ($self->{fh}->read($data, $size) or stkutils::debug::fail('chunked_file::r_chunk_data', __LINE__, 'cannot read requested data'));
+	$size > 0 && ($self->{fh}->read($data, $size) or stkutils::debug::fail(
+		__PACKAGE__.'::r_chunk_data', 
+		__LINE__, 
+		'$size > 0 && $self->{fh}->read($data, $size)', 
+		'cannot read requested data'));
 	$self->{offset} += $size;
 	return $data;
 }
@@ -109,32 +129,64 @@ sub r_chunk_seek {
 	my $self = shift;
 	my ($seek_offset) = @_;
 	my $offset = $self->{end_offsets}[$#{$self->{end_offsets}}];
-	defined($seek_offset) or stkutils::debug::fail('chunked_file::r_chunk_seek', __LINE__, 'you must set seek offset to use this method');
-	$self->{offset} + $seek_offset <= $offset or stkutils::debug::fail('chunked_file::r_chunk_seek', __LINE__, 'you try to seek outside current chunk');
-	$seek_offset > 0 && ($self->{fh}->seek($seek_offset, SEEK_CUR) or stkutils::debug::fail('chunked_file::r_chunk_seek', __LINE__, 'cannot seek requested offset'));
+	defined($seek_offset) or stkutils::debug::fail(
+		__PACKAGE__.'::r_chunk_seek', 
+		__LINE__, 
+		'defined($seek_offset)', 
+		'you must set seek offset to use this method');
+	$self->{offset} + $seek_offset <= $offset or stkutils::debug::fail(
+		__PACKAGE__.'::r_chunk_seek', 
+		__LINE__, 
+		'$self->{offset} + $seek_offset <= $offset', 
+		'you try to seek outside current chunk');
+	$seek_offset > 0 && ($self->{fh}->seek($seek_offset, SEEK_CUR) or stkutils::debug::fail(
+		__PACKAGE__.'::r_chunk_seek', 
+		__LINE__, 
+		'$seek_offset > 0 && $self->{fh}->seek($seek_offset, SEEK_CUR)', 
+		'cannot seek requested offset'));
 	$self->{offset} += $seek_offset;
 }
 sub w_chunk_open {
 	my $self = shift;
 	my ($index) = @_;
 	my $data = pack('VV', $index, 0xaaaaaaaa);
-	$self->{fh}->write($data, 8) or stkutils::debug::fail('chunked_file::w_chunk_open', __LINE__, "cannot open chunk $index");
+	$self->{fh}->write($data, 8) or stkutils::debug::fail(
+		__PACKAGE__.'::w_chunk_open', 
+		__LINE__, 
+		'$self->{fh}->write($data, 8)',
+		"cannot open chunk $index");
 	push @{$self->{start_offsets}}, $self->{offset};
 	$self->{offset} += 8;
 }
 sub w_chunk_close {
 	my $self = shift;
 	my $offset = pop @{$self->{start_offsets}};
-	$self->{fh}->seek($offset + 4, SEEK_SET) or stkutils::debug::fail('chunked_file::w_chunk_close', __LINE__, "cannot close chunk");
+	$self->{fh}->seek($offset + 4, SEEK_SET) or stkutils::debug::fail(
+		__PACKAGE__.'::w_chunk_close', 
+		__LINE__,
+		'$self->{fh}->seek($offset + 4, SEEK_SET)',
+		"cannot close chunk");
 	my $data = pack('V', $self->{offset} - $offset - 8);
-	$self->{fh}->write($data, 4) or stkutils::debug::fail('chunked_file::w_chunk_close', __LINE__, "cannot write size of chunk");
-	$self->{fh}->seek($self->{offset}, SEEK_SET) or stkutils::debug::fail('chunked_file::w_chunk_close', __LINE__, "cannot seek current write position");
+	$self->{fh}->write($data, 4) or stkutils::debug::fail(
+		__PACKAGE__.'::w_chunk_close', 
+		__LINE__, 
+		'$self->{fh}->write($data, 4)',
+		"cannot write size of chunk");
+	$self->{fh}->seek($self->{offset}, SEEK_SET) or stkutils::debug::fail(
+		__PACKAGE__.'::w_chunk_close', 
+		__LINE__, 
+		'$self->{fh}->seek($self->{offset}, SEEK_SET)',
+		"cannot seek current write position");
 }
 sub w_chunk_data {
 	my $self = shift;
 	my ($data) = @_;
 	my $size = length($data);
-	$self->{fh}->write($data, $size) or stkutils::debug::fail('chunked_file::w_chunk_data', __LINE__, "cannot write data");
+	$self->{fh}->write($data, $size) or stkutils::debug::fail(
+		__PACKAGE__.'::w_chunk_data', 
+		__LINE__, 
+		'$self->{fh}->write($data, $size)',
+		"cannot write data");
 	$self->{offset} += $size;
 }
 sub w_chunk {
@@ -142,8 +194,15 @@ sub w_chunk {
 	my ($index, $data) = @_;
 	my $size = length($data);
 	my $hdr = pack('VV', $index, $size);
-	$self->{fh}->write($hdr, 8) or stkutils::debug::fail('chunked_file::w_chunk', __LINE__, "cannot write header of chunk $index");
-	$size > 0 && ($self->{fh}->write($data, $size) or stkutils::debug::fail('chunked_file::w_chunk', __LINE__, "cannot write data in chunk $index"));
+	$self->{fh}->write($hdr, 8) or stkutils::debug::fail(
+		__PACKAGE__.'::w_chunk', 
+		__LINE__, 
+		"cannot write header of chunk $index");
+	$size > 0 && ($self->{fh}->write($data, $size) or stkutils::debug::fail(
+		__PACKAGE__.'::w_chunk', 
+		__LINE__, 
+		'$size > 0 && ($self->{fh}->write($data, $size)',
+		"cannot write data in chunk $index"));
 	$self->{offset} += $size + 8;
 }
 1;

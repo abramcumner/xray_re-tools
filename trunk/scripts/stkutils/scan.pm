@@ -1,9 +1,10 @@
 #!perl -w -I \temp\1\bin
 #
-# v.0.1. Last Modified: 25 May 2011
+# v.0.2. Last Modified: 25 Jule 2011
 #######################################################################
 package stkutils::scan;
 use strict;
+use stkutils::debug;
 use IO::File;
 
 use constant section_to_class => {
@@ -1083,7 +1084,11 @@ sub read_ini {
 		$_ =~ qr/^\s*;/ and next;
 		if (/^\[(.*)\]\s*:\s*(\w.*)?/) {
 			$section = $1;
-			die if defined $self->{sections_hash}->{$section};
+			stkutils::debug::fail(
+				__PACKAGE__.'::read_ini', 
+				__LINE__, 
+				'defined $self->{sections_hash}->{$section}', 
+				'duplicate section found while reading '.$_[0]) if defined $self->{sections_hash}->{$section};
 			push @{$self->{sections_list}}, $section;
 			my %tmp = ();
 			$self->{sections_hash}{$section} = \%tmp;
@@ -1094,7 +1099,11 @@ sub read_ini {
 			next;
 		} elsif (/^\[(.*)\]\s*:*\s*(\w.*)?/) {
 			$section = $1;
-			die if defined $self->{sections_hash}->{$section};
+			stkutils::debug::fail(
+				__PACKAGE__.'::read_ini', 
+				__LINE__, 
+				'defined $self->{sections_hash}->{$section}', 
+				'duplicate section found while reading '.$_[0]) if defined $self->{sections_hash}->{$section};
 			push @{$self->{sections_list}}, $section;
 			my %tmp = ();
 			$self->{sections_hash}{$section} = \%tmp;
@@ -1102,7 +1111,11 @@ sub read_ini {
 		}
 		if (/^([^=]*?)\s*=\s*(.*?)\s*$/) {
 			my ($name, $value) = ($1, $2);
-			die "died on $name, $value\n" unless defined $section;
+			stkutils::debug::fail(
+				__PACKAGE__.'::read_ini', 
+				__LINE__, 
+				'defined $section', 
+				'undefined section found while reading '.$_[0]) unless defined $section;
 			if ($value =~ /^\W+(\w+)\W+/) {
 				$value = $1;
 			}
