@@ -340,7 +340,7 @@ use strict;
 use IO::File;
 use stkutils::data_packet;
 use stkutils::chunked_file;
-#use stkutils::ogf;
+use stkutils::ogf;
 use Cwd;
 use Digest::MD5 qw(md5_hex);
 sub new {
@@ -1128,16 +1128,16 @@ if (!(::debug())) {
 			}
 			print "scanning materials for $level...\n";
 			if ($lFile->find_chunk(0x5)) {
-				my $packet = stkutils::data_packet->new($lFile->r_chunk_data());
+				my $packet = stkutils::data_packet->new($lFile->r_chunk_data(36));
 				my ($version, 
 					$vert_count,
 					$face_count) = $packet->unpack('VVV');
 				my @bbox = $packet->unpack('f6');
-				$lFile->seek($vert_count * 0xc, SEEK_CUR);
+				$lFile->r_chunk_seek($vert_count * 0xc);
 				for (my $i = 0; $i < $face_count; $i++) {
-					$cFile->seek(12, SEEK_CUR);
+					$lFile->r_chunk_seek(12);
 					my $data = '';
-					$cFile->read($data, 4);
+					$lFile->r_chunk_data(4);
 					my ($mat_id) = unpack('V', $data);
 					$mat_id &= 0x3fff;
 					$mats{$mat_id} = $i;
@@ -1551,10 +1551,8 @@ sub update_xrlc_version {
 			}
 			$level_w->w_chunk(0x6, $chunk_hash{0x6});
 			$level_w->w_chunk(0x7, $chunk_hash{0x7});
-			if ($pXRLC == 12 && $aXRLC > 12) {
-#				$self->conv_vis_to_v3($level_w, $chunk_hash{0x3}, $pXRLC, $aXRLC);
-			} elsif ($pXRLC > 12 && $aXRLC == 12) {
-#				$self->conv_vis_to_v4($level_w, $chunk_hash{0x3}, $pXRLC, $aXRLC);
+			if ($pXRLC == 12 || $aXRLC == 12) {
+				$self->convert_visuals($level_w, $chunk_hash{0x3}, $pXRLC, $aXRLC);
 			} else {
 				$level_w->w_chunk(0x3, $chunk_hash{0x3});
 			}
@@ -1589,39 +1587,32 @@ sub update_xrlc_version {
 		}
 	}	
 }
-sub conv_vis_to_v3 {
+sub convert_visuals {
 	my $self = shift;
 	my ($level, $raw, $pXRLC, $aXRLC) = @_;
+	print "	converting visuals...\n";
 	my @visuals = ();
 	my $temp = IO::File->new('~ggrc_temp_visuals', 'w');
 	binmode $temp;
 	$temp->write($raw, length($raw));
 	$temp->close();
 	$temp = stkutils::chunked_file->new('~ggrc_temp_visuals', 'r');
+	$level->w_chunk_open(0x3);
 	while (1) {
 		my ($index, $size) = $temp->r_chunk_open();
 		defined $index or last;
+		print "$index\n";
 		my $vis = stkutils::ogf->new();
-		$vis->read($temp->r_chunk_data());
-		push @visuals, $vis;
+		$vis->read($temp);
 		$temp->r_chunk_close();
-	}
-	$level->w_chunk_open(0x3);
-	my $id = 0;
-	foreach my $vis (@visuals) {
-		$level->w_chunk_open($id);
-		$vis->write($pXRLC);
+		$level->w_chunk_open($index);
+		$vis->convert(4, $self->{subversion});
+		$vis->write($level);
 		$level->w_chunk_close();
-		$id++;
 	}
 	$level->w_chunk_close();
 	$temp->close();
 	unlink '~ggrc_temp_visuals';
-}
-sub conv_vis_to_v4 {
-	my $self = shift;
-	my ($level, $raw, $pXRLC, $aXRLC) = @_;
-	my @visuals = ();
 }
 sub update_cform {
 	my $self = shift;
@@ -1855,6 +1846,7 @@ my $guids_file;
 my $out_links;
 my $rct;
 my $ai;
+my $sv;
 my $sect;
 my $rscan;
 my $debug;
@@ -1872,6 +1864,7 @@ GetOptions(
 	'debug' => \$debug,
 	'sect' => \$sect,
 	'ai=s' => \$ai,
+	'sv=i' => \$sv,
 	'rscan:s' => \$rscan,
 ) or die usage();
 
@@ -1906,7 +1899,6 @@ sub edge_block_size {
 		return 0x08;
 	}
 }
-
 sub vertex_block_size {
 	if ($_[0] eq '1469' or $_[0] eq '1472') {
 		return 0x24;
@@ -1916,7 +1908,6 @@ sub vertex_block_size {
 		return 0x2a;
 	}
 }
-
 sub header_size {
 	if ($_[0] eq '1469' or $_[0] eq '1472') {
 		return 0x0C;
@@ -1932,7 +1923,20 @@ sub header_size {
 		return 0x1C;
 	}
 }
-
+sub prepare_sv {
+	my ($sv) = @_;
+	if ($sv <= 1917) {
+		return 1;
+	} elsif ($sv <= 1936) {
+		return 2;
+	} elsif ($sv <= 1964) {
+		return 3;
+	} elsif ($sv <= 2218) {
+		return 4;
+	} else {
+		return 5;
+	}
+}
 if (!(::add_edge())) {
 	my $gg1 = game_graph->new();
 	$gg1->{build_version} = $b1;
@@ -1945,6 +1949,10 @@ if (!(::add_edge())) {
 		$gg2->{levels_to_push} = $l2;
 		$gg2->read($fn2);
 		my $result_graph = game_graph->new();
+		if (defined $sv) {
+			$result_graph->{subversion} = prepare_sv($sv);
+			print "$result_graph->{subversion}\n";
+		}
 		$result_graph->write($gg1, $gg2, $fn1, $fn2);
 	} else {
 		if (defined $output) {
