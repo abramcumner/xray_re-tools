@@ -1,6 +1,6 @@
 #!perl -w -I \temp\1\bin
 #
-# last edited: 25 Jule 2011
+# last edited: 26 Jule 2011
 #######################################################################
 package cse_abstract;
 use strict;
@@ -65,11 +65,11 @@ sub state_read {
 	}
 	my ($unused, $spawn_id);
 	if (($self->{version} > 70) && ($self->{version} <= 79)) {
-		$unused = $packet->unpack($self, 'C');
+		$unused = $packet->unpack('C');
 	} elsif (($self->{version} > 79) && ($self->{version} <= 93)) {
-		($unused, $spawn_id) = $packet->unpack($self, 'Cv');
+		($unused, $spawn_id) = $packet->unpack('Cv');
 	} elsif ($self->{version} > 93) {
-		($unused, $spawn_id) = $packet->unpack($self, 'vv');
+		($unused, $spawn_id) = $packet->unpack('vv');
 	}
 	if ($self->{version} < 112) {
 		if ($self->{version} > 82) {
@@ -82,7 +82,7 @@ sub state_read {
 			$packet->unpack_properties($self, (properties_info)[21..22]);
 		}	
 	}
-	my $extended_size = $packet->unpack($self, 'v');
+	my $extended_size = $packet->unpack('v');
 }
 sub state_write {
 	my $self = shift;
@@ -139,7 +139,7 @@ sub state_write {
 	}
 }
 sub update_read {
-	my ($size) = $_[1]->unpack($_[0], 'v');
+	my ($size) = $_[1]->unpack('v');
 	stkutils::debug::fail(__PACKAGE__.'::update_read', __LINE__, '$size == 0', 'unexpected size of CSE_Abstract M_UPDATE packet') unless $size == 0;
 }
 sub update_write {
@@ -1527,7 +1527,7 @@ sub update_read {
 		(($_[1]->length() > 28) && (ref($_[0]) eq 'se_actor')))) {
 		$_[1]->unpack_properties($_[0], (upd_properties_info)[4..5]);
 	} else {
-		if ($_[0]->{version} > 79) {
+		if ($_[0]->{version} > 85) {
 			$_[1]->unpack_properties($_[0], (upd_properties_info)[6]);
 		}
 		if ($_[0]->{version} > 63) {
@@ -1864,7 +1864,7 @@ sub state_write {
 sub update_read {
 	if (($_[0]->{version} > 19) && ($_[0]->{version} < 102)) {
 		$_[1]->unpack_properties($_[0], (upd_properties_info)[0..1]);
-		if ($_[0]->{version} < 80) {
+		if ($_[0]->{version} < 86) {
 			$_[1]->unpack_properties($_[0], (upd_properties_info)[2]);
 		}
 	}
@@ -1872,7 +1872,7 @@ sub update_read {
 sub update_write {
 	if (($_[0]->{version} > 19) && ($_[0]->{version} < 102)) {
 		$_[1]->pack_properties($_[0], (upd_properties_info)[0..1]);
-		if ($_[0]->{version} < 80) {
+		if ($_[0]->{version} < 86) {
 			$_[1]->pack_properties($_[0], (upd_properties_info)[2]);
 		}
 	}
@@ -1919,7 +1919,7 @@ sub state_import {
 	if (not(::level())) {
 		if (($_[0]->{version} > 19) && ($_[0]->{version} < 102)) {
 			$_[1]->import_properties($_[2], $_[0], (upd_properties_info)[0..1]);
-			if ($_[0]->{version} < 80) {
+			if ($_[0]->{version} < 86) {
 				$_[1]->import_properties($_[2], $_[0], (upd_properties_info)[2]);
 			}
 		}
@@ -1973,7 +1973,7 @@ sub state_export {
 	if (not(::level())) {
 		if (($_[0]->{version} > 19) && ($_[0]->{version} < 102)) {
 			$_[1]->export_properties(undef, $_[0], (upd_properties_info)[0..1]);
-			if ($_[0]->{version} < 80) {
+			if ($_[0]->{version} < 86) {
 				$_[1]->export_properties(undef, $_[0], (upd_properties_info)[2]);
 			}
 		}
@@ -2696,7 +2696,7 @@ use constant properties_info => (
 	{ name => 'sim_forced_online',	type => 'u8',	default => 0 },
 );
 sub state_read {
-	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 101)) {
+	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 104)) {
 		cse_alife_monster_rat::state_read(@_);
 	} else {
 		cse_alife_monster_base::state_read(@_);
@@ -2716,7 +2716,7 @@ sub state_read {
 	}
 }
 sub state_write {
-	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 101)) {
+	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 104)) {
 		cse_alife_monster_rat::state_write(@_);
 	} else {
 		cse_alife_monster_base::state_write(@_);
@@ -2735,21 +2735,21 @@ sub state_write {
 	}
 }
 sub update_read {
-	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 101)) {
+	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 104)) {
 		cse_alife_monster_rat::update_read(@_);
 	} else {
 		cse_alife_monster_base::update_read(@_);
 	}
 }
 sub update_write {
-	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 101)) {
+	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 104)) {
 		cse_alife_monster_rat::update_write(@_);
 	} else {
 		cse_alife_monster_base::update_write(@_);
 	}
 }
 sub state_import {
-	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 101)) {
+	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 104)) {
 		cse_alife_monster_rat::state_import(@_);
 	} else {
 		cse_alife_monster_base::state_import(@_);
@@ -2768,7 +2768,7 @@ sub state_import {
 	}
 }
 sub state_export {
-	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 101)) {
+	if (($_[0]->{section_name} eq 'm_rat_e') && ($_[0]->{version} <= 104)) {
 		cse_alife_monster_rat::state_export(@_);
 	} else {
 		cse_alife_monster_base::state_export(@_);
@@ -2893,13 +2893,13 @@ sub state_write {
 sub update_read {
 	cse_alife_monster_abstract::update_read(@_);
 	if ($_[0]->{version} > 39) {
-	cse_alife_inventory_item::update_read(@_);
+		cse_alife_inventory_item::update_read(@_);
 	}
 }
 sub update_write {
 	cse_alife_monster_abstract::update_write(@_);
 	if ($_[0]->{version} > 39) {
-	cse_alife_inventory_item::update_write(@_);
+		cse_alife_inventory_item::update_write(@_);
 	}
 }
 sub state_import {
@@ -4105,11 +4105,11 @@ sub update_read {
 			$_[1]->unpack_properties($_[0], (upd_properties_info)[3]);
 			$_[1]->unpack_properties($_[0], (upd_properties_info)[8]);
 			my $flags = $_[0]->{'upd:num_items'} >> 5;
-			if ((::use_2942()) || (($flags & 0x02) == 0)) {
+			if ($_[0]->{is_first_patch} || (($flags & 0x02) == 0)) {
 				stkutils::debug::fail(__PACKAGE__.'::update_read', __LINE__, '[1]->length() >= 3', 'unexpected size') unless $_[1]->length() >= 3;
 				$_[1]->unpack_properties($_[0], (upd_properties_info)[9]);
 			}
-			if ((::use_2942()) || (($flags & 0x04) == 0)) {
+			if ($_[0]->{is_first_patch} || (($flags & 0x04) == 0)) {
 				stkutils::debug::fail(__PACKAGE__.'::update_read', __LINE__, '[1]->length() >= 3', 'unexpected size') unless $_[1]->length() >= 3;
 				$_[1]->unpack_properties($_[0], (upd_properties_info)[10]);
 			}
@@ -4154,10 +4154,10 @@ sub update_write {
 		if ($flags != 0) {
 			$_[1]->pack_properties($_[0], (upd_properties_info)[3]);
 			$_[1]->pack_properties($_[0], (upd_properties_info)[8]);
-			if ((::use_2942()) || (($mask & 0x02) == 0)) {
+			if ($_[0]->{is_first_patch} || (($mask & 0x02) == 0)) {
 				$_[1]->pack_properties($_[0], (upd_properties_info)[9]);
 			}
-			if ((::use_2942()) || (($mask & 0x04) == 0)) {
+			if ($_[0]->{is_first_patch} || (($mask & 0x04) == 0)) {
 				$_[1]->pack_properties($_[0], (upd_properties_info)[10]);
 			}
 		}
@@ -4207,10 +4207,10 @@ sub state_import {
 				$_[1]->import_properties($_[2], $_[0], (upd_properties_info)[3]);
 				$_[1]->import_properties($_[2], $_[0], (upd_properties_info)[8]);
 				my $flags = $_[0]->{'upd:num_items'} >> 5;
-				if ((::use_2942()) || (($flags & 0x02) == 0)) {
+				if ($_[0]->{is_first_patch} || (($flags & 0x02) == 0)) {
 					$_[1]->import_properties($_[2], $_[0], (upd_properties_info)[9]);
 				}
-				if ((::use_2942()) || (($flags & 0x04) == 0)) {
+				if ($_[0]->{is_first_patch} || (($flags & 0x04) == 0)) {
 					$_[1]->import_properties($_[2], $_[0], (upd_properties_info)[10]);
 				}
 			}
@@ -4240,50 +4240,50 @@ sub state_export {
 		$_[1]->export_properties(undef, $_[0], (properties_info)[1]);
 	}
 	if (not(::level())) {
-	if (($_[0]->{version} >= 122) && ($_[0]->{version} <= 128)) {
-		$_[1]->export_properties(undef, $_[0], (upd_properties_info)[0]);
-		if ($_[0]->{'upd:num_items'} != 0) {
-			$_[1]->export_properties(undef, $_[0], (upd_properties_info)[1..4]);
-			my $flags = $_[0]->{'upd:num_items'} >> 5;
-			if (($flags & 0x2) == 0) {
-				$_[1]->export_properties(undef, $_[0], (upd_properties_info)[5]);
+		if (($_[0]->{version} >= 122) && ($_[0]->{version} <= 128)) {
+			$_[1]->export_properties(undef, $_[0], (upd_properties_info)[0]);
+			if ($_[0]->{'upd:num_items'} != 0) {
+				$_[1]->export_properties(undef, $_[0], (upd_properties_info)[1..4]);
+				my $flags = $_[0]->{'upd:num_items'} >> 5;
+				if (($flags & 0x2) == 0) {
+					$_[1]->export_properties(undef, $_[0], (upd_properties_info)[5]);
+				}
+				if (($flags & 0x4) == 0) {
+					$_[1]->export_properties(undef, $_[0], (upd_properties_info)[6]);
+				}
+				if (defined $_[0]->{'upd:enabled'}) {
+					$_[1]->export_properties(undef, $_[0], (upd_properties_info)[7]);
+				}
 			}
-			if (($flags & 0x4) == 0) {
-				$_[1]->export_properties(undef, $_[0], (upd_properties_info)[6]);
+		} elsif ((($_[0]->{version} >= 118) && ($_[0]->{script_version} > 5)) && (not (::use_hack()))) {
+			$_[1]->export_properties(undef, $_[0], (upd_properties_info)[0]);
+			if ($_[0]->{'upd:num_items'} != 0) {
+				$_[1]->export_properties(undef, $_[0], (upd_properties_info)[3]);
+				$_[1]->export_properties(undef, $_[0], (upd_properties_info)[8]);
+				my $flags = $_[0]->{'upd:num_items'} >> 5;
+				if ($_[0]->{is_first_patch} || (($flags & 0x02) == 0)) {
+					$_[1]->export_properties(undef, $_[0], (upd_properties_info)[9]);
+				}
+				if ($_[0]->{is_first_patch} || (($flags & 0x04) == 0)) {
+					$_[1]->export_properties(undef, $_[0], (upd_properties_info)[10]);
+				}
 			}
-			if (defined $_[0]->{'upd:enabled'}) {
+		} else {
+			if (($_[0]->{version} > 59) &&($_[0]->{version} <= 63)) {
+				$_[1]->export_properties(undef, $_[0], (upd_properties_info)[14]);
+			}
+			$_[1]->export_properties(undef, $_[0], (upd_properties_info)[11..13]);
+			my $flags = $_[0]->{'upd:num_items_old_format'};
+			if ($flags != 0x8000) {
+				$_[1]->export_properties(undef, $_[0], (upd_properties_info)[3]);
+			}
+			if ($flags & ~0x8000) {
 				$_[1]->export_properties(undef, $_[0], (upd_properties_info)[7]);
+				$_[1]->export_properties(undef, $_[0], (upd_properties_info)[5..6]);
+				$_[1]->export_properties(undef, $_[0], (upd_properties_info)[1..2]);
+				$_[1]->export_properties(undef, $_[0], (upd_properties_info)[4]);
 			}
 		}
-	} elsif ((($_[0]->{version} >= 118) && ($_[0]->{script_version} > 5)) && (not (::use_hack()))) {
-		$_[1]->export_properties(undef, $_[0], (upd_properties_info)[0]);
-		if ($_[0]->{'upd:num_items'} != 0) {
-			$_[1]->export_properties(undef, $_[0], (upd_properties_info)[3]);
-			$_[1]->export_properties(undef, $_[0], (upd_properties_info)[8]);
-			my $flags = $_[0]->{'upd:num_items'} >> 5;
-			if ((::use_2942()) || (($flags & 0x02) == 0)) {
-				$_[1]->export_properties(undef, $_[0], (upd_properties_info)[9]);
-			}
-			if ((::use_2942()) || (($flags & 0x04) == 0)) {
-				$_[1]->export_properties(undef, $_[0], (upd_properties_info)[10]);
-			}
-		}
-	} else {
-		if (($_[0]->{version} > 59) &&($_[0]->{version} <= 63)) {
-			$_[1]->export_properties(undef, $_[0], (upd_properties_info)[14]);
-		}
-		$_[1]->export_properties(undef, $_[0], (upd_properties_info)[11..13]);
-		my $flags = $_[0]->{'upd:num_items_old_format'};
-		if ($flags != 0x8000) {
-			$_[1]->export_properties(undef, $_[0], (upd_properties_info)[3]);
-		}
-		if ($flags & ~0x8000) {
-			$_[1]->export_properties(undef, $_[0], (upd_properties_info)[7]);
-			$_[1]->export_properties(undef, $_[0], (upd_properties_info)[5..6]);
-			$_[1]->export_properties(undef, $_[0], (upd_properties_info)[1..2]);
-			$_[1]->export_properties(undef, $_[0], (upd_properties_info)[4]);
-		}
-	}
 	}
 }
 #######################################################################
@@ -4303,12 +4303,12 @@ sub state_write {
 }
 sub update_read {
 	if ($_[0]->{version} > 39) {
-	cse_alife_inventory_item::update_read(@_);
+		cse_alife_inventory_item::update_read(@_);
 	}
 }
 sub update_write {
 	if ($_[0]->{version} > 39) {
-	cse_alife_inventory_item::update_write(@_);
+		cse_alife_inventory_item::update_write(@_);
 	}
 }
 sub state_import {
@@ -5039,7 +5039,6 @@ sub update_read {
 	if ($_[1]->length() != 0) {
 		$_[1]->unpack_properties($_[0], upd_properties_info);
 	}
-stkutils::debug::fail(__PACKAGE__.'::update_read', __LINE__, '[1]->length() == 0', 'unexpected size') unless $_[1]->length() == 0;
 }
 sub update_write {
 	cse_alife_item_weapon_magazined::update_write(@_);
@@ -5108,7 +5107,7 @@ use constant build_verions => (
 	{ version => 124, script_version => 8, build => 'Clear Sky (patch 1.5.04 or higher)', 	short_build => 'cs4',  graph_build => 'cop'},
 	{ version => 123, script_version => 8, build => 'Clear Sky (patch 1.5.03)', 			short_build => 'cs3',  graph_build => 'cop'},
 	{ version => 122, script_version => 8, build => 'Clear Sky (patch 1.5.00 - 1.5.02)', 	short_build => 'cs0',  graph_build => 'cop'},
-	{ version => 118, script_version => 6, build => 'Shadow Of Chernobyl (patch 1.0001 or higher) or xrCore build 3120', short_build => 'soc1',  graph_build => 'soc'},
+	{ version => 118, script_version => 6, build => 'Shadow Of Chernobyl (patch 1.0001 or higher)', short_build => 'soc1',  graph_build => 'soc'},
 	{ version => 118, script_version => 5, build => 'xrCore build 2559-2947', 				short_build => 'soc0', graph_build => 'soc'},
 	{ version => 117, script_version => 4, build => 'xrCore build 2571', graph_build => 'soc'},
 	{ version => 115, script_version => 3, build => 'xrCore build 2365', graph_build => 'soc'},
@@ -5240,7 +5239,8 @@ sub read_common {
 			UNIVERSAL::can($self->{cse_object}, 'update_read') && do {
 				$self->{cse_object}->update_read($packet);
 			};
-			$packet->length() == 0 or stkutils::debug::fail(__PACKAGE__.'::read_common', __LINE__, '$packet->length() == 0', 'update data left ['.$packet->length().'] in entity '.$self->{cse_object}->{name});
+			if ($packet->length() == 6 && $self->{cse_object}->{version} == 118) {$packet = $self->first_patch_handler($data, $packet)};
+			$packet->length() == 0 or stkutils::debug::fail(__PACKAGE__.'::read_common', __LINE__, '$packet->length() == 0', 'update data left ['.$packet->length().'] in entity '.$self->{cse_object}->{name});	
 		}
 		$cf->r_chunk_close();
 	}
@@ -5474,6 +5474,20 @@ sub convert_spawn {
 	$self->{cse_object}->{script_version} = $new_script_version;
 	$self->{cse_object}->{game_vertex_id} += ($new_gvid - $old_gvid);
 }
+sub first_patch_handler {
+	my $self = shift;
+	my ($data, $packet) = @_;
+	if (substr(ref($self->{cse_object}), 0, 14) eq 'cse_alife_item') {
+		print "$self->{cse_object}->{name}\n";
+		$packet = stkutils::data_packet->new(substr($data, 2));
+		$self->{cse_object}->{is_first_patch} = 1;
+		cse_abstract::update_read($self->{cse_object}, $packet);
+		$self->{cse_object}->update_read($packet);
+		return $packet;
+	} else {
+		return $packet;
+	}
+}
 #######################################################################
 package way_object;
 use strict;
@@ -5548,11 +5562,11 @@ sub read_links {
 	my $packet = stkutils::data_packet->new($cf->r_chunk_data());
 	while (1) {
 		$packet->length() > 0 or last;
-		my ($from, $to_count) = $packet->unpack($self, 'VV');
+		my ($from, $to_count) = $packet->unpack('VV');
 		my $point = $self->{points}[$from];
 		while ($to_count--) {
 			my %link;
-			($link{to}, $link{weight}) = $packet->unpack($self, 'Vf');
+			($link{to}, $link{weight}) = $packet->unpack('Vf');
 			push @{$point->{links}}, \%link;
 		}
 	}
@@ -6062,7 +6076,7 @@ sub read {
 	my ($fn, $version) = @_;
 	my $ini = stkutils::ini_file->new('sections.ini', 'r') if ::with_scan();
 	my $cf = stkutils::chunked_file->new($fn, 'r') or stkutils::debug::fail(__PACKAGE__.'::read', __LINE__, '', 'cannot open '.$fn);
-	if (not(::level()) && ($version > 0x4F)) {
+	if (not(::level()) && ($version > 79)) {
 		while (1) {
 			my ($index, $size) = $cf->r_chunk_open();
 			defined($index) or last;
@@ -6079,21 +6093,23 @@ sub read {
 				print "reading way objects...\n";
 				$self->read_way($cf);
 			} elsif ($index == 4) {
-				print "reading game graph...\n";
 				$self->read_graph($cf, $ini);
 			} else {
 				stkutils::debug::fail(__PACKAGE__.'::read', __LINE__, '$index <= 4', 'unexpected chunk index '.$index);
 			}
 			$cf->r_chunk_close();
 		}
-	} elsif (not(::level()) && ($version <= 0x4F)) {
+	} elsif (not(::level()) && ($version <= 79)) {
 		my $count;
 		my ($index, $size) = $cf->r_chunk_open();
+		print "reading header...\n";
 		$self->read_header($cf, $version);
 		$cf->r_chunk_close();
+		print "reading alife objects...\n";
 		$self->read_alife($cf, $version, $ini);
 		if ($version > 16) {
 			($count, $size) = $cf->r_chunk_open();
+			print "reading artefact spawn places...\n";
 			$self->read_section2($cf);
 			$cf->r_chunk_close();	
 		}
@@ -6167,7 +6183,7 @@ sub read_alife {
 	my ($cf, $version, $ini) = @_;
 	my $i = 0;
 	
-	if ($version > 0x4F) {
+	if ($version > 79) {
 		while (1) {
 			my ($index, $size) = $cf->r_chunk_open();
 			defined($index) or last;
@@ -6180,12 +6196,14 @@ sub read_alife {
 					($index, $size) = $cf->r_chunk_open();
 					defined($index) or last;
 					my $object = alife_object->new();
+					$object->{cse_object}->{is_first_patch} = 1 if ($self->{is_first_patch} && $self->{is_first_patch} == 1);
 					$object->spawn_read($cf, $version, $ini);
+					$self->{is_first_patch} = 1 if ($object->{cse_object}->{is_first_patch} && $object->{cse_object}->{is_first_patch} == 1);
 					push @{$self->{alife_objects}}, $object;
 					$cf->r_chunk_close();
 				}
 			} elsif ($index == 2) {
-				$size == 0 or stkutils::debug::fail(__PACKAGE__.'::read_alife', __LINE__, '$size == 0', 'unexpected unknown section size');
+				$size == 0 or stkutils::debug::fail(__PACKAGE__.'::read_alife', __LINE__, '$size == 0', 'unexpected unknown section size '.$size);
 			}
 			$cf->r_chunk_close();
 		}
@@ -6469,6 +6487,7 @@ sub import_header {
 	$self->{graph_guid} = pack 'H*', $if->value('header', 'graph_guid') if ($if->is_value_exists('header', 'graph_guid'));
 	$self->{level_count} = $if->value('header', 'level_count');
 	$self->{unknown} = $if->value('header', 'unknown');
+	$self->{is_first_patch} = $if->value('header', 'is_first_patch') if $if->is_value_exists('header', 'is_first_patch');
 }
 sub import_alife {
 	my $self = shift;
@@ -6485,6 +6504,7 @@ sub import_alife {
 		print "importing alife objects from file $fn...\n";
 		foreach my $section (@{$lif->{sections_list}}) {
 			my $object = alife_object->new();
+			$object->{cse_object}->{is_first_patch} = 1 if ($self->{is_first_patch} && $self->{is_first_patch} == 1);
 			$object->state_import($lif, $section, $ini);
 			push @{$self->{alife_objects}}, $object;
 		}
@@ -6510,7 +6530,7 @@ sub import_section2 {
 	$fn = $if->value('section2', 'binary_files') or stkutils::debug::fail(__PACKAGE__.'::import_section2', __LINE__, '$if->value(section2, binary_files)', 'cannot find section2.bin record in all.ltx');
 	my $bin_fh = IO::File->new($fn, 'r') or stkutils::debug::fail(__PACKAGE__.'::import_section2', __LINE__, '', 'cannot open '.$fn);
 	binmode $bin_fh;
-	print "importing raw data...\n";
+	print "importing artefact spawn places data...\n";
 	$bin_fh->read($self->{section2_raw_data}, ($bin_fh->stat())[7]);
 }
 sub import_way {
@@ -6571,6 +6591,7 @@ sub export_header {
 	print $fh 'graph_guid = ', unpack('H*', $self->{graph_guid}), "\n" if (defined $self->{graph_guid});
 	print $fh "level_count = $self->{level_count}\n" if (defined $self->{level_count});
 	print $fh "unknown = $self->{unknown}\n" if (defined $self->{unknown});
+	print $fh "is_first_patch = 1\n" if ($self->{is_first_patch} && $self->{is_first_patch} == 1);
 	print $fh "\n";
 }
 sub export_alife {
@@ -6782,7 +6803,8 @@ use Getopt::Long;
 use File::Path;
 use stkutils::scan;
 use stkutils::graph;
-#use diagnostics;
+use stkutils::chunked_file;
+use diagnostics;
 
 sub usage {
 	return <<END
@@ -6829,7 +6851,6 @@ GetOptions(
 	'f=s' => \$flags,
 	'a=s' => \$actor_pos,
 	'l' => \$level_spawn,	
-	'2942' => \$use_2942,
 	'hack' => \$use_hack,
 	'parse=s' => \$parse,		
 	'way' => \$way,	
@@ -6891,6 +6912,7 @@ if (defined $convert) {
 	binmode $fh;
 	my $data;
 	$fh->read($data, 0x12C) or stkutils::debug::fail(__PACKAGE__, __LINE__, '$fh->read($data, 0x12C)', 'cannot read '.$spawn_file);
+	$fh->close();
 	my $table = ();
 	if (::level()) {
 			(
@@ -6942,7 +6964,18 @@ if (defined $convert) {
 		$table->{script_version} = 0;
 	}
 	my $build = (build_version::build_by_version($table->{version}, $table->{script_version}) or 'unknown,  spawn ver. '.$table->{version}.'');
-	print "you're trying to unpack spawn of S.T.A.L.K.E.R. $build\n";
+	if ($table->{version} == 118 && $table->{script_version} == 6) {
+		$fh = stkutils::chunked_file->new($spawn_file, 'r');
+		if ($fh->find_chunk(0x4)) {
+			print "you're trying to unpack spawn of S.T.A.L.K.E.R. xrCore build 3120\n";
+			$fh->close_found_chunk();
+		} else {
+			print "you're trying to unpack spawn of S.T.A.L.K.E.R. $build\n";
+		}
+		$fh->close();
+	} else {
+		print "you're trying to unpack spawn of S.T.A.L.K.E.R. $build\n";
+	}
 	my $spawn = all_spawn->new();
 	print "reading $spawn_file...\n";
 	$spawn->read($spawn_file, $table->{version});
@@ -6990,7 +7023,6 @@ sub is_flag_defined {
 	return (defined $flags_hash{$_[0]}) ? 1 : 0;
 }
 sub level {return defined $level_spawn;}
-sub use_2942 {return defined $use_2942;}
 sub use_hack {return defined $use_hack;}
 sub edge_block_size {
 	if ($_[0] eq 'soc' or $_[0] eq 'cop') {

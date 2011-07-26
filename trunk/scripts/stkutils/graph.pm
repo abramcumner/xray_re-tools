@@ -162,7 +162,6 @@ sub read {
 }
 #######################################################################
 package gg_edge;
-
 use strict;
 use constant edge_builds => (
 	{ name => 'game_vertex_id',	type => 'u32' },
@@ -206,15 +205,15 @@ sub read {
 	my $packet;
 
 	print "reading graph...\n";
-	if ($version < 122) {
+	if ($spawn->{section4_raw_data}) {
+		$data = substr($spawn->{section4_raw_data}, 0, 300000);
+		$packet = stkutils::data_packet->new($data);
+	} else {
 		my $fh = IO::File->new('game.graph', 'r') or stkutils::debug::fail(__PACKAGE__.'::read',__LINE__, '', 'cannot open game.graph');
 		binmode $fh;
-		$fh->read($data, 225000);
+		$fh->read($data, 300000);
 		$packet = stkutils::data_packet->new($data);
 		$fh->close();
-	} else {
-		$data = substr($spawn->{section4_raw_data}, 0, 225000);
-		$packet = stkutils::data_packet->new($data);
 	}
 	my $hs = ::header_size($self->{build_version});
 	my $vbs = ::vertex_block_size($self->{build_version});
@@ -268,6 +267,7 @@ sub read {
 			my $level = $level_by_id{$vertex->{level_id}};
 			$level_id = $vertex->{level_id};
 			$self->{level_by_guid}{$game_vertex_id} = $$level->{level_name};
+#			print "$game_vertex_id = $$level->{level_name}\n";
 		}
 		$game_vertex_id++;
 	}

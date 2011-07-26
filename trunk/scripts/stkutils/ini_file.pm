@@ -89,8 +89,7 @@ sub export_properties {
 
 	my $fh = $self->{fh};
 
-	print $fh "\n" if defined $comment;
-	print $fh "; $comment properties\n" if defined $comment;
+	print $fh "\n; $comment properties\n" if defined $comment;
 	foreach my $p (@_) {
 #	print "$p->{name}, $p->{type}\n";
 		my $format = format_for_number->{$p->{type}};
