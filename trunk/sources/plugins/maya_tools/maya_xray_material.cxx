@@ -298,7 +298,7 @@ MStatus maya_xray_material::init()
 	if (shaders_xrlc_lib.shaders().empty())
 		enum_attr_fn.addField("default", 0);
 
-	g_xrm = enum_attr_fn.create("xrayGameMaterial", " ", 0, &status);
+	g_xrm = enum_attr_fn.create("xrayGameMaterial", "gammat", 0, &status);
 	CHECK_MSTATUS(status);
 	enum_attr_fn.setKeyable(true);
 	enum_attr_fn.setStorable(true);
