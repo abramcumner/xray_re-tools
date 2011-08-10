@@ -198,7 +198,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
-				AdditionalIncludeDirectories="..\..\..\xray_re;..\opcode"
+				Optimization="2"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\..\..\xray_re;..\opcode;&quot;..\..\..\3rd party\libogg\include&quot;;&quot;..\..\..\3rd party\libvorbis\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;ICE_NO_DLL;BAN_OPCODE_AUTOLINK"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -207,6 +211,7 @@
 				EnableEnhancedInstructionSet="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -223,7 +228,7 @@
 				AdditionalDependencies="xray_re.lib"
 				AdditionalLibraryDirectories="$(OutDir)\libraries"
 				GenerateManifest="true"
-				GenerateDebugInformation="false"
+				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -280,6 +285,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
+				Optimization="2"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="..\..\..\xray_re;..\opcode;&quot;..\..\..\3rd party\libogg\include&quot;;&quot;..\..\..\3rd party\libvorbis\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;ICE_NO_DLL;BAN_OPCODE_AUTOLINK"
 				StringPooling="true"
@@ -288,7 +297,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -304,10 +313,11 @@
 				AdditionalDependencies="xray_re.lib"
 				AdditionalLibraryDirectories="&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries\x64&quot;"
 				GenerateManifest="true"
-				GenerateDebugInformation="false"
+				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				OptimizeForWindows98="0"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="17"
