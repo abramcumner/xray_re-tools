@@ -1,14 +1,15 @@
 [Правила распространения]
 Программы используют разработанный сторонними авторами код:
- - OPCODE 1.3 (http://www.codercorner.com/Opcode.htm)
+ - OPCODE 1.3 (http://www.codercorner.com/Opcode.htm).
  - Реализация большинства операций с матрицами и кватернионами взята
    из Game Programming Gems (http://www.graphicsgems.org),
    библиотеки WildMagic (http://www.geometrictools.com),
    LightWave 8.0 SDK и примера ik2Bsolver из Maya 8.5 SDK.
- - NVIDIA Texture Tools 2.0.3 (...).
- - lzhuf.c (Haruyasu Yoshizaki)
- - Библиотека minilzo (http://www.oberhumer.com/opensource/lzo/)
- - Реализация CRC32 (Gary S. Brown)
+ - NVIDIA Texture Tools 2.0.8 (http://code.google.com/p/nvidia-texture-tools/).
+ - CUDA Toolkit 4.0 (http://developer.nvidia.com/cuda-toolkit-40).
+ - lzhuf.c (Haruyasu Yoshizaki).
+ - Библиотека minilzo (http://www.oberhumer.com/opensource/lzo/).
+ - Реализация CRC32 (Gary S. Brown).
  - (что ещё?)
 
 Кроме того, код непосредственной загрузки/сохранения файлов X-Ray
@@ -24,8 +25,8 @@ converter.exe - многофункциональная утилита и декомпилятор карт.
 aiwrapper.exe - оболочка для компилятора ИИ-компонент от сборки 2215.
 xrayMayaTools.mll - расширение Maya для поддержки файлов X-Ray.
 xrayMaxTools.dlu - расширение 3ds Max для поддержки файлов X-Ray.
-msXRayImport.dll - расширение Milkshape3D для импорта файлов X-Ray.
-msXRayExport.dll - расширение Milkshape3D для экспорта файлов X-Ray.
+msXRayImport.dll - расширение Milkshape 3D для импорта файлов X-Ray.
+msXRayExport.dll - расширение Milkshape 3D для экспорта файлов X-Ray.
 
 
 [Требования к системе]

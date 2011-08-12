@@ -5,10 +5,11 @@ The unofficial toolset uses third-party code:
    Game Programming Gems (http://www.graphicsgems.org),
    WildMagic library (http://www.geometrictools.com),
    LightWave 8.0 SDK and ik2Bsolver sample from Maya 8.5 SDK.
- - NVIDIA Texture Tools 2.0.3 ();
- - lzhuf.c (Haruyasu Yoshizaki)
- - minilzo library (http://www.oberhumer.com/opensource/lzo/)
- - CRC32 (Gary S. Brown)
+ - NVIDIA Texture Tools 2.0.8 (http://code.google.com/p/nvidia-texture-tools/).
+ - CUDA Toolkit 4.0 (http://developer.nvidia.com/cuda-toolkit-40).
+ - lzhuf.c (Haruyasu Yoshizaki).
+ - minilzo library (http://www.oberhumer.com/opensource/lzo/).
+ - CRC32 (Gary S. Brown).
  - (more?)
 
 The code to load/save X-Ray files closely follows the GSC one.

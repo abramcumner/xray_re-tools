@@ -1,0 +1,102 @@
+SOME IDEAS about xdb format:
+
+Result of checking shows that even just putted to mods folder xdb-file processes by engine, and its textures or
+thm's will overlapp default game settings, what allows for example to fix too blue colors by smallsky's in r2,
+and this is way to increase quality of second render with bad default soc-weather. Also you can connect to servers after
+that without any problems, where peoples plays without that fixes.
+
+Its possible to create xdb-file with level for which textures will automaticly load from another xdb-file.
+
+Also possible of creating xdb-file without level at all and only with textures. And simultaneously create rather small
+xdb-archives of levels without textures or their minium, without any necessity of dublicate already existed textures.
+During creating such archive you should be carefull, because even one spare thm with wrong settings if it conflicts
+by name with any existed textures in SOC, it will overlap their settings so result to bugs on soc-levels.
+As side-effect it can be long game running, because engine needs time anyway to reread all additional xdb with levels 
+and textures.
+
+About *.thm files: in them stored settings for textures something like connection with details, bumps and scaling of details,
+like for terrains. Same settings stored in textures.ltx. If file is written in textures.ltx, but simultaneously have
+own thm, then settings of thm will have priority.
+
+Its forbidden to create xdb-file with textures from subfolder textures\act. It this happens xdb-file will be broken. I mean
+by having this file in folder mods you can't connect to any standart server. But if there is already ready level, which
+wana missing SOC textures from this folder, its possible to create for example not folder textures\act, but
+textures\azt. And after by HEX-editor in file level replace all calls to folder act to azt.
+
+You can also create one xdb-file from start with many levels, but advantages of this doubtful because if y need fixing that
+you will need to rebuild all pack.
+
+Even singleplayer, if game asks for textures, loads them from xdb, if it finds them. Self *.xdb0 files as usual are in mods folder.
+
+Name of xdb-file is not important, essential only extension type xdb0.
+
+How CORRECT TO PACK mp-map to xdb (instruction ONLY for SOC):
+
+As example we will use map red_forest - lets it's be such name for ready level.
+
+We are taking bardak converter.
+
+In folder with converter y create file pack-xdb.bat with this inside:
+
+converter -pack project -xdb -out project.xdb0
+pause
+
+In folder with converter create subfolder project. And inside it will be such folders and files:
+
+config\text\map_desc\red_forest.ltx
+
+levels\red_forest\level.ltx + files of level
+
+textures\intro\intro_map_pic_red_forest.dds (+thm in some case) - picture to show in creation server menu
+textures\intro\intro_red_forest.dds (+thm-ка на всяк. случай) - picture of loading level process
+textures\map\map_red_forest.dds (+thm-ка на всяк. случай) - minimap (plan of area) of level
+
+
+Content of red_forest.ltx:
+
+[map_info]
+players = 8-32
+modes = "st_deathmatch, st_team_deathmatch, st_artefacthunt"
+short_desc = "Here should be short description"
+large_desc = "Here should be full description"
+
+
+Content of level.ltx:
+
+[map_usage]
+ver=1.0
+deathmatch
+teamdeathmatch
+artefacthunt
+
+[red_forest]
+bound_rect = -285.000000,-485.000000,375.000000,175.000000
+global_rect = 198.0, 1028.0, 380.0, 1210.000000
+texture = map\map_red_forest
+
+[deathmatch_game_anomaly_sets]
+permanent = mp_rail_rad1,mp_rail_rad2,mp_rail_rad3, mp_railroad_zone_mine_gravitational_strong, mp_railroad_zone_mine_acidic_strong
+
+set0= mp_railroad_zone_mine_gravitational_strong_0000,mp_railroad_zone_mine_gravitational_strong_0001,mp_rail_gz2
+set1= mp_railroad_zone_mine_gravitational_strong_0001,mp_rail_wg2,mp_rail_mb2
+set2= mp_railroad_zone_mine_gravitational_strong_0000,mp_railroad_zone_mine_electric_strong
+
+[teamdeathmatch_game_anomaly_sets]
+permanent = mp_rail_rad1, mp_rail_rad2, mp_rail_rad3,mp_railroad_zone_mine_gravitational_strong, mp_railroad_zone_mine_acidic_strong
+
+set0= mp_railroad_zone_mine_gravitational_strong_0000,mp_railroad_zone_mine_gravitational_strong_0001,mp_rail_gz2
+set1= mp_railroad_zone_mine_gravitational_strong_0001,mp_rail_wg2,mp_rail_mb2
+set2= mp_railroad_zone_mine_gravitational_strong_0000,mp_railroad_zone_mine_electric_strong
+
+[artefacthunt_game_anomaly_sets]
+permanent = mp_rail_rad1, mp_rail_rad2, mp_rail_rad3,mp_railroad_zone_mine_gravitational_strong, mp_railroad_zone_mine_acidic_strong
+
+set0= mp_railroad_zone_mine_gravitational_strong_0000,mp_railroad_zone_mine_gravitational_strong_0001,mp_rail_gz2
+set1= mp_railroad_zone_mine_gravitational_strong_0001,mp_rail_wg2,mp_rail_mb2
+set2= mp_railroad_zone_mine_gravitational_strong_0000,mp_railroad_zone_mine_electric_strong
+
+Run pack-xdb.bat. Rename obtained project.xdb0 as we wana and put it to game into folder mods and first step is try 
+to connect to several internet-servers with standart maps. If not working, then we packed something additional. 
+Only textures (exept act) can be packed, level itself and that config with map description.
+
+Written by MacroN, translated by loxotron
