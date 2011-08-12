@@ -44,14 +44,14 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\xray_re;&quot;..\..\..\3rd party\maya_sdk\8.5\include&quot;"
+				AdditionalIncludeDirectories="..\..\..\xray_re;C:\sources\sdk\maya2012\win32\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;MAYA_TOOLS_EXPORTS;NT_PLUGIN;REQUIRE_IOSTREAM"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="false"
+				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -69,7 +69,7 @@
 				AdditionalDependencies="xray_re.lib Foundation.lib OpenMaya.lib OpenMayaAnim.lib OpenMayaUI.lib"
 				OutputFile="$(OutDir)\xrayMayaTools.mll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\..\..\3rd party\maya_sdk\8.5\lib&quot;;&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries&quot;"
+				AdditionalLibraryDirectories="&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries&quot;;C:\sources\sdk\maya2012\win32\lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
@@ -100,8 +100,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\binaries\$(ConfigurationName)\x64"
+			IntermediateDirectory="..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)\x64"
 			ConfigurationType="2"
 			CharacterSet="0"
 			>
@@ -124,7 +124,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\xray_re;&quot;$(MAYA_SDK)\include&quot;"
+				AdditionalIncludeDirectories="..\..\..\xray_re;C:\sources\sdk\maya2012\win64\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;MAYA_TOOLS_EXPORTS;NT_PLUGIN;REQUIRE_IOSTREAM"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -149,9 +149,11 @@
 				AdditionalDependencies="xray_re.lib Foundation.lib OpenMaya.lib OpenMayaAnim.lib OpenMayaUI.lib"
 				OutputFile="$(OutDir)\xrayMayaTools.mll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\bld-vs2005\x64\debug;&quot;$(MAYA_SDK)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries\x64&quot;;C:\sources\sdk\maya2012\win64\lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -202,8 +204,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
-				Optimization="1"
-				AdditionalIncludeDirectories="..\..\..\xray_re;&quot;$(MAYA_SDK)\win32\include&quot;"
+				Optimization="2"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="2"
+				AdditionalIncludeDirectories="..\..\..\xray_re;C:\sources\sdk\maya2012\win32\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;MAYA_TOOLS_EXPORTS;NT_PLUGIN;REQUIRE_IOSTREAM"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -211,7 +216,7 @@
 				EnableEnhancedInstructionSet="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="false"
+				Detect64BitPortabilityProblems="true"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -227,7 +232,7 @@
 				AdditionalOptions="/export:initializePlugin /export:uninitializePlugin"
 				AdditionalDependencies="xray_re.lib Foundation.lib OpenMaya.lib OpenMayaAnim.lib OpenMayaUI.lib"
 				OutputFile="$(OutDir)\xrayMayaTools.mll"
-				AdditionalLibraryDirectories="&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries&quot;;&quot;$(MAYA_SDK)\win32\lib&quot;"
+				AdditionalLibraryDirectories="&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries&quot;;C:\sources\sdk\maya2012\win32\lib"
 				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -285,8 +290,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
-				Optimization="1"
-				AdditionalIncludeDirectories="..\..\..\xray_re;&quot;$(MAYA_SDK)\win64\include&quot;"
+				Optimization="2"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\..\..\xray_re;C:\sources\sdk\maya2012\win64\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;MAYA_TOOLS_EXPORTS;NT_PLUGIN;REQUIRE_IOSTREAM"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -309,11 +317,13 @@
 				AdditionalOptions="/export:initializePlugin /export:uninitializePlugin"
 				AdditionalDependencies="xray_re.lib Foundation.lib OpenMaya.lib OpenMayaAnim.lib OpenMayaUI.lib"
 				OutputFile="$(OutDir)\xrayMayaTools.mll"
-				AdditionalLibraryDirectories="&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries\x64&quot;;&quot;$(MAYA_SDK)\win64\lib&quot;"
+				AdditionalLibraryDirectories="&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries\x64&quot;;C:\sources\sdk\maya2012\win64\lib"
 				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="17"
 			/>
 			<Tool

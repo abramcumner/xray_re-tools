@@ -1,6 +1,6 @@
 VERSION 0.1
 
-LIBRARY msXRayImport.dll
+LIBRARY ms3dXRayImport.dll
 EXPORTS
 	CreatePlugIn
 	DestroyPlugIn

@@ -97,8 +97,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\binaries\$(ConfigurationName)\x64"
+			IntermediateDirectory="..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)\x64"
 			ConfigurationType="1"
 			CharacterSet="0"
 			>
@@ -121,7 +121,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\xray_re"
+				AdditionalIncludeDirectories="..\..\..\xray_re"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -143,7 +143,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="xray_re.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\bld-vs2008\x64\debug"
+				AdditionalLibraryDirectories="..\..\..\..\binaries\$(ConfigurationName)\libraries\x64"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
@@ -198,7 +198,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
-				Optimization="1"
+				Optimization="2"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="..\..\..\xray_re"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				StringPooling="true"
@@ -278,7 +281,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
-				Optimization="1"
+				Optimization="2"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="..\..\..\xray_re"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				StringPooling="true"
@@ -299,7 +305,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="xray_re.lib"
-				AdditionalLibraryDirectories="&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries\x64&quot;"
+				AdditionalLibraryDirectories="..\..\..\..\binaries\$(ConfigurationName)\libraries\x64"
 				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"

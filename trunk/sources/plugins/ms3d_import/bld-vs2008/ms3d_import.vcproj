@@ -120,7 +120,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
-				Optimization="1"
+				Optimization="2"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="..\..\..\xray_re;&quot;..\..\..\3rd party\milkshape_sdk\msLib&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;MS3D_IMPORT_EXPORTS"
 				StringPooling="true"
@@ -142,7 +145,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib xray_re.lib msModelLib.lib"
-				OutputFile="$(OutDir)\msXRayImport.dll"
+				OutputFile="$(OutDir)\ms3dXRayImport.dll"
 				AdditionalLibraryDirectories="&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries&quot;;&quot;..\..\..\3rd party\milkshape_sdk\msLib\lib&quot;"
 				ModuleDefinitionFile="..\ms3d_xray_import.def"
 				GenerateDebugInformation="false"
