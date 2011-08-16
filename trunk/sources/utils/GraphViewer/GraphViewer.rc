@@ -1,0 +1,350 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Russian resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+#ifdef _WIN32
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\GraphViewer.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\GraphViewer.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_GRAPHVIEWER DIALOGEX 0, 0, 249, 200
+STYLE WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_VSCROLL | WS_HSCROLL | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "GraphViewer"
+MENU IDM_MAINMENU
+FONT 10, "MS Sans Serif"
+BEGIN
+END
+
+IDD_LOAD DIALOG DISCARDABLE  0, 0, 258, 165
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Загрузка графа"
+FONT 10, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Загрузить",IDC_LOAD_SELECT,4,148,84,14
+    LTEXT           "Выбор файла:",IDC_STATIC,4,4,156,8
+    EDITTEXT        IDC_LOAD_FILE,4,12,216,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Поиск",IDC_LOAD_BROWS,220,12,32,12
+    LISTBOX         IDC_LOAD_LEVELS,4,36,84,108,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Список уровней:",IDC_STATIC,4,28,84,8
+    LTEXT           "Заголовок файла:",IDC_STATIC,96,28,156,8
+    CTEXT           "",IDC_LOAD_HEADER_INFO,96,36,156,52,SS_SUNKEN
+    LTEXT           "Информация об уровне:",IDC_STATIC,96,92,156,8
+    CTEXT           "",IDC_LOAD_LEVEL_INFO,96,100,156,44,SS_SUNKEN
+END
+
+IDD_INFO DIALOGEX 0, 0, 150, 137
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "Информация"
+FONT 10, "MS Sans Serif"
+BEGIN
+    LTEXT           "Позиция:",IDC_STATIC,4,4,48,8
+    EDITTEXT        IDC_INFO_POSITION,4,12,48,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    LTEXT           "Выбрано:",IDC_STATIC,4,28,36,8
+    EDITTEXT        IDC_INFO_SEL_TEXT,4,52,140,80,ES_MULTILINE | 
+                    ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+    COMBOBOX        IDC_INFO_SEL,4,36,84,148,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    COMBOBOX        IDC_INFO_SELEX,88,36,56,148,CBS_DROPDOWNLIST | 
+                    WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_SETTINGS DIALOG DISCARDABLE  0, 0, 290, 105
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Настройки"
+FONT 10, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Принять",IDOK,220,4,60,16
+    PUSHBUTTON      "Отмена",IDCANCEL,220,24,60,16
+    COMBOBOX        IDC_SETTINGS_ZOOM,8,12,80,88,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Масштаб",IDC_STATIC,4,0,88,28
+    GROUPBOX        "Интервал высот",IDC_STATIC,4,32,196,68
+    CONTROL         "Slider1",IDC_SETTINGS_RANGE,"msctls_trackbar32",
+                    TBS_ENABLESELRANGE | WS_TABSTOP,28,44,148,16
+    PUSHBUTTON      "min",IDC_SETTINGS_SETMIN,8,44,20,16
+    PUSHBUTTON      "max",IDC_SETTINGS_SETMAX,176,44,20,16
+    LTEXT           "Всего:",IDC_STATIC,8,64,36,12,SS_CENTERIMAGE
+    LTEXT           "Выбрано:",IDC_STATIC,8,80,36,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_SETTINGS_MIN,44,64,36,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_SETTINGS_CURMIN,44,80,36,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_SETTINGS_MAX,92,64,36,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_SETTINGS_CURMAX,92,80,36,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    CTEXT           "-",IDC_STATIC,80,64,12,12,SS_CENTERIMAGE
+    CTEXT           "-",IDC_STATIC,80,80,12,12,SS_CENTERIMAGE
+    GROUPBOX        "Режим показа AI",IDC_STATIC,112,0,88,28
+    COMBOBOX        IDC_SETTINGS_COVER,116,11,80,88,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_WAYOBJECTS DIALOG DISCARDABLE  0, 0, 266, 229
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Загрузка путей"
+FONT 10, "MS Sans Serif"
+BEGIN
+    LTEXT           "Ltx-файл путей:",IDC_WAYOBJECT_FILETITLE,4,4,220,8
+    EDITTEXT        IDC_WAYOBJECTS_FILE,4,12,220,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "Поиск",IDC_WAYOBJECTS_BROWS,224,12,36,12
+    LISTBOX         IDC_WAYOBJECTS_LIST,4,36,108,188,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_WAYOBJECTS_INFO,116,36,144,132,ES_MULTILINE | 
+                    ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+    LISTBOX         IDC_WAYOBJECTS_SELECTED,116,180,144,44,
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Выбранные объекты:",IDC_STATIC,116,172,144,8
+    LTEXT           "Все объекты:",IDC_STATIC,4,28,108,8
+    LTEXT           "Информация:",IDC_STATIC,116,28,144,8
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041904b0"
+        BEGIN
+            VALUE "Comments", "\0"
+            VALUE "CompanyName", "\0"
+            VALUE "FileDescription", "GraphViewer\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "InternalName", "GraphViewer\0"
+            VALUE "LegalCopyright", "Copyright © 2008\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "GraphViewer.exe\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x419, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_GRAPHVIEWER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 234
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 185
+    END
+
+    IDD_LOAD, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 251
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 158
+    END
+
+    IDD_INFO, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 143
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 130
+    END
+
+    IDD_SETTINGS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 283
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 98
+    END
+
+    IDD_WAYOBJECTS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 259
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 222
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDM_MAINMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "Файл"
+    BEGIN
+        MENUITEM "Открыть...",                  IDM_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "Выход",                       IDM_CLOSE
+    END
+    POPUP "Просмотр"
+    BEGIN
+        MENUITEM "Настройки...",                IDM_SHOW_SETTINGS, GRAYED
+        MENUITEM "Информация",                  IDM_SHOW_INFO
+        MENUITEM "Пути",                        IDM_SHOW_WAYS
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_SETTINGS DLGINIT
+BEGIN
+    IDC_SETTINGS_ZOOM, 0x403, 11, 0
+0xeeea, 0xefec, 0xeae0, 0xedf2, 0xe9fb, "\000" 
+    IDC_SETTINGS_ZOOM, 0x403, 8, 0
+0xf0f1, 0xe4e5, 0xe8ed, 0x00e9, 
+    IDC_SETTINGS_ZOOM, 0x403, 8, 0
+0xf0ea, 0xeff3, 0xfbed, 0x00e9, 
+    IDC_SETTINGS_ZOOM, 0x403, 9, 0
+0xe3ee, 0xeef0, 0xedec, 0xe9fb, "\000" 
+    IDC_SETTINGS_COVER, 0x403, 8, 0
+0xe1ee, 0xf7fb, 0xfbed, 0x00e9, 
+    IDC_SETTINGS_COVER, 0x403, 15, 0
+0xeaf3, 0xfbf0, 0xe8f2, 0x20ff, 0x20f1, 0xe5eb, 0xe0e2, "\000" 
+    IDC_SETTINGS_COVER, 0x403, 16, 0
+0xeaf3, 0xfbf0, 0xe8f2, 0x20ff, 0x20f1, 0xe5e2, 0xf5f0, 0x00f3, 
+    IDC_SETTINGS_COVER, 0x403, 16, 0
+0xeaf3, 0xfbf0, 0xe8f2, 0x20ff, 0x20f1, 0xf0ef, 0xe2e0, 0x00e0, 
+    IDC_SETTINGS_COVER, 0x403, 15, 0
+0xeaf3, 0xfbf0, 0xe8f2, 0x20ff, 0x20f1, 0xe8ed, 0xf3e7, "\000" 
+    IDC_SETTINGS_COVER, 0x403, 16, 0
+0xf327, 0xebea, 0xedee, 0x2027, 0xeeed, 0xecf0, 0xebe0, 0x00e8, 
+    0
+END
+
+#endif    // Russian resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\GraphViewer.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

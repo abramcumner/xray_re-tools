@@ -1,0 +1,52 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: GraphViewer - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\igor\LOCALS~1\Temp\RSP616.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /Fp"Debug/GraphViewer.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"C:\Documents and Settings\igor\My Documents\Visual Studio 1998\Projects\lvid\GraphViewer\DlgGraphViewer.cpp"
+"C:\Documents and Settings\igor\My Documents\Visual Studio 1998\Projects\lvid\GraphViewer\DlgInfo.cpp"
+"C:\Documents and Settings\igor\My Documents\Visual Studio 1998\Projects\lvid\GraphViewer\DlgLoad.cpp"
+"C:\Documents and Settings\igor\My Documents\Visual Studio 1998\Projects\lvid\GraphViewer\DlgWayObjects.cpp"
+"C:\Documents and Settings\igor\My Documents\Visual Studio 1998\Projects\lvid\GraphViewer\GraphViewer.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\igor\LOCALS~1\Temp\RSP616.tmp" 
+Creating temporary file "C:\DOCUME~1\igor\LOCALS~1\Temp\RSP617.tmp" with contents
+[
+/nologo /subsystem:windows /incremental:yes /pdb:"Debug/GraphViewer.pdb" /debug /machine:I386 /out:"Debug/GraphViewer.exe" /pdbtype:sept 
+".\Debug\DlgGraphViewer.obj"
+".\Debug\DlgInfo.obj"
+".\Debug\DlgLoad.obj"
+".\Debug\DlgSettings.obj"
+".\Debug\DlgWayObjects.obj"
+".\Debug\Graph.obj"
+".\Debug\GraphViewer.obj"
+".\Debug\LtxReader.obj"
+".\Debug\StdAfx.obj"
+".\Debug\GraphViewer.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\igor\LOCALS~1\Temp\RSP617.tmp"
+<h3>Output Window</h3>
+Compiling...
+DlgWayObjects.cpp
+C:\Documents and Settings\igor\My Documents\Visual Studio 1998\Projects\lvid\GraphViewer\DlgWayObjects.cpp(195) : warning C4018: '==' : signed/unsigned mismatch
+Generating Code...
+Skipping... (no relevant changes detected)
+DlgGraphViewer.cpp
+DlgInfo.cpp
+DlgLoad.cpp
+GraphViewer.cpp
+Linking...
+
+
+
+<h3>Results</h3>
+GraphViewer.exe - 0 error(s), 1 warning(s)
+</pre>
+</body>
+</html>
