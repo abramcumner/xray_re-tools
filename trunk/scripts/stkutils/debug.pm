@@ -1,1 +1,0 @@
-package stkutils::debug;use strict;sub fail {	my ($function, $line, $expr, $reason) = @_;	die "\nFATAL ERROR!\nFunction: $function\nLine: $line\nExpression: $expr\nDescription: $reason\n";}sub warn {	my ($function, $line, $expr, $reason) = @_;	warn "\nWarning!\nFunction: $function\nLine: $line\nExpression: $expr\nDescription: $reason\n";}1;
