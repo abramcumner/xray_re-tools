@@ -98,7 +98,6 @@ Windows XP SP2/SP3.
 
 Примеры:
  converter -level default:l01_escape -out l01_escape -mode le
-
  converter -level 1844:military_game -out military_game -mode le
 
 Ключ -mode задаёт режим работы:
@@ -145,10 +144,13 @@ Windows XP SP2/SP3.
 
 [Распаковка и упаковка игровых архивов]
 Команда для распаковки:
- converter -unpack <архив> [-1114|-2215|-2945|-2947ru|-2947|-xdb]
+ converter -unpack <архив> [-11xx|-2215|-2945|-2947ru|-2947|-xdb]
 
 Команда для упаковки:
- converter -pack <папка> [-2947ru|-2947ww|-xdb]
+ converter -pack <папка> [-2947ru|-2947ww|-xdb|-xdb_ud <файл>]
+
+Заметка:
+ - Используйте ключ -xdb для распаковки архивов Чистого Неба и Зова Припяти.
 
 
 [Множественное преобразование текстур из .dds в .tga]

@@ -91,7 +91,6 @@ Command line:
 
 Examples:
  converter -level default:l01_escape -out l01_escape -mode le
-
  converter -level 1844:military_game -out military_game -mode le
 
 -mode option specifies operation mode:
@@ -134,13 +133,13 @@ Notes/problems:
 
 [Game archive packing/unpacking]
 Command line to unpack:
- converter -unpack <archive> [-1114|-2215|-2945|-2947ru|-2947|-xdb]
+ converter -unpack <archive> [-11xx|-2215|-2945|-2947ru|-2947|-xdb]
 
 Command line to pack:
- converter -pack <folder> [-2947ru|-2947ww|-xdb]
+ converter -pack <folder> [-2947ru|-2947ww|-xdb|-xdb_ud <file>]
 
 Notes:
- - Use -xdb to unpack Clear Sky archives.
+ - Use -xdb to unpack Clear Sky and Call of Pripyat archives.
 
 
 [.dds to .tga multi-conversion]

@@ -1,0 +1,33 @@
+//AEXRayMtlTemplate.mel
+
+global proc AEXRayMtlTemplate( string $nodeName )
+{
+	AEswatchDisplay $nodeName;
+	editorTemplate -beginScrollLayout;
+	
+	editorTemplate -beginLayout "Common Material Attributes" -cl false;
+		editorTemplate -addControl "color";
+		editorTemplate -addControl "transparency";
+		editorTemplate -addControl "incandescence";
+        //editorTemplate -addControl "diffuseReflectivity";
+        //ditorTemplate -addControl "translucenceCoeff";
+	editorTemplate -endLayout;
+	
+	// include/call base class/node attributes
+	//AEdependNodeTemplate $nodeName;
+	
+	editorTemplate -beginLayout "Hardware Texturing" -cl false;
+	AEhardwareTextureTemplate $nodeName
+		("color transparency incandescence");
+	editorTemplate -endLayout;
+	
+	editorTemplate -beginLayout "XRay Parameters" -cl false;
+		editorTemplate -addControl "xrayDoubleSide";
+		editorTemplate -addControl "xrayEngineShader";
+		editorTemplate -addControl "xrayCompilerShader";
+		editorTemplate -addControl "xrayGameMaterial";
+	editorTemplate -endLayout;
+	
+	editorTemplate -addExtraControls;
+	editorTemplate -endScrollLayout;
+}
