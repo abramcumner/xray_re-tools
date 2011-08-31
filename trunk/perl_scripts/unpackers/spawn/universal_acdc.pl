@@ -1,6 +1,6 @@
 #!perl -w -I \temp\1\bin
 #
-# last edited: 26 Jule 2011
+# last edited: 30 Aug 2011
 #######################################################################
 package cse_abstract;
 use strict;
@@ -6804,7 +6804,7 @@ use File::Path;
 use stkutils::scan;
 use stkutils::graph;
 use stkutils::chunked_file;
-use diagnostics;
+#use diagnostics;
 
 sub usage {
 	return <<END
@@ -6833,7 +6833,6 @@ my $flags;
 my %flags_hash;
 my $actor_pos;
 my $level_spawn;
-my $use_2942;
 my $use_hack;
 my $convert;
 my ($game1, $game2);

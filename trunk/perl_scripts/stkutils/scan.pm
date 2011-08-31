@@ -1,6 +1,6 @@
 #!perl -w -I \temp\1\bin
 #
-# v.0.2. Last Modified: 25 Jule 2011
+# v.0.3. Last Modified: 30 Aug 2011
 #######################################################################
 package stkutils::scan;
 use strict;
@@ -991,6 +991,10 @@ use constant section_to_class => {
 	flesh_up_ac_desert_eagle	=> 'cse_alife_item_pda',
 	flesh_up_bd_desert_eagle	=> 'cse_alife_item_pda',
 	flesh_up_ac_spas12	=> 'cse_alife_item_pda',
+	
+	#nlc6 hack
+	amk_zone_sakbuzz_strong => 'se_zone_anom',
+	
 };
 sub launch {
 	print "scanning your gamedata folder...";
@@ -1021,7 +1025,9 @@ sub launch {
 				}
 			}		
 		}
+		#сформируем хэш, у которого ключи - движковые классы, значения - оффлайн-классы
 		my %rev_hash = ();
+		#помещаем значения в хэш. Игнорируем уже присутствующие классы и секции без классов.
 		foreach my $section (keys %{$obj->{sections_hash}}) {
 			my $class = $obj->{sections_hash}{$section}{class};
 			next if !(defined $class);
@@ -1030,13 +1036,20 @@ sub launch {
 				$rev_hash{$class} = section_to_class->{$section};
 			}
 		}
+		#помещаем значения в хэш на вывод. Игнорируем секции без классов.
+		my %delayed = ();
 		foreach my $section (keys %{$obj->{sections_hash}}) {
 			my $class = $obj->{sections_hash}{$section}{class};
 			next if !(defined $class);
-			if (defined section_to_class->{$section}) {
+			if (defined section_to_class->{$section}) {			#если такая секция есть в таблице, берем оттуда.
 				my $sclass = section_to_class->{$section};
 				$table_hash{$section} = $sclass;
-			} else {
+			}
+		}
+		foreach my $section (keys %{$obj->{sections_hash}}) {
+			my $class = $obj->{sections_hash}{$section}{class};
+			next if !(defined $class);
+			if (!defined section_to_class->{$section}) {		#если такой секции нет, берем из хэша по ключу с таким же классом.
 				next if !(defined $rev_hash{$class});
 				$table_hash{$section} = $rev_hash{$class};
 			}
@@ -1056,20 +1069,15 @@ sub get_class {
 }
 sub scan_system {
 	my ($stalker_path, $path, $obj) = @_;
-	my $system = read_ini($stalker_path.$path);
-	push @{$obj->{sections_list}}, @{$system->{sections_list}};
-	foreach my $section (%{$system->{sections_hash}}) {
-		$obj->{sections_hash}{$section}{class} = $system->{sections_hash}{$section}{class} if defined $system->{sections_hash}{$section}{class};
-		$obj->{sections_hash}{$section}{parent} = $system->{sections_hash}{$section}{parent} if defined $system->{sections_hash}{$section}{parent};
+	my @files = get_filelist($stalker_path);
+	foreach my $file (@files) {
+		my $system = read_ini($file);
+		push @{$obj->{sections_list}}, @{$system->{sections_list}};
+		foreach my $section (%{$system->{sections_hash}}) {
+			$obj->{sections_hash}{$section}{class} = $system->{sections_hash}{$section}{class} if defined $system->{sections_hash}{$section}{class};
+			$obj->{sections_hash}{$section}{parent} = $system->{sections_hash}{$section}{parent} if defined $system->{sections_hash}{$section}{parent};
+		}
 	}
-	my @folder = split /\\/, $_[1];
-	splice @folder, $#folder;
-	foreach my $path (@{$system->{sections_paths}}) {
-		temp_funct($stalker_path, join('\\', @folder).'\\'.$path, $obj) if -e ($stalker_path.join('\\', @folder).'\\'.$path);
-	}
-}
-sub temp_funct {
-	scan_system(@_);
 }
 sub read_ini {
 	my $fh = IO::File->new($_[0], 'r') or die "cannot open $_[0]\n";
@@ -1111,11 +1119,7 @@ sub read_ini {
 		}
 		if (/^([^=]*?)\s*=\s*(.*?)\s*$/) {
 			my ($name, $value) = ($1, $2);
-			stkutils::debug::fail(
-				__PACKAGE__.'::read_ini', 
-				__LINE__, 
-				'defined $section', 
-				'undefined section found while reading '.$_[0]) unless defined $section;
+			next unless defined $section;
 			if ($value =~ /^\W+(\w+)\W+/) {
 				$value = $1;
 			}
@@ -1131,6 +1135,19 @@ sub read_ini {
 	}
 	$fh->close();
 	return $self;
+}
+sub get_filelist {
+	my @files = <$_[0]\\*>;
+	my @out;
+	foreach (@files) {
+		if (-d $_) {
+			my @temp = get_filelist("$_");
+			push @out, @temp;
+		} elsif (-f $_ and (substr($_, -3) eq 'ltx')) {
+			push @out, $_;
+		}
+	}
+	return @out;
 }
 1;
 #######################################################################
