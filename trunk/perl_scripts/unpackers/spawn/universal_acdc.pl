@@ -1,6 +1,6 @@
 #!perl -w -I \temp\1\bin
 #
-# last edited: 30 Aug 2011
+# last edited: 17 Sep 2011
 #######################################################################
 package cse_abstract;
 use strict;
@@ -2214,8 +2214,13 @@ sub state_read {
 	if ($_[0]->{version} > 94) {
 		$_[1]->unpack_properties($_[0], (properties_info)[0]);
 		if ($_[0]->{version} >= 128) {
-			$_[1]->length() == 2 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[1]->length() == 2', 'unexpected size');
+			if (not ::sdk()) {
+				if ($_[1]->length() != 2) {
+					stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[1]->length() == 2', 'unexpected size ['.$_[1]->length().'] in '.$_[0]->{name});
+				}
+			}
 			$_[1]->unpack_properties($_[0], (properties_info)[1..2]);
+			$_[1]->unpack_properties($_[0], (properties_info)[3..4]) if ::sdk();
 		} elsif ($_[0]->{version} >= 122) {
 			$_[1]->unpack_properties($_[0], (properties_info)[2..4]);	
 		} elsif ($_[0]->{version} == 118) {
@@ -2704,8 +2709,13 @@ sub state_read {
 			if ((($_[0]->{version} >= 116) && ($_[0]->{script_version} > 3)) || ($_[0]->{script_version} == 2)) {
 				$_[1]->unpack_properties($_[0], (properties_info)[0]);
 				if ($_[0]->{version} >= 128) {
-					$_[1]->length() == 1 or stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[1]->length() == 1', 'unexpected size');
+					if (not ::sdk()) {
+						if ($_[1]->length() != 1) {
+							stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, '$_[1]->length() == 1', 'unexpected size ['.$_[1]->length().'] in '.$_[0]->{name});
+						}
+					}
 					$_[1]->unpack_properties($_[0], (properties_info)[1]);
+					$_[1]->unpack_properties($_[0], (properties_info)[2..3]) if ::sdk();
 				} elsif ($_[0]->{version} >= 122) {
 					$_[1]->unpack_properties($_[0], (properties_info)[2..3]);	
 				} elsif (($_[0]->{version} == 118) && ($_[0]->{script_version} >= 5)) {
@@ -5365,7 +5375,7 @@ sub state_import {
 
 	cse_abstract::state_import($self->{cse_object}, $if, $section);
 	my $class_name = stkutils::scan->get_class($self->{cse_object}->{section_name});
-	if (!defined $class_name && (::with_scan())) {
+	if (!defined $class_name && $ini) {
 		$class_name = $ini->value('sections', $self->{cse_object}->{section_name});
 	}
 	defined $class_name or stkutils::debug::fail(__PACKAGE__.'::state_import', __LINE__, 'defined $class_name', 'unknown class for section '.$self->{cse_object}->{section_name});
@@ -6463,9 +6473,8 @@ sub write_graph {
 }
 sub import {
 	my $self = shift;
-	my ($fn) = @_;
-	my $if = stkutils::ini_file->new($fn, 'r') or stkutils::debug::fail(__PACKAGE__.'::import', __LINE__, '', 'cannot open '.$fn);
-	my $ini = stkutils::ini_file->new('sections.ini', 'r') if ::with_scan();
+	my ($ini) = @_;
+	my $if = stkutils::ini_file->new('all.ltx', 'r') or stkutils::debug::fail(__PACKAGE__.'::import', __LINE__, '', 'cannot open all.ltx');
 	if (not(::level())) {
 		$self->import_header($if);
 		$self->import_alife($if, $ini);
@@ -6473,10 +6482,10 @@ sub import {
 		$self->import_way($if);
 		$self->import_graph($if);
 	} else {
-		$self->import_level($fn, $ini);
+		$self->import_level('all.ltx', $ini);
 	}
 	$if->close();
-	$ini->close() if ::with_scan();
+	
 }
 sub import_header {
 	my $self = shift;
@@ -6804,6 +6813,7 @@ use File::Path;
 use stkutils::scan;
 use stkutils::graph;
 use stkutils::chunked_file;
+use Cwd;
 #use diagnostics;
 
 sub usage {
@@ -6827,7 +6837,7 @@ END
 }
 
 my $spawn_file;
-my $src_file;
+my $src_dir;
 my $out;
 my $flags;
 my %flags_hash;
@@ -6839,10 +6849,11 @@ my ($game1, $game2);
 my $parse;
 my $way;
 my $sc;
+my $sdk;
 
 GetOptions(
 	'd=s' => \$spawn_file,
-	'c=s' => \$src_file,
+	'c:s' => \$src_dir,
 	'convert=s' => \$convert,
 	'game1=s' => \$game1,
 	'game2=s' => \$game2,
@@ -6853,7 +6864,8 @@ GetOptions(
 	'hack' => \$use_hack,
 	'parse=s' => \$parse,		
 	'way' => \$way,	
-	'scan=s' => \$sc		
+	'scan=s' => \$sc,		
+	'sdk' => \$sdk	
 ) or die usage();
 
 if (defined $flags) {
@@ -6868,7 +6880,7 @@ if ((defined $sc) && !(::is_alredy_scanned())) {
 }
 
 if (defined $convert) {
-	die convert_usage() if (defined $src_file or defined $actor_pos or defined $spawn_file or (not (defined $game1 or defined $game2)));
+	die convert_usage() if (defined $src_dir or defined $actor_pos or defined $spawn_file or (not (defined $game1 or defined $game2)));
 	my $params = {};
 	$params->{old_game} = {};
 	$params->{new_game} = {};
@@ -6905,7 +6917,7 @@ if (defined $convert) {
 	$ini->close();
 	print "done!\n";
 } elsif (defined $spawn_file) {
-	stkutils::debug::fail(__PACKAGE__, __LINE__, '!defined $src_file && !defined $actor_pos', 'bad params') if (defined $src_file or defined $actor_pos);
+	stkutils::debug::fail(__PACKAGE__, __LINE__, '!defined $src_file && !defined $actor_pos', 'bad params') if (defined $src_dir or defined $actor_pos);
 	print "checking version of $spawn_file...\n";	
 	my $fh = IO::File->new($spawn_file, 'r') or stkutils::debug::fail(__PACKAGE__, __LINE__, '', 'cannot open '.$spawn_file);
 	binmode $fh;
@@ -6989,20 +7001,27 @@ if (defined $convert) {
 	};
 	print "exporting alife objects...\n";	
 	$spawn->export('all.ltx', $graph);
-} elsif (defined $src_file) {
+} elsif (defined $src_dir) {
 	stkutils::debug::fail(__PACKAGE__, __LINE__, '!defined $spawn_file', 'bad params') if defined $spawn_file;
+	my $wd = getcwd();
+	my $ini = stkutils::ini_file->new('sections.ini', 'r') if ::with_scan();
+	if ($src_dir ne '') {
+		chdir $src_dir or stkutils::debug::fail(__PACKAGE__, __LINE__, '', 'cannot change dir to '.$src_dir);
+	}
 	my $spawn = all_spawn->new();
 	$out = 'all.spawn.new' unless defined $out;
 	print "importing alife objects...\n";
-	$spawn->import($src_file);
+	$spawn->import($ini);
 	if (defined $actor_pos) {
 		$spawn->move_actor($actor_pos);
 	}
 	print "writing $out...\n";
+	chdir $wd or die;
+	$ini->close() if ::with_scan();
 	$spawn->write($out);
 	print "done!\n";
 } elsif (defined $parse) {
-	die parse_usage() if (defined $src_file or defined $actor_pos or defined $spawn_file or (not (defined $game1 or defined $game2)));
+	die parse_usage() if (defined $src_dir or defined $actor_pos or defined $spawn_file or (not (defined $game1 or defined $game2)));
 	print "parsing...\n";
 	my $spawn = parsing->new();
 	$spawn->import($parse);
@@ -7050,6 +7069,7 @@ sub header_size {
 		return 0x1C;
 	}
 }
+sub sdk {return defined $sdk}
 
 my %markers;
 sub set_save_marker {
