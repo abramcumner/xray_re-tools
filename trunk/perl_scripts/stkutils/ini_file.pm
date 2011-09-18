@@ -13,6 +13,7 @@ sub new {
 	$self->{fh} = $fh;
 	$self->{sections_list} = [];
 	$self->{sections_hash} = ();
+	$self->{is_with_idx} = 0;
 	bless($self, $class);
 
 	$mode eq 'w' and return $self;
@@ -21,20 +22,26 @@ sub new {
 	my $skip_section = 0;
 	while (<$fh>) {
 		$_ =~ qr/^\s*;/ and next;
-		if (/^\[(.*)\]\s*:*\s*(\w.*)?/) {
-			if (defined $2 && !::is_flag_defined($2)) {
-				$skip_section = 1;
-				next;
+		if (/^\[(.*)\]\s*:*\s*(\w+)??$/) {
+			if (defined $2) {
+				if (::is_flag_defined($2)) {
+					$skip_section = 1;
+					next;
+				}
 			}
 			$section = $1;
 			stkutils::debug::fail(
 				__PACKAGE__.'::new', 
 				__LINE__, 
 				'defined $self->{sections_hash}->{$section}', 
-				'duplicate section found while reading '.$fn) if defined $self->{sections_hash}->{$section};
+				'duplicate section ['.$1.'] found while reading '.$fn) if defined $self->{sections_hash}->{$section};
 			push @{$self->{sections_list}}, $section;
 			my %tmp = ();
 			$self->{sections_hash}{$section} = \%tmp;
+			if (defined $2 && ($2 eq 'index')) { 
+				$self->{sections_hash}{$section}{'index'} = 1;
+				$self->{is_with_idx} = 1;
+			}		
 			$skip_section = 0;
 			next;
 		}
@@ -48,7 +55,11 @@ sub new {
 					last if $_ eq $terminator;
 					$value .= "\n".$_;
 				}
-				die unless defined $_;
+				stkutils::debug::fail(
+					__PACKAGE__.'::new', 
+					__LINE__, 
+					'defined $_', 
+					'you forgot to close custom_data with '.$terminator.' in section ['.$section.'] while reading '.$fn) unless defined $_;
 				substr ($value, 0, 1) = '';
 			}
 			$skip_section == 1 and next;
@@ -237,12 +248,23 @@ sub import_properties {
 		my $value = $self->value($section, $p->{name});
 		if ($p->{type} eq 'sz') {
 			$container->{$p->{name}} = (defined $value) ? $value : $p->{default};
+			stkutils::debug::fail(
+				__PACKAGE__.'::import_properties', 
+				__LINE__, 
+				'defined $p->{default} or $value',
+				'in section ['.$section.'] parameter '.$p->{name}.' has no value!!!') unless defined $container->{$p->{name}};
 		} elsif (defined format_for_number->{$p->{type}}) {
 			if (defined $value) {
 				$value = hex($value) if ($value =~ /^\s*0x/);
 				$container->{$p->{name}} = $value;
-			} else {
+			} elsif (defined $p->{default}) {
 				$container->{$p->{name}} = $p->{default};
+			} else {
+				stkutils::debug::fail(
+				__PACKAGE__.'::import_properties', 
+				__LINE__, 
+				'defined $p->{default} or $value',
+				'in section ['.$section.'] parameter '.$p->{name}.' has no value!!!');
 			}
 		} elsif ($p->{type} eq 'shape') {
 			die unless defined $value;
@@ -271,8 +293,17 @@ sub import_properties {
 #				push @{$container->{$p->{name}}}, $sect;
 #			}
 		} else {
-			@{$container->{$p->{name}}} = defined $value ?
-					split(/,/, $value) : @{$p->{default}};
+			if (defined $value) {
+				@{$container->{$p->{name}}} = split(/,/, $value);
+			} elsif (defined $p->{default}) {
+				@{$container->{$p->{name}}} = @{$p->{default}};
+			} else {
+				stkutils::debug::fail(
+				__PACKAGE__.'::import_properties', 
+				__LINE__, 
+				'defined $p->{default} or $value',
+				'in section ['.$section.'] parameter '.$p->{name}.' has no value!!!');
+			}
 		}
 	}
 }

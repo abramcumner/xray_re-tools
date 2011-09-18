@@ -1,6 +1,6 @@
 #!perl -w -I \temp\1\bin
 #
-# last edited: 17 Sep 2011
+# last edited: 18 Sep 2011
 #######################################################################
 package cse_abstract;
 use strict;
@@ -5393,7 +5393,12 @@ sub state_export {
 	my ($if, $id) = @_;
 
 	my $fh = $if->{fh};
-	print $fh "[$id]\n";
+	if ($self->{cse_object}->{custom_data} =~ /^(.*)\n\[(fix_index)\]/s) {
+		$self->{cse_object}->{custom_data} = $1;
+		print $fh "[$id]:index\n";
+	} else {
+		print $fh "[$id]\n";
+	}
 	cse_abstract::state_export($self->{cse_object}, $if);
 	$self->{cse_object}->state_export($if);
 	if (defined $self->{update_raw_data} && (not defined ::is_convert())) {
@@ -6250,6 +6255,9 @@ sub write_alife {
 		$cf->w_chunk(0, pack('V', $#{$self->{alife_objects}} + 1));
 		$cf->w_chunk_open(1);
 		my $id = 0;
+		my $file = ::idx();
+		$file .= '.ltx' if (defined $file and (substr($file, -3) ne 'ltx')); 
+		my $log = IO::File->new($file, 'w') if defined $file;
 		foreach my $object (@{$self->{alife_objects}}) {
 			if ($object->{cse_object}->{section_name} eq "inventory_box") {
 				$object->{cse_object}->{object_flags} = 0xffffff3b;
@@ -6259,10 +6267,16 @@ sub write_alife {
 				print "skipping $object->{cse_object}->{name}\n";
 			} else {
 				$cf->w_chunk_open($id);
+				if (defined ::idx()) {
+					print $log "\n[$object->{cse_object}->{name}]\n";
+					print $log "id = $id\n";
+					print $log "story_id = $object->{cse_object}->{story_id}\n";
+				}
 				$object->spawn_write($cf, $id++);
 				$cf->w_chunk_close();
 			}
 		}
+		$log->close() if defined ::idx();
 		$cf->w_chunk_close();
 		$cf->w_chunk(2, '');
 		$cf->w_chunk_close();
@@ -6511,12 +6525,20 @@ sub import_alife {
 			$lif = stkutils::ini_file->new($fn, 'r') or stkutils::debug::fail(__PACKAGE__.'::import_alife', __LINE__, '', 'cannot open '.$fn);
 		}
 		print "importing alife objects from file $fn...\n";
+		my $id = 0;
+		my $idx_log = IO::File->new('new_idx.log', 'a+') if ($lif->{is_with_idx} == 1 && !::idx());
 		foreach my $section (@{$lif->{sections_list}}) {
 			my $object = alife_object->new();
 			$object->{cse_object}->{is_first_patch} = 1 if ($self->{is_first_patch} && $self->{is_first_patch} == 1);
 			$object->state_import($lif, $section, $ini);
+			if (defined $lif->{sections_hash}{$section}{'index'} && $lif->{sections_hash}{$section}{'index'} == 1) {
+				$object->{cse_object}->{custom_data} .= "\n[fix_index]\n$object->{cse_object}->{name} = $id";
+				print $idx_log "\n[$object->{cse_object}->{name}]\nnew_idx = $id\n" if ($lif->{is_with_idx} == 1 && !::idx());
+			}
 			push @{$self->{alife_objects}}, $object;
+			$id++;
 		}
+		$idx_log->close() if ($lif->{is_with_idx} == 1 && !::idx());
 		$lif->close();
 	}
 }
@@ -6814,7 +6836,7 @@ use stkutils::scan;
 use stkutils::graph;
 use stkutils::chunked_file;
 use Cwd;
-#use diagnostics;
+use diagnostics;
 
 sub usage {
 	return <<END
@@ -6850,6 +6872,8 @@ my $parse;
 my $way;
 my $sc;
 my $sdk;
+my $graph_dir;
+my $idx_file;
 
 GetOptions(
 	'd=s' => \$spawn_file,
@@ -6865,7 +6889,9 @@ GetOptions(
 	'parse=s' => \$parse,		
 	'way' => \$way,	
 	'scan=s' => \$sc,		
-	'sdk' => \$sdk	
+	'sdk' => \$sdk,
+	'g:s' => \$graph_dir,
+	'idx=s' => \$idx_file	
 ) or die usage();
 
 if (defined $flags) {
@@ -6993,7 +7019,7 @@ if (defined $convert) {
 	my $graph = stkutils::graph->new();
 	$graph->{build_version} = build_version::graph_build($table->{version}, $table->{script_version});
 	if (not ::level()) {
-		$graph->read($table->{version}, $spawn);
+		$graph->read($table->{version}, $spawn, $graph_dir);
 	}
 	defined $out && do {
 		File::Path::mkpath($out, 0);
@@ -7070,6 +7096,7 @@ sub header_size {
 	}
 }
 sub sdk {return defined $sdk}
+sub idx {return $idx_file}
 
 my %markers;
 sub set_save_marker {

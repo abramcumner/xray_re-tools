@@ -200,7 +200,7 @@ sub new {
 }
 sub read {
 	my $self = shift;
-	my ($version, $spawn) = @_;
+	my ($version, $spawn, $graph_dir) = @_;
 	my $data;
 	my $packet;
 
@@ -209,7 +209,12 @@ sub read {
 		$data = substr($spawn->{section4_raw_data}, 0, 300000);
 		$packet = stkutils::data_packet->new($data);
 	} else {
-		my $fh = IO::File->new('game.graph', 'r') or stkutils::debug::fail(__PACKAGE__.'::read',__LINE__, '', 'cannot open game.graph');
+		my $fh;
+		if ($graph_dir && ($graph_dir ne '')) {
+			$fh = IO::File->new($graph_dir.'\game.graph', 'r') or stkutils::debug::fail(__PACKAGE__.'::read',__LINE__, '', 'cannot open game.graph');
+		} else {
+			$fh = IO::File->new('game.graph', 'r') or stkutils::debug::fail(__PACKAGE__.'::read',__LINE__, '', 'cannot open game.graph');
+		}
 		binmode $fh;
 		$fh->read($data, 300000);
 		$packet = stkutils::data_packet->new($data);
