@@ -1,6 +1,6 @@
 #!perl -w -I \temp\1\bin
 #
-# last edited: 18 Sep 2011
+# last edited: 19 Sep 2011
 #######################################################################
 package cse_abstract;
 use strict;
@@ -5393,7 +5393,7 @@ sub state_export {
 	my ($if, $id) = @_;
 
 	my $fh = $if->{fh};
-	if ($self->{cse_object}->{custom_data} =~ /^(.*)\n\[(fix_index)\]/s) {
+	if (!::level() && ($self->{cse_object}->{custom_data} =~ /^(.*)\n\[(fix_index)\]/s)) {
 		$self->{cse_object}->{custom_data} = $1;
 		print $fh "[$id]:index\n";
 	} else {
@@ -5405,7 +5405,27 @@ sub state_export {
 		print $fh "; don't touch this\n";
 		print $fh 'update_raw_data = ', unpack('H*', $self->{update_raw_data}), "\n";
 	}
-	print $fh "\n";
+	print $fh "\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n\n";
+}
+sub state_split_spawns {
+	my $self = shift;
+	my ($cf, $object_id, $ini) = @_;
+	my $packet2 = stkutils::data_packet->new('');
+	my $class_name = stkutils::scan->get_class($self->{cse_object}->{section_name});
+	if (!defined $class_name && (::with_scan())) {
+		$class_name = $ini->value('sections', $self->{cse_object}->{section_name});
+	}
+	$self->{cse_object}->state_write($packet2);
+	my $packet1 = stkutils::data_packet->new('');
+	if ($self->{cse_object}->{section_name} eq 'graph_point') {
+		cse_abstract::state_write($self->{cse_object}, $packet1, 0, $packet2->length() + 2);
+	} else {
+		cse_abstract::state_write($self->{cse_object}, $packet1, 0xFFFF, $packet2->length() + 2);
+	}
+	$cf->w_chunk_open($object_id);
+	$cf->w_chunk_data($packet1->data());
+	$cf->w_chunk_data($packet2->data());
+	$cf->w_chunk_close();
 }
 sub convert_spawn {
 	my $self = shift;
@@ -5709,6 +5729,46 @@ sub state_export {
 		print $fh "\n";
 	}
 	print $fh "\n";
+}
+sub state_split_ways {
+	my $self = shift;
+	my ($cf, $object_id) = @_;
+	$cf->w_chunk_open($object_id);
+	$cf->w_chunk_open(1);
+	$cf->w_chunk_data(pack('v', 0x13));
+	$cf->w_chunk_close();
+	
+	$cf->w_chunk_open(5);
+	$cf->w_chunk_data(pack('Z*', $self->{name}));
+	$cf->w_chunk_close();
+
+	$cf->w_chunk_open(2);
+	$cf->w_chunk_data(pack('v', $#{$self->{points}} + 1));
+	my $links_data = '';
+	my $point_id = 0;
+	foreach my $p (@{$self->{points}}) {
+		my $data = pack('f3VZ*',
+		@{$p->{position}},
+		$p->{flags},
+		$p->{name});
+		$cf->w_chunk_data($data);
+	}
+	$cf->w_chunk_close();
+	$cf->w_chunk_open(3);
+	my $id = 0;
+	foreach my $p (@{$self->{points}}) {
+		if ($#{$p->{links}} != -1) {
+			foreach my $l (@{$p->{links}}) {
+				$links_data .= pack('vvf', $point_id, $l->{to}, $l->{weight});
+				$id++;
+			}
+		}
+		$point_id++;
+	}
+	$cf->w_chunk_data(pack('v', $id));
+	$cf->w_chunk_data($links_data);
+	$cf->w_chunk_close();
+	$cf->w_chunk_close();
 }
 #######################################################################
 package converting ;
@@ -6080,6 +6140,7 @@ use IO::File;
 use stkutils::ini_file;
 use stkutils::chunked_file;
 use stkutils::debug;
+use Cwd;
 sub new {
 	my $class = shift;
 	my $self = {};
@@ -6133,6 +6194,19 @@ sub read {
 	}
 	$cf->close();
 	$ini->close() if ::with_scan();
+}
+sub read_graph_points {
+	my $self = shift;
+	my ($graph, $ini) = @_;
+	print "reading graph_points...\n";
+	for my $level (@{$graph->{levels}}) {
+		my $gvid = $graph->gvid_by_name($level->{level_name});
+		my $sfn = '..\levels\\'.$level->{level_name}.'\level.spawn';
+		print "$sfn\n";
+		my $spawn_file = stkutils::chunked_file->new($sfn, 'r');
+		$self->read_alife_level($spawn_file, $ini, $gvid, $graph) if $spawn_file;
+		$spawn_file->close() if $spawn_file;
+	}	
 }
 sub write {
 	my $self = shift;
@@ -6233,17 +6307,23 @@ sub read_alife {
 }
 sub read_alife_level {
 	my $self = shift;
-	my ($cf, $ini) = @_;
+	my ($cf, $ini, $gvid, $graph) = @_;
 	my $i = 0;
 	while (1) {
 		my $object = alife_object->new();
-		my	($index, $size) = $cf->r_chunk_open();
+		my ($index, $size) = $cf->r_chunk_open();
 		defined $index or last;
 		die unless $i == $index;
 		$object->spawn_read_level($cf, $size, $ini);
 		$cf->r_chunk_close();
 		$i++;
-		push @{$self->{alife_objects}}, $object;
+		if (::split_spawns()) {
+			$object->{cse_object}->{game_vertex_id} = $gvid;
+			my $level = $graph->level_name($gvid);
+			push (@{$self->{$level}}, $object) if ($object->{cse_object}->{section_name} eq 'graph_point');
+		} else {
+			push @{$self->{alife_objects}}, $object;
+		}
 	}
 }
 sub write_alife {
@@ -6256,8 +6336,10 @@ sub write_alife {
 		$cf->w_chunk_open(1);
 		my $id = 0;
 		my $file = ::idx();
+		$file = 'spawn_ids' if $file eq '';
 		$file .= '.ltx' if (defined $file and (substr($file, -3) ne 'ltx')); 
 		my $log = IO::File->new($file, 'w') if defined $file;
+		my $guids_file = stkutils::ini_file->new('guids.ltx', 'r') if defined ::idx();
 		foreach my $object (@{$self->{alife_objects}}) {
 			if ($object->{cse_object}->{section_name} eq "inventory_box") {
 				$object->{cse_object}->{object_flags} = 0xffffff3b;
@@ -6268,7 +6350,8 @@ sub write_alife {
 			} else {
 				$cf->w_chunk_open($id);
 				if (defined ::idx()) {
-					print $log "\n[$object->{cse_object}->{name}]\n";
+					my $level_id = get_level_id($guids_file, $object->{cse_object}->{game_vertex_id});
+					print $log "\n[".$level_id."_".$object->{cse_object}->{name}."]\n";
 					print $log "id = $id\n";
 					print $log "story_id = $object->{cse_object}->{story_id}\n";
 				}
@@ -6277,6 +6360,7 @@ sub write_alife {
 			}
 		}
 		$log->close() if defined ::idx();
+		$guids_file->close() if defined ::idx();
 		$cf->w_chunk_close();
 		$cf->w_chunk(2, '');
 		$cf->w_chunk_close();
@@ -6488,18 +6572,17 @@ sub write_graph {
 sub import {
 	my $self = shift;
 	my ($ini) = @_;
-	my $if = stkutils::ini_file->new('all.ltx', 'r') or stkutils::debug::fail(__PACKAGE__.'::import', __LINE__, '', 'cannot open all.ltx');
-	if (not(::level())) {
+	if (!::level()) {
+		 my $if = stkutils::ini_file->new('all.ltx', 'r') or stkutils::debug::fail(__PACKAGE__.'::import', __LINE__, '', 'cannot open all.ltx');
 		$self->import_header($if);
 		$self->import_alife($if, $ini);
 		$self->import_section2($if);
 		$self->import_way($if);
 		$self->import_graph($if);
+		$if->close();
 	} else {
-		$self->import_level('all.ltx', $ini);
+		$self->import_level('level_spawn.ltx', $ini);
 	}
-	$if->close();
-	
 }
 sub import_header {
 	my $self = shift;
@@ -6515,7 +6598,7 @@ sub import_header {
 sub import_alife {
 	my $self = shift;
 	my ($if, $ini) = @_;
-	
+
 	foreach my $fn (split /,/, ($if->value('alife', 'source_files') or stkutils::debug::fail(__PACKAGE__.'::import_alife', __LINE__, '$if->value(alife, source_files)', 'cannot find any locations in all.ltx'))) {
 		$fn =~ s/^\s*|\s*$//g;
 		my $lif;
@@ -6526,13 +6609,13 @@ sub import_alife {
 		}
 		print "importing alife objects from file $fn...\n";
 		my $id = 0;
-		my $idx_log = IO::File->new('new_idx.log', 'a+') if ($lif->{is_with_idx} == 1 && !::idx());
+		my $idx_log = IO::File->new('spawn_ids.log', 'a+') if ($lif->{is_with_idx} == 1 && !::idx());
 		foreach my $section (@{$lif->{sections_list}}) {
 			my $object = alife_object->new();
 			$object->{cse_object}->{is_first_patch} = 1 if ($self->{is_first_patch} && $self->{is_first_patch} == 1);
 			$object->state_import($lif, $section, $ini);
 			if (defined $lif->{sections_hash}{$section}{'index'} && $lif->{sections_hash}{$section}{'index'} == 1) {
-				$object->{cse_object}->{custom_data} .= "\n[fix_index]\n$object->{cse_object}->{name} = $id";
+				$object->{cse_object}->{custom_data} .= "\n[spawn_id]\n$object->{cse_object}->{name} = $id";
 				print $idx_log "\n[$object->{cse_object}->{name}]\nnew_idx = $id\n" if ($lif->{is_with_idx} == 1 && !::idx());
 			}
 			push @{$self->{alife_objects}}, $object;
@@ -6662,7 +6745,6 @@ sub export_level {
 	my $id = 0;
 	my $lif = stkutils::ini_file->new("level_spawn.ltx", 'w') or stkutils::debug::fail(__PACKAGE__.'::export_level', __LINE__, '', 'cannot open level_spawn.ltx');
 	foreach my $object (@{$self->{alife_objects}}) {
-		my $cse_object = $object->{cse_object};
 		$object->state_export($lif, $id++);
 	}
 	$lif->close();
@@ -6696,7 +6778,57 @@ sub export_graph {
 	}
 	print "done!\n";
 }
-# FIXME: it is better to scan level.game files
+sub split_spawn {
+	my $ini = stkutils::ini_file->new('sections.ini', 'r');
+	$_[0]->read_graph_points($_[1], $ini);
+	$_[0]->split_spawns($_[1], $ini);
+	$ini->close();
+	$_[0]->split_ways($_[1]);
+}
+sub split_spawns {
+	print "splitting spawns...\n";
+	my $self = shift;
+	my ($graph, $ini) = @_;
+	my $id = 0;
+	my %if_by_level;
+	my @levels;
+	my $bdir = getcwd();
+	my $flag = 0;
+	my %id_of_levels;
+	foreach my $object (@{$self->{alife_objects}}) {
+		my $cse_object = $object->{cse_object};
+		my $level = $graph->level_name($cse_object->{game_vertex_id});
+		my $lif = $if_by_level{$level};
+		if (!defined $lif) {
+			print "writing level.spawn for $level...\n";
+			my $dir;
+			if (::use_graph()) {
+				$dir = '..\levels\\'.$level;
+				File::Path::mkpath($dir, 0);
+			} else {
+				$dir = '..\levels\\'.$level;
+			}
+			chdir ($dir) or die "cannot change level path to levels/$level\n";
+			rename 'level.spawn', 'level.spawn.bak' or (unlink 'level.spawn.bak' and rename 'level.spawn', 'level.spawn.bak') ;
+			$lif = stkutils::chunked_file->new("level.spawn", 'w') or die;
+			$if_by_level{$level} = $lif;
+			push @levels, "$level.spawn";
+			$id_of_levels{$level} = 0;
+		}
+		$object->alife_object::state_split_spawns($lif, ($id_of_levels{$level})++, $ini);
+		chdir ($bdir); 
+	}
+	foreach my $level (@{$graph->{levels}}) {
+		my $lif = $if_by_level{$level};
+		$id = $id_of_levels{$level};
+		foreach my $object (@{$self->{$level}}) {
+			$object->alife_object::state_split_spawns($lif, ($id_of_levels{$level})++, $ini);
+		}
+	}
+	foreach my $if (values %if_by_level) {
+		$if->close();
+	}
+}
 use constant way_name_exceptions => {
 	kat_teleport_to_dark_city_orientation	=> 'l03u_agr_underground',
 	walk_3					=> 'l05_bar',
@@ -6751,6 +6883,51 @@ sub export_way {
 		print $fh "[way]\nsource_files = <<END\n", join(",\n", map {"way_$_.ltx"} (keys %info_by_level)), "\nEND\n\n";
 	}
 }
+sub split_ways {
+	my $self = shift;
+	my ($graph) = @_;
+	print "splitting ways...\n";
+	my %info_by_level;
+	my $bdir = getcwd();
+	foreach my $object (@{$self->{way_objects}}) {
+		my $level = $graph->level_name($object->{points}[0]->{game_vertex_id});
+		if (!defined $level) {
+			$level = (way_name_exceptions->{$object->{name}});
+		}
+		die "unknown level of the way object $object->{name}\n" unless defined $level;
+		my $info = $info_by_level{$level};
+		if (!defined $info) {
+			chdir ($bdir); 
+			$info = {};
+			my $dir;
+			if (::use_graph()) {
+				$dir = $bdir.'\levels\\'.$level;
+			} else {
+				$dir = '..\levels\\'.$level;
+			}
+			chdir ($dir) or next;
+			rename 'level.game', 'level.game.bak' or (unlink 'level.game.bak' and rename 'level.game', 'level.game.bak') ;
+			$info->{lif} = stkutils::chunked_file->new("level.game", 'w') or die;
+			$info->{way_objects} = ();
+			$info_by_level{$level} = $info;
+		}
+		push @{$info->{way_objects}}, \$object;
+	}
+	
+	foreach my $info (values %info_by_level) {
+
+		my $id = 0;
+		$info->{lif}->w_chunk_open(4096);
+		foreach my $object (sort {$$a->{name} cmp $$b->{name}}  @{$info->{way_objects}}) {
+			$$object->state_split_ways($info->{lif}, $id++);
+		}
+		$info->{lif}->w_chunk_close();
+		$info->{lif}->w_chunk_open(8192);
+		$info->{lif}->w_chunk_close();
+		$info->{lif}->close();
+	}
+	
+}
 sub move_actor {
 	my $self = shift;
 
@@ -6785,7 +6962,6 @@ sub move_actor {
 		stkutils::debug::fail(__PACKAGE__.'::move_actor', __LINE__, 'defined $actor && defined $lchanger', 'cannot find actor or level_changer');
 	}
 }
-#######################################################################
 use constant good_sects => {
 	zone_buzz				=> 'se_zone_anom',
 	zone_buzz_weak				=> 'se_zone_anom',
@@ -6826,6 +7002,14 @@ use constant good_sects => {
 sub good_anom {
 	my ($sect) = @_;
 	return defined(good_sects->{$sect});
+}
+sub get_level_id {
+	foreach my $level (reverse @{$_[0]->{sections_list}}) {
+		if ($_[1] >= $_[0]->value($level, 'gvid0')) {
+			return $_[0]->value($level, 'id')
+		}
+	}
+	return undef;
 }
 #######################################################################
 package main;
@@ -6874,6 +7058,8 @@ my $sc;
 my $sdk;
 my $graph_dir;
 my $idx_file;
+my $split_spawns;
+my $use_graph;
 
 GetOptions(
 	'd=s' => \$spawn_file,
@@ -6891,7 +7077,9 @@ GetOptions(
 	'scan=s' => \$sc,		
 	'sdk' => \$sdk,
 	'g:s' => \$graph_dir,
-	'idx=s' => \$idx_file	
+	'idx:s' => \$idx_file,	
+	'split_spawns' => \$split_spawns,
+	'use_graph' => \$use_graph,
 ) or die usage();
 
 if (defined $flags) {
@@ -6929,11 +7117,6 @@ if (defined $convert) {
 	$params->{new_game}->{script_version},
 	$params->{new_game}->{build}) = build_version::version_by_build($params->{new_game}->{short_build});
 	print "converting from $params->{old_game}->{build} spawn format to $params->{new_game}->{build} spawn format...\n";
-#	my $graph = stkutils::graph->new();
-#	$graph->{build_version} = build_version::graph_build($params->{old_game}->{version}, $params->{old_game}->{script_version});
-#	if (not ::level()) {
-#		$graph->read();
-#	}
 	my $spawn = converting->new();
 	$spawn->import($convert);
 	my $ini = stkutils::ini_file->new('convert.ini', 'r') or  stkutils::debug::fail(__PACKAGE__, __LINE__, '', 'cannot open convert.ini');
@@ -7019,14 +7202,35 @@ if (defined $convert) {
 	my $graph = stkutils::graph->new();
 	$graph->{build_version} = build_version::graph_build($table->{version}, $table->{script_version});
 	if (not ::level()) {
-		$graph->read($table->{version}, $spawn, $graph_dir);
+		if (defined $spawn->{section4_raw_data}) {
+			$graph->read($table->{version}, $spawn->{section4_raw_data});
+		} else {
+			if (defined $graph_dir) {
+				$graph_dir .= '\\';
+			} else {
+				$graph_dir = '';
+			}
+			my $graph_file = IO::File->new($graph_dir.'game.graph', 'r');
+			binmode $graph_file;
+			my $raw_graph = '';
+			$graph_file->read($raw_graph, ($graph_file->stat())[7]);
+			$graph_file->close();
+			$graph->read($table->{version}, $raw_graph);
+		}
+		$graph->show_guids('guids.ltx');
 	}
 	defined $out && do {
 		File::Path::mkpath($out, 0);
 		chdir $out or stkutils::debug::fail(__PACKAGE__, __LINE__, '', 'cannot change path to '.$out);
 	};
-	print "exporting alife objects...\n";	
-	$spawn->export('all.ltx', $graph);
+	if (defined $split_spawns) {
+		stkutils::debug::fail(__PACKAGE__, __LINE__, '', 'you cannot split level.spawn') unless !::level();
+		$spawn->split_spawn($graph);
+		print "done!\n";
+	} else {
+		print "exporting alife objects...\n";	
+		$spawn->export('all.ltx', $graph);
+	}
 } elsif (defined $src_dir) {
 	stkutils::debug::fail(__PACKAGE__, __LINE__, '!defined $spawn_file', 'bad params') if defined $spawn_file;
 	my $wd = getcwd();
@@ -7097,6 +7301,8 @@ sub header_size {
 }
 sub sdk {return defined $sdk}
 sub idx {return $idx_file}
+sub split_spawns { return defined $split_spawns}
+sub use_graph { return defined $use_graph}
 
 my %markers;
 sub set_save_marker {

@@ -1,4 +1,4 @@
-# Last modified: 25 Jule 2011
+# Last modified: 19 Sep 2011
 ##########################################################
 package gg_header;
 use strict;
@@ -200,31 +200,17 @@ sub new {
 }
 sub read {
 	my $self = shift;
-	my ($version, $spawn, $graph_dir) = @_;
+	my ($version, $graph_data) = @_;
 	my $data;
 	my $packet;
 
 	print "reading graph...\n";
-	if ($spawn->{section4_raw_data}) {
-		$data = substr($spawn->{section4_raw_data}, 0, 300000);
-		$packet = stkutils::data_packet->new($data);
-	} else {
-		my $fh;
-		if ($graph_dir && ($graph_dir ne '')) {
-			$fh = IO::File->new($graph_dir.'\game.graph', 'r') or stkutils::debug::fail(__PACKAGE__.'::read',__LINE__, '', 'cannot open game.graph');
-		} else {
-			$fh = IO::File->new('game.graph', 'r') or stkutils::debug::fail(__PACKAGE__.'::read',__LINE__, '', 'cannot open game.graph');
-		}
-		binmode $fh;
-		$fh->read($data, 300000);
-		$packet = stkutils::data_packet->new($data);
-		$fh->close();
-	}
+	$data = substr($graph_data, 0, 300000);
+	$packet = stkutils::data_packet->new($data);
 	my $hs = ::header_size($self->{build_version});
 	my $vbs = ::vertex_block_size($self->{build_version});
 	my $ebs = ::edge_block_size($self->{build_version});
 	print "	reading header...\n";
-#	$fh->read($data, $hs) or die;
 	my $data_h = substr($data, 0, $hs);
 	$self->{header} = gg_header->new();
 	$self->{header}->read(stkutils::data_packet->new($data_h), $self->{build_version});
@@ -235,7 +221,6 @@ sub read {
 	}
 	print "	reading levels...\n";	
 	# 4KB should be enough for the level
-#	$fh->read($data, 0x1000) or die;
 	my $data_l = substr($data, 0, 0x1000);
 	my $packet_l = stkutils::data_packet->new(substr($data_l, $hs));
 	for (my $i = 0; $i < $self->{header}->{level_count}; $i++) {
@@ -248,10 +233,8 @@ sub read {
 		$level_by_id{$level->{level_id}} = \$level;
 	}
 	print "	reading vertices...\n";	
-#	$fh->seek(-$packet->length(), SEEK_CUR);
 	my $packet_v = stkutils::data_packet->new(substr($data, 0x1000 - $packet_l->length()));
 	for (my $i = 0; $i < $self->{header}->{vertex_count}; $i++) {
-#		$fh->read($data, $vbs) or die;
 		my $vertex = gg_vertex->new();
 		if ($self->{build_version} eq '1469' or $self->{build_version} eq '1472') {
 			$vertex->read($packet_v, $edges_offset, $self->{build_version});
@@ -260,7 +243,7 @@ sub read {
 		}
 		my $level_name = $level_by_id{$vertex->{level_id}};
 		if (not defined $level_name) {
-			$self->error_handler($version, $spawn);
+			$self->error_handler($version, $graph_data);
 			return;
 		}
 		push @{$self->{vertices}}, $vertex;
@@ -272,26 +255,64 @@ sub read {
 			my $level = $level_by_id{$vertex->{level_id}};
 			$level_id = $vertex->{level_id};
 			$self->{level_by_guid}{$game_vertex_id} = $$level->{level_name};
-#			print "$game_vertex_id = $$level->{level_name}\n";
 		}
 		$game_vertex_id++;
 	}
 }
+sub show_guids {
+	my $self = shift;
+	my ($fn) = @_;
+	my $fh;
+	if (defined $fn) {
+		$fh = IO::File->new($fn, 'w') or die "cannot open $fn\n";
+	}
+	my %level_by_id = ();
+	foreach my $level (@{$self->{levels}}) {
+		$level_by_id{$level->{level_id}} = \$level;
+	}
+	my $game_vertex_id = 0;
+	my $level_id = -1;
+	foreach my $vertex (@{$self->{vertices}}) {
+		if ($vertex->{level_id} != $level_id) {
+			my $level = $level_by_id{$vertex->{level_id}};
+			if (defined $fn) {
+				print $fh "\n[$$level->{level_name}]\ngvid0 = $game_vertex_id\nid = $vertex->{level_id}\n";
+			} else {
+				print "{ gvid0 => $game_vertex_id,		name => '$$level->{level_name}' },\n";			
+			}
+			$level_id = $vertex->{level_id};
+		}
+		$game_vertex_id++;
+	}
+	if (defined $fn) {
+		$fh->close();
+	}
+}
+sub gvid_by_name {
+	my $self = shift;
+	my %rev = reverse %{$self->{level_by_guid}};
+	foreach my $level (sort {$b cmp $a} keys %rev) {
+		if ($_[0] eq $level) {
+			return $rev{$level};
+		}
+	}
+	return undef;
+}
 sub level_name {
 	my $self = shift;
-	foreach my $table (sort {$b <=> $a} keys %{$self->{level_by_guid}}) {
-		if ($_[0] >= $table) {
-			return $self->{level_by_guid}{$table};
+	foreach my $guid (sort {$b <=> $a} keys %{$self->{level_by_guid}}) {
+		if ($_[0] >= $guid) {
+			return $self->{level_by_guid}{$guid};
 		}
 	}
 	return undef;
 }
 sub error_handler {
 	my $self = shift;
-	my ($version, $spawn) = @_;
+	my ($version, $graph_data) = @_;
 	print "error occured! trying to fix...\n";
 	$self->{build_version} = '1935';
-	$self->read($version, $spawn);
+	$self->read($version, $graph_data);
 }
 1;
 #####################################################################
