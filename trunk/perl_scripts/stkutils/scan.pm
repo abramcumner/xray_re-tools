@@ -1006,7 +1006,7 @@ sub launch {
 	$obj->{sections_list} = [];
 	my %table_hash = ();
 	if (defined $stalker_path) {
-		scan_system($stalker_path, '\system.ltx', $obj);
+		scan_system($stalker_path, '\system.ltx', $obj, $_[2]);
 		foreach my $section (@{$obj->{sections_list}}) {
 			delete ($obj->{sections_hash}{$section}) if substr($section, 0, 3) eq 'mp_';
 			next if substr($section, 0, 3) eq 'mp_';
@@ -1068,10 +1068,10 @@ sub get_class {
 	return section_to_class->{$_[1]};
 }
 sub scan_system {
-	my ($stalker_path, $path, $obj) = @_;
+	my ($stalker_path, $path, $obj, $idx) = @_;
 	my @files = get_filelist($stalker_path);
 	foreach my $file (@files) {
-		my $system = read_ini($file);
+		my $system = read_ini($file) if $file !~ /($idx)/;
 		push @{$obj->{sections_list}}, @{$system->{sections_list}};
 		foreach my $section (%{$system->{sections_hash}}) {
 			$obj->{sections_hash}{$section}{class} = $system->{sections_hash}{$section}{class} if defined $system->{sections_hash}{$section}{class};

@@ -1,6 +1,9 @@
 #!perl -w -I \temp\1\bin
 #
 # last edited: 19 Sep 2011
+#TODO:
+#
+#
 #######################################################################
 package cse_abstract;
 use strict;
@@ -52,7 +55,7 @@ sub state_read {
 	my $self = shift;
 	my ($packet) = @_;
 	$packet->unpack_properties($self, (properties_info)[0]);
-	fail(__PACKAGE__.'::state_read', __LINE__, 'M_SPAWN == dummy16', 'cannot open M_SPAWN!') if $self->{'dummy16'} != 1;
+	stkutils::debug::fail(__PACKAGE__.'::state_read', __LINE__, 'M_SPAWN == dummy16', 'cannot open M_SPAWN!') if $self->{'dummy16'} != 1;
 	$packet->unpack_properties($self, (properties_info)[1..11]);
 	if ($self->{s_flags} & 0x20) {
 		$packet->unpack_properties($self, (properties_info)[12]);
@@ -65,11 +68,11 @@ sub state_read {
 	}
 	my ($unused, $spawn_id);
 	if (($self->{version} > 70) && ($self->{version} <= 79)) {
-		$unused = $packet->unpack('C');
+		$unused = $packet->unpack('C', 1);
 	} elsif (($self->{version} > 79) && ($self->{version} <= 93)) {
-		($unused, $spawn_id) = $packet->unpack('Cv');
+		($unused, $spawn_id) = $packet->unpack('Cv', 3);
 	} elsif ($self->{version} > 93) {
-		($unused, $spawn_id) = $packet->unpack('vv');
+		($unused, $spawn_id) = $packet->unpack('vv', 4);
 	}
 	if ($self->{version} < 112) {
 		if ($self->{version} > 82) {
@@ -82,7 +85,7 @@ sub state_read {
 			$packet->unpack_properties($self, (properties_info)[21..22]);
 		}	
 	}
-	my $extended_size = $packet->unpack('v');
+	my $extended_size = $packet->unpack('v', 2);
 }
 sub state_write {
 	my $self = shift;
@@ -139,7 +142,7 @@ sub state_write {
 	}
 }
 sub update_read {
-	my ($size) = $_[1]->unpack('v');
+	my ($size) = $_[1]->unpack('v', 2);
 	stkutils::debug::fail(__PACKAGE__.'::update_read', __LINE__, '$size == 0', 'unexpected size of CSE_Abstract M_UPDATE packet') unless $size == 0;
 }
 sub update_write {
@@ -5110,7 +5113,7 @@ sub state_export {
 	$_[1]->export_properties(__PACKAGE__, $_[0], properties_info);
 }
 #######################################################################
-package build_version;
+package gg_version;
 use strict;
 use constant build_verions => (
 	{ version => 128, script_version => 12, build => 'Call Of Pripyat (any patch)', 		short_build => 'cop',  graph_build => 'cop'},
@@ -5597,11 +5600,11 @@ sub read_links {
 	my $packet = stkutils::data_packet->new($cf->r_chunk_data());
 	while (1) {
 		$packet->length() > 0 or last;
-		my ($from, $to_count) = $packet->unpack('VV');
+		my ($from, $to_count) = $packet->unpack('VV', 8);
 		my $point = $self->{points}[$from];
 		while ($to_count--) {
 			my %link;
-			($link{to}, $link{weight}) = $packet->unpack('Vf');
+			($link{to}, $link{weight}) = $packet->unpack('Vf', 8);
 			push @{$point->{links}}, \%link;
 		}
 	}
@@ -6147,6 +6150,17 @@ sub new {
 	bless($self, $class);
 	return $self;
 }
+sub read_service {
+	my $self = shift;
+	my ($cf) = @_;
+	while (1) {
+		my ($index, $size) = $cf->r_chunk_open();
+		defined($index) or last;	
+		if ($index == 5) {
+			$self->read_service_chunk($cf);
+		}
+	}
+}
 sub read {
 	my $self = shift;
 	my ($fn, $version) = @_;
@@ -6162,6 +6176,7 @@ sub read {
 			} elsif ($index == 1) {
 				print "reading alife objects...\n";
 				$self->read_alife($cf, $version, $ini);
+				$self->read_alife($cf, $version, $ini);
 			} elsif ($index == 2) {
 				print "reading artefact spawn places...\n";
 				$self->read_section2($cf);
@@ -6170,6 +6185,8 @@ sub read {
 				$self->read_way($cf);
 			} elsif ($index == 4) {
 				$self->read_graph($cf, $ini);
+			} elsif ($index == 5) {
+				$self->read_service_chunk($cf);
 			} else {
 				stkutils::debug::fail(__PACKAGE__.'::read', __LINE__, '$index <= 4', 'unexpected chunk index '.$index);
 			}
@@ -6219,6 +6236,7 @@ sub write {
 		$self->write_section2($cf, $version);
 		$self->write_way($cf);
 		$self->write_graph($cf);
+		$self->write_service_chunk($cf);
 	} else {
 		$self->write_level($cf);
 	}
@@ -6336,7 +6354,7 @@ sub write_alife {
 		$cf->w_chunk_open(1);
 		my $id = 0;
 		my $file = ::idx();
-		$file = 'spawn_ids' if $file eq '';
+		$file = 'spawn_ids' if ($file && $file eq '');
 		$file .= '.ltx' if (defined $file and (substr($file, -3) ne 'ltx')); 
 		my $log = IO::File->new($file, 'w') if defined $file;
 		my $guids_file = stkutils::ini_file->new('guids.ltx', 'r') if defined ::idx();
@@ -7011,6 +7029,25 @@ sub get_level_id {
 	}
 	return undef;
 }
+sub read_service_chunk {
+	my $self = shift;
+	my ($cf) = @_;
+	print "reading service information...\n";
+	($self->{idx_file}) = unpack('Z*', $cf->r_chunk_data());
+}
+sub write_service_chunk {
+	my $self = shift;
+	my ($cf) = @_;
+	
+	if (defined ::idx()){
+		print "writing service information...\n";
+		my $idx_name;
+		if (::idx() eq '') {
+			$idx_name = 'spawn_ids.ltx';
+		}
+		$cf->w_chunk(5, $idx_name);
+	}
+}
 #######################################################################
 package main;
 use strict;
@@ -7020,7 +7057,7 @@ use stkutils::scan;
 use stkutils::graph;
 use stkutils::chunked_file;
 use Cwd;
-use diagnostics;
+#use diagnostics;
 
 sub usage {
 	return <<END
@@ -7090,7 +7127,12 @@ if (defined $flags) {
 }
 
 if ((defined $sc) && !(::is_alredy_scanned())) {
-	stkutils::scan->launch($sc);
+	my $temp = all_spawn->new();
+	my $fh = IO::File->new($spawn_file, 'r') or stkutils::debug::fail(__PACKAGE__, __LINE__, '', 'cannot open '.$spawn_file);
+	binmode $fh;
+	$temp = read_service($fh);
+	stkutils::scan->launch($sc, $temp->{idx_file});
+	undef $temp;
 }
 
 if (defined $convert) {
@@ -7112,10 +7154,10 @@ if (defined $convert) {
 	}
 	($params->{old_game}->{version},
 	$params->{old_game}->{script_version},
-	$params->{old_game}->{build}) = build_version::version_by_build($params->{old_game}->{short_build});
+	$params->{old_game}->{build}) = gg_version::version_by_build($params->{old_game}->{short_build});
 	($params->{new_game}->{version},
 	$params->{new_game}->{script_version},
-	$params->{new_game}->{build}) = build_version::version_by_build($params->{new_game}->{short_build});
+	$params->{new_game}->{build}) = gg_version::version_by_build($params->{new_game}->{short_build});
 	print "converting from $params->{old_game}->{build} spawn format to $params->{new_game}->{build} spawn format...\n";
 	my $spawn = converting->new();
 	$spawn->import($convert);
@@ -7183,7 +7225,7 @@ if (defined $convert) {
 	if ($table->{version} <= 0x45) {
 		$table->{script_version} = 0;
 	}
-	my $build = (build_version::build_by_version($table->{version}, $table->{script_version}) or 'unknown,  spawn ver. '.$table->{version}.'');
+	my $build = (gg_version::build_by_version($table->{version}, $table->{script_version}) or 'unknown,  spawn ver. '.$table->{version}.'');
 	if ($table->{version} == 118 && $table->{script_version} == 6) {
 		$fh = stkutils::chunked_file->new($spawn_file, 'r');
 		if ($fh->find_chunk(0x4)) {
@@ -7200,25 +7242,8 @@ if (defined $convert) {
 	print "reading $spawn_file...\n";
 	$spawn->read($spawn_file, $table->{version});
 	my $graph = stkutils::graph->new();
-	$graph->{build_version} = build_version::graph_build($table->{version}, $table->{script_version});
-	if (not ::level()) {
-		if (defined $spawn->{section4_raw_data}) {
-			$graph->read($table->{version}, $spawn->{section4_raw_data});
-		} else {
-			if (defined $graph_dir) {
-				$graph_dir .= '\\';
-			} else {
-				$graph_dir = '';
-			}
-			my $graph_file = IO::File->new($graph_dir.'game.graph', 'r');
-			binmode $graph_file;
-			my $raw_graph = '';
-			$graph_file->read($raw_graph, ($graph_file->stat())[7]);
-			$graph_file->close();
-			$graph->read($table->{version}, $raw_graph);
-		}
-		$graph->show_guids('guids.ltx');
-	}
+	$graph->{gg_version} = gg_version::graph_build($table->{version}, $table->{script_version});
+	read_graph($graph, $spawn->{section4_raw_data});
 	defined $out && do {
 		File::Path::mkpath($out, 0);
 		chdir $out or stkutils::debug::fail(__PACKAGE__, __LINE__, '', 'cannot change path to '.$out);
@@ -7264,7 +7289,13 @@ if (defined $convert) {
 }
 
 sub with_scan {return ((defined $sc) || (-e 'sections.ini'));}
-sub is_alredy_scanned {return (-e 'sections.ini');}
+sub is_alredy_scanned {
+	if (-e 'sections.ini') {
+		my $size = -s 'sections.ini';
+		return $size > 0;
+	}
+	return 0;
+}
 sub is_convert {return defined $convert;}
 sub way {return defined $way;}
 sub is_flag_defined {
@@ -7303,6 +7334,28 @@ sub sdk {return defined $sdk}
 sub idx {return $idx_file}
 sub split_spawns { return defined $split_spawns}
 sub use_graph { return defined $use_graph}
+sub read_graph {
+	my ($graph, $raw_graph) = @_;
+	if (not ::level()) {
+		my $graph_data = '';
+		if (defined $raw_graph) {
+			$graph_data = $raw_graph;
+		} else {
+			if (defined $graph_dir) {
+				$graph_dir .= '\\';
+			} else {
+				$graph_dir = '';
+			}
+			my $graph_file = IO::File->new($graph_dir.'game.graph', 'r');
+			binmode $graph_file;
+			$graph_file->read($graph_data, ($graph_file->stat())[7]);
+			$graph_file->close();
+		}
+		$graph->decompose_graph($graph_data);
+		$graph->read_vertices($graph->{raw_vertices});
+		$graph->show_guids('guids.ltx');
+	}
+}
 
 my %markers;
 sub set_save_marker {
@@ -7319,7 +7372,7 @@ sub set_save_marker {
 		} else {
 			my $diff = $packet->r_tell() - $markers{$name};
 			die unless $diff > 0;
-			my ($diff1) = $packet->unpack('v');
+			my ($diff1) = $packet->unpack('v', 2);
 			die unless $diff == $diff1;
 		}
 	} else {

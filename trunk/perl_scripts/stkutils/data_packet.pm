@@ -1,11 +1,9 @@
 # SLOW!!!
-
 package stkutils::data_packet;
 use strict;
-use stkutils::debug;
 use IO::File;
+use stkutils::debug;
 use stkutils::ini_file;
-
 sub new {
 	my $class = shift;
 	my $data = shift;
@@ -18,14 +16,19 @@ sub new {
 sub unpack {
 	my $self = shift;
 	my $template = shift;
-	my $container = shift;
+	my ($len) = @_;
 stkutils::debug::fail(__PACKAGE__.'::unpack', __LINE__, 'defined $self', "packet is not defined") if !(defined $self);
 stkutils::debug::fail(__PACKAGE__.'::unpack', __LINE__, 'defined $self->{data}', "there is no data in packet") if !(defined $self->{data});
 stkutils::debug::fail(__PACKAGE__.'::unpack', __LINE__, 'defined $template', "template is not defined") if !(defined $template);
-$self->error_handler($container, $template) if CORE::length($self->{data}) == 0;
-	my @values = CORE::unpack($template.'a*', $self->{data});
-stkutils::debug::fail(__PACKAGE__.'::unpack', __LINE__, '$#values != -1', "cannot unpack requested data") if $#values == -1;
-	$self->{data} = splice(@values, -1);
+	my @values;
+	if (!defined $len) {
+		@values = CORE::unpack($template.'a*', $self->{data});
+		stkutils::debug::fail(__PACKAGE__.'::unpack', __LINE__, '$#values != -1', "cannot unpack requested data") if $#values == -1;
+		$self->{data} = pop(@values);
+	} else {
+		my $d = substr($self->{data}, 0, $len, '');
+		@values = CORE::unpack($template, $d);
+	}
 stkutils::debug::fail(__PACKAGE__.'::unpack', __LINE__, 'defined $self->{data}', "data container is empty") if !(defined $self->{data});
 #print "@values\n";
 	return @values;
@@ -53,6 +56,24 @@ use constant template_for_scalar => {
 	f32	=> 'f',
 	guid	=> 'a[16]',
 };
+use constant template_len => {
+	'V' => 4,
+	'v' => 2,
+	'C' => 1,
+	'l' => 4,
+	'f' => 4,
+	'a[16]' => 16,
+	'C8' => 8,
+	'C4' => 4,
+	'f3' => 12,
+	'f4' => 16,
+	'l3' => 12,
+	'l4' => 16,
+	'V3' => 12,
+	'V4' => 16,	
+	'C171' => 171,
+	'C12' => 12,
+};
 use constant template_for_vector => {
 	l8u8v	=> 'C/C',
 	l32u8v	=> 'V/C',
@@ -78,14 +99,14 @@ sub unpack_properties {
 	foreach my $p (@_) {
 #print "$p->{name} = ";
 		if ($p->{type} eq 'shape') {
-			my ($count) = $self->unpack('C');
+			my ($count) = $self->unpack('C', 1);
 			while ($count--) {
 				my %shape;
-				($shape{type}) = $self->unpack('C');
+				($shape{type}) = $self->unpack('C', 1);
 				if ($shape{type} == 0) {
-					@{$shape{sphere}} = $self->unpack('f4');
+					@{$shape{sphere}} = $self->unpack('f4', 16);
 				} elsif ($shape{type} == 1) {
-					@{$shape{box}} = $self->unpack('f12');
+					@{$shape{box}} = $self->unpack('f12', 48);
 				} else {
 					stkutils::debug::fail(__PACKAGE__.'::unpack_properties', __LINE__, '$shape{type} == 0 or $shape{type} == 1', "shape has undefined type ($shape{type})");
 				}
@@ -108,14 +129,15 @@ sub unpack_properties {
 #				push @{$container->{$p->{name}}}, \%obj;
 #			}
 		} elsif ($p->{type} eq 'suppl') {
-			my ($count) = $self->unpack('V');
+			my ($count) = $self->unpack('V', 4);
 			while ($count--) {
 				my %obj;
-				($obj{section_name}, $obj{item_count}, $obj{min_factor}, $obj{max_factor}) = $self->unpack('Z*Vff');
+				($obj{section_name}) = $self->unpack('Z*');
+				($obj{item_count}, $obj{min_factor}, $obj{max_factor}) = $self->unpack('Vff', 12);
 				push @{$container->{$p->{name}}}, \%obj;
 			}
 		} elsif ($p->{type} eq 'f32v4') {				#let's shut up #QNAN warnings.
-			my @buf = $self->unpack('f4');
+			my @buf = $self->unpack('f4', 16);
 			my $i = 0;
 			while ($i < 4) {
 				if (!defined ($buf[$i] <=> 9**9**9)) {
@@ -126,7 +148,7 @@ sub unpack_properties {
 			}
 			@{$container->{$p->{name}}} = @buf;
 		} elsif ($p->{type} eq 'f32v3') {				
-			my @buf = $self->unpack('f3');
+			my @buf = $self->unpack('f3', 12);
 			my $i = 0;
 			while ($i < 3) {
 				if (!defined ($buf[$i] <=> 9**9**9)) {
@@ -137,44 +159,47 @@ sub unpack_properties {
 			}
 			@{$container->{$p->{name}}} = @buf;
 		} elsif ($p->{type} eq 'afspawns' or $p->{type} eq 'afspawns_u32') {
-			my ($count) = $self->unpack('v');
+			my ($count) = $self->unpack('v', 2);
 			while ($count--) {
 				my %obj;
 				if ($p->{type} eq 'afspawns') {
-					($obj{section_name}, $obj{weight}) = $self->unpack('Z*f');
+					($obj{section_name}) = $self->unpack('Z*');
+					($obj{weight}) = $self->unpack('f', 4);
 				} else {
-					($obj{section_name}, $obj{weight}) = $self->unpack('Z*V');
+					($obj{section_name}) = $self->unpack('Z*');
+					($obj{weight}) = $self->unpack('V', 4);
 				}
 				push @{$container->{$p->{name}}}, \%obj;
 			}
 		} else {
 			my $template = template_for_scalar->{$p->{type}};
 			if (defined $template) {
-				($container->{$p->{name}}) = $self->unpack($template, $container);
+				$self->error_handler($container, $template) if CORE::length($self->{data}) == 0;
+				($container->{$p->{name}}) = $self->unpack($template, template_len->{$template});
 				if ($p->{type} eq 'sz') {
 					chomp $container->{$p->{name}};
 					$container->{$p->{name}} =~ s/\r//g;
 				}
 			} elsif ($p->{type} eq 'u24') {
-				($container->{$p->{name}}) = CORE::unpack('V', CORE::pack('CCCC', $self->unpack('C3'), 0));
+				($container->{$p->{name}}) = CORE::unpack('V', CORE::pack('CCCC', $self->unpack('C3', 3), 0));
 			} elsif ($p->{type} eq 'q16') {
-				my ($qf) = $self->unpack('v');
+				my ($qf) = $self->unpack('v', 2);
 				($container->{$p->{name}}) = convert_q16($qf);
 			} elsif ($p->{type} eq 'q16_old') {
-				my ($qf) = $self->unpack('v');
+				my ($qf) = $self->unpack('v', 2);
 				($container->{$p->{name}}) = convert_q16_old($qf);
 			} elsif ($p->{type} eq 'q8') {
-				my ($q8) = $self->unpack('C');
+				my ($q8) = $self->unpack('C', 1);
 				($container->{$p->{name}}) = convert_q8($q8);
 			} elsif ($p->{type} eq 'q8v3') {
-				my (@q8) = $self->unpack('C3');
+				my (@q8) = $self->unpack('C3', 3);
 				my $i = 0;
 				while ($i < 3) {
 					@{$container->{$p->{name}}}[$i] = convert_q8($q8[$i]);
 					$i++;
 				}
 			} elsif ($p->{type} eq 'q8v4') {
-				my (@q8) = $self->unpack('C4');
+				my (@q8) = $self->unpack('C4', 4);
 				my $i = 0;
 				while ($i < 4) {
 					@{$container->{$p->{name}}}[$i] = convert_q8($q8[$i]);
