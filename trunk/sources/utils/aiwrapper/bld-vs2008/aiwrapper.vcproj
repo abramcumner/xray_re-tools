@@ -21,8 +21,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\..\..\binaries\$(ConfigurationName)"
-			IntermediateDirectory="..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)"
+			OutputDirectory="..\..\..\..\binaries\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
+			IntermediateDirectory="..\..\..\..\intermediate\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="1"
 			CharacterSet="0"
 			>
@@ -66,9 +66,10 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="xray_re.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="$(OutDir)\libraries"
+				AdditionalLibraryDirectories="..\..\..\..\binaries\$(PlatformName)\$(ConfigurationName)\xray_re"
 				GenerateDebugInformation="true"
 				SubSystem="1"
+				LargeAddressAware="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
@@ -97,8 +98,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="..\..\..\..\binaries\$(ConfigurationName)\x64"
-			IntermediateDirectory="..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)\x64"
+			OutputDirectory="..\..\..\..\binaries\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
+			IntermediateDirectory="..\..\..\..\intermediate\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="1"
 			CharacterSet="0"
 			>
@@ -143,9 +144,10 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="xray_re.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\..\binaries\$(ConfigurationName)\libraries\x64"
+				AdditionalLibraryDirectories="..\..\..\..\binaries\$(PlatformName)\$(ConfigurationName)\xray_re"
 				GenerateDebugInformation="true"
 				SubSystem="1"
+				LargeAddressAware="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="17"
@@ -174,8 +176,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\..\..\..\binaries\$(ConfigurationName)"
-			IntermediateDirectory="..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)"
+			OutputDirectory="..\..\..\..\binaries\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
+			IntermediateDirectory="..\..\..\..\intermediate\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="1"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
@@ -202,6 +204,7 @@
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
+				EnableFiberSafeOptimizations="true"
 				AdditionalIncludeDirectories="..\..\..\xray_re"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				StringPooling="true"
@@ -223,9 +226,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="xray_re.lib"
-				AdditionalLibraryDirectories="$(OutDir)\libraries"
+				AdditionalLibraryDirectories="..\..\..\..\binaries\$(PlatformName)\$(ConfigurationName)\xray_re"
 				GenerateDebugInformation="false"
 				SubSystem="1"
+				LargeAddressAware="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
@@ -256,8 +260,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="..\..\..\..\binaries\$(ConfigurationName)\x64"
-			IntermediateDirectory="..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)\x64"
+			OutputDirectory="..\..\..\..\binaries\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
+			IntermediateDirectory="..\..\..\..\intermediate\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="1"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
@@ -285,6 +289,7 @@
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
+				EnableFiberSafeOptimizations="true"
 				AdditionalIncludeDirectories="..\..\..\xray_re"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				StringPooling="true"
@@ -305,9 +310,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="xray_re.lib"
-				AdditionalLibraryDirectories="..\..\..\..\binaries\$(ConfigurationName)\libraries\x64"
+				AdditionalLibraryDirectories="..\..\..\..\binaries\$(PlatformName)\$(ConfigurationName)\xray_re"
 				GenerateDebugInformation="false"
 				SubSystem="1"
+				LargeAddressAware="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"

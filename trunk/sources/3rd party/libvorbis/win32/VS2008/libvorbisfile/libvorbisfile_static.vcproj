@@ -21,8 +21,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\..\..\..\..\binaries\$(ConfigurationName)\libraries"
-			IntermediateDirectory="..\..\..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)"
+			OutputDirectory="..\..\..\..\..\..\binaries\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
+			IntermediateDirectory="..\..\..\..\..\..\intermediate\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops;..\libogg.vsprops"
 			CharacterSet="1"
@@ -87,8 +87,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="..\..\..\..\..\..\binaries\$(ConfigurationName)\libraries\x64"
-			IntermediateDirectory="..\..\..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)\x64"
+			OutputDirectory="..\..\..\..\..\..\binaries\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
+			IntermediateDirectory="..\..\..\..\..\..\intermediate\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops;..\libogg.vsprops"
 			CharacterSet="1"
@@ -154,8 +154,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\..\..\..\..\..\binaries\$(ConfigurationName)\libraries"
-			IntermediateDirectory="..\..\..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)"
+			OutputDirectory="..\..\..\..\..\..\binaries\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
+			IntermediateDirectory="..\..\..\..\..\..\intermediate\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops;..\libogg.vsprops"
 			CharacterSet="1"
@@ -181,6 +181,7 @@
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
+				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="..\..\..\include;..\..\..\..\libogg\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBVORBISFILE_EXPORTS"
@@ -222,8 +223,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="..\..\..\..\..\..\binaries\$(ConfigurationName)\libraries\x64"
-			IntermediateDirectory="..\..\..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)\x64"
+			OutputDirectory="..\..\..\..\..\..\binaries\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
+			IntermediateDirectory="..\..\..\..\..\..\intermediate\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops;..\libogg.vsprops"
 			CharacterSet="1"
@@ -246,6 +247,12 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="2"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				EnableFiberSafeOptimizations="true"
+				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="..\..\..\include;..\..\..\..\libogg\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBVORBISFILE_EXPORTS"
 				RuntimeLibrary="2"

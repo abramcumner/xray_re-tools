@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\..\..\binaries\$(ConfigurationName)"
-			IntermediateDirectory="..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)"
+			OutputDirectory="..\..\..\..\binaries\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
+			IntermediateDirectory="..\..\..\..\intermediate\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="2"
 			CharacterSet="0"
 			>
@@ -64,7 +64,7 @@
 				AdditionalDependencies="shlwapi.lib xray_re.lib msModelLib.lib"
 				OutputFile="$(OutDir)\msXRayImport.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries&quot;;&quot;..\..\..\3rd party\milkshape_sdk\msLib\lib&quot;"
+				AdditionalLibraryDirectories="&quot;..\..\..\3rd party\milkshape_sdk\msLib\lib&quot;;&quot;..\..\..\..\binaries\$(PlatformName)\$(ConfigurationName)\xray_re&quot;"
 				ModuleDefinitionFile="..\ms3d_xray_import.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -96,8 +96,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\..\..\..\binaries\$(ConfigurationName)"
-			IntermediateDirectory="..\..\..\..\intermediate\$(ConfigurationName)\$(ProjectName)"
+			OutputDirectory="..\..\..\..\binaries\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
+			IntermediateDirectory="..\..\..\..\intermediate\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="2"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
@@ -124,6 +124,7 @@
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
+				EnableFiberSafeOptimizations="true"
 				AdditionalIncludeDirectories="..\..\..\xray_re;&quot;..\..\..\3rd party\milkshape_sdk\msLib&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;MS3D_IMPORT_EXPORTS"
 				StringPooling="true"
@@ -146,7 +147,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib xray_re.lib msModelLib.lib"
 				OutputFile="$(OutDir)\ms3dXRayImport.dll"
-				AdditionalLibraryDirectories="&quot;..\..\..\..\binaries\$(ConfigurationName)\libraries&quot;;&quot;..\..\..\3rd party\milkshape_sdk\msLib\lib&quot;"
+				AdditionalLibraryDirectories="&quot;..\..\..\3rd party\milkshape_sdk\msLib\lib&quot;;&quot;..\..\..\..\binaries\$(PlatformName)\$(ConfigurationName)\xray_re&quot;"
 				ModuleDefinitionFile="..\ms3d_xray_import.def"
 				GenerateDebugInformation="false"
 				SubSystem="2"
