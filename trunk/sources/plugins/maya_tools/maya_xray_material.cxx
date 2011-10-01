@@ -164,7 +164,7 @@ bool less_func(T elem1, T elem2)
 		return true;
 	else if(elem2->name == "default")
 		return false;
-	return elem1->name > elem2->name;
+	return elem1->name < elem2->name;
 }
 
 template <> bool less_func<std::string&>(std::string &elem1, std::string &elem2)
