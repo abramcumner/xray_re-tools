@@ -157,6 +157,12 @@ short maya_field_maker::get(const std::string& name, MString& maya_name)
 	return short(crc);
 }
 
+template <class T>
+bool less_func(T *elem1, T *elem2)
+{
+	return elem1->name < elem2->name;
+}
+
 MStatus maya_xray_material::init()
 {
 	MStatus status;
@@ -286,10 +292,12 @@ MStatus maya_xray_material::init()
 	xr_shaders_xrlc_lib shaders_xrlc_lib;
 	if (shaders_xrlc_lib.load(PA_GAME_DATA, "shaders_xrlc.xr")) {
 		MString field;
-		for (xr_shader_xrlc_vec_cit it = shaders_xrlc_lib.shaders().begin(),
-				end = shaders_xrlc_lib.shaders().end(); it != end; ++it) {
+		int i = 0;
+		xr_shader_xrlc_vec &shaders = const_cast<xr_shader_xrlc_vec&>(shaders_xrlc_lib.shaders());
+		std::sort(shaders.begin(), shaders.end(), less_func<xr_shader_xrlc>);
+		for (xr_shader_xrlc_vec_cit it = shaders.begin(), end = shaders.end(); it != end; ++it) {
 			short index = maya_field.get((*it)->name, field);
-			CHECK_MSTATUS(enum_attr_fn.addField(field, index));
+			CHECK_MSTATUS(enum_attr_fn.addField(field, i++));
 		}
 		enum_attr_fn.setDefault("default");
 	} else {
@@ -305,10 +313,12 @@ MStatus maya_xray_material::init()
 	xr_gamemtls_lib gamemtls_lib;
 	if (gamemtls_lib.load(PA_GAME_DATA, "gamemtl.xr")) {
 		MString field;
-		for (xr_gamemtl_vec_cit it = gamemtls_lib.materials().begin(),
-				end = gamemtls_lib.materials().end(); it != end; ++it) {
+		int i = 0;
+		xr_gamemtl_vec &gamemtl = const_cast<xr_gamemtl_vec&>(gamemtls_lib.materials());
+		std::sort(gamemtl.begin(), gamemtl.end(), less_func<xr_gamemtl>);
+		for (xr_gamemtl_vec_cit it = gamemtl.begin(), end = gamemtl.end(); it != end; ++it) {
 			short index = maya_field.get((*it)->name, field);
-			CHECK_MSTATUS(enum_attr_fn.addField(field, index));
+			CHECK_MSTATUS(enum_attr_fn.addField(field, i++));
 		}
 	} else {
 		msg("can't open %s", "gamemtl.xr");
