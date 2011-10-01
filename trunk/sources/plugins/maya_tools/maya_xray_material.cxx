@@ -158,9 +158,22 @@ short maya_field_maker::get(const std::string& name, MString& maya_name)
 }
 
 template <class T>
-bool less_func(T *elem1, T *elem2)
+bool less_func(T elem1, T elem2)
 {
-	return elem1->name < elem2->name;
+	if(elem1->name == "default" && elem1->name != elem2->name)
+		return true;
+	else if(elem2->name == "default")
+		return false;
+	return elem1->name > elem2->name;
+}
+
+template <> bool less_func<std::string&>(std::string &elem1, std::string &elem2)
+{
+	if(elem1 == "default" && elem1 != elem2)
+		return true;
+	else if(elem2 == "default")
+		return false;
+	return elem1 < elem2;
 }
 
 MStatus maya_xray_material::init()
@@ -270,13 +283,13 @@ MStatus maya_xray_material::init()
 	xr_shaders_lib shaders_lib;
 	if (shaders_lib.load(PA_GAME_DATA, "shaders.xr")) {
 		MString field;
-		std::vector<std::string> names = shaders_lib.names();
-		std::sort(names.begin(), names.end());
-		short index = 0;
-		for (std::vector<std::string>::const_iterator it = names.begin(),
+		std::vector<std::string> &names = const_cast<std::vector<std::string>&>(shaders_lib.names());
+		std::sort(names.begin(), names.end(), less_func<std::string&>);
+		int i = 0;
+		for (std::vector<std::string>::iterator it = names.begin(),
 				end = names.end(); it != end; ++it) {
 			maya_field.get(*it, field);
-			CHECK_MSTATUS(enum_attr_fn.addField(field, index++));
+			CHECK_MSTATUS(enum_attr_fn.addField(field, i++));
 		}
 		enum_attr_fn.setDefault("default");
 	} else {
@@ -294,7 +307,7 @@ MStatus maya_xray_material::init()
 		MString field;
 		int i = 0;
 		xr_shader_xrlc_vec &shaders = const_cast<xr_shader_xrlc_vec&>(shaders_xrlc_lib.shaders());
-		std::sort(shaders.begin(), shaders.end(), less_func<xr_shader_xrlc>);
+		std::sort(shaders.begin(), shaders.end(), less_func<xr_shader_xrlc*>);
 		for (xr_shader_xrlc_vec_cit it = shaders.begin(), end = shaders.end(); it != end; ++it) {
 			short index = maya_field.get((*it)->name, field);
 			CHECK_MSTATUS(enum_attr_fn.addField(field, i++));
@@ -315,7 +328,7 @@ MStatus maya_xray_material::init()
 		MString field;
 		int i = 0;
 		xr_gamemtl_vec &gamemtl = const_cast<xr_gamemtl_vec&>(gamemtls_lib.materials());
-		std::sort(gamemtl.begin(), gamemtl.end(), less_func<xr_gamemtl>);
+		std::sort(gamemtl.begin(), gamemtl.end(), less_func<xr_gamemtl*>);
 		for (xr_gamemtl_vec_cit it = gamemtl.begin(), end = gamemtl.end(); it != end; ++it) {
 			short index = maya_field.get((*it)->name, field);
 			CHECK_MSTATUS(enum_attr_fn.addField(field, i++));
