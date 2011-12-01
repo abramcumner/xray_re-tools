@@ -14,6 +14,9 @@ const uint32_t AI_VERSION_2 = 2;
 // 1580
 const uint32_t AI_VERSION_3 = 3;
 
+// 1829
+const uint32_t AI_VERSION_5 = 5;
+
 // 1844
 const uint32_t AI_VERSION_6 = 6;
 

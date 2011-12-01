@@ -1323,7 +1323,7 @@ void cse_alife_trader_abstract::state_read(xr_packet& packet, uint16_t size)
 			packet.r_u32(m_money);
 		if (version > CSE_VERSION_0x4b && version < CSE_VERSION_0x62)
 			xr_not_implemented();
-		if (version > CSE_VERSION_0x27)
+		if (version > CSE_VERSION_0x2e)
 			packet.r_sz(m_specific_character);
 		if (version > CSE_VERSION_0x4d)
 			packet.r_u32(m_trader_flags);
@@ -2207,6 +2207,22 @@ void cse_alife_item_torch::state_read(xr_packet& packet, uint16_t size)
 {
 	if (m_version > CSE_VERSION_0x14)
 		cse_alife_item::state_read(packet, size);
+
+	if (m_version == CSE_VERSION_0x2e) {
+		packet.r_u32();
+		packet.skip_sz();
+		packet.skip_sz();
+		packet.r_float();
+		packet.r_angle8();
+		packet.r_float();
+
+		if (m_version > 0x28u ) {
+			packet.skip_sz();
+			packet.r_float();
+		}
+		if (m_version > 0x29u )
+			packet.r_u16();
+	}
 }
 
 void cse_alife_item_torch::state_write(xr_packet& packet)

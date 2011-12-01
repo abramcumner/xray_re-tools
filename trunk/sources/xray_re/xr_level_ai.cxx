@@ -73,7 +73,7 @@ struct write_node_v10 { void operator()(const ai_node& node, xr_writer& w) const
 void xr_level_ai::load(xr_reader& r)
 {
 	m_version = r.r_u32();
-	xr_assert(m_version >= AI_VERSION_6 && m_version <= AI_VERSION_10 || m_version == AI_VERSION_3);
+	xr_assert(m_version >= AI_VERSION_5 && m_version <= AI_VERSION_10 || m_version == AI_VERSION_3);
 	m_num_nodes = r.r_u32();
 	m_size = r.r_float();
 	m_size_y = r.r_float();
@@ -83,6 +83,9 @@ void xr_level_ai::load(xr_reader& r)
 		m_guid.load(r);
 
 	if (m_version == AI_VERSION_3) {
+		m_num_nodes = 0; // because unknown format
+		m_nodes = 0;
+	} else if (m_version == AI_VERSION_5) {
 		m_num_nodes = 0; // because unknown format
 		m_nodes = 0;
 	} else if (m_version == AI_VERSION_6) {
