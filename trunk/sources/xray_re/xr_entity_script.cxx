@@ -288,9 +288,7 @@ void se_monster::state_read(xr_packet& packet, uint16_t size)
 	} else if (m_version == CSE_VERSION_2215) {
 		if (m_script_version >= 2)
 			packet.r_bool(m_was_in_smart_terrain);
-	} else if (m_version == CSE_VERSION_0x27) {
-		// no script entity
-	} else if (m_version == CSE_VERSION_0x2e) {
+	} else if (m_version >= CSE_VERSION_0x27 && m_version <= CSE_VERSION_0x2e) {
 		// no script entity
 	} else {
 		xr_not_implemented();

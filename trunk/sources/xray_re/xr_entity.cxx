@@ -2208,7 +2208,7 @@ void cse_alife_item_torch::state_read(xr_packet& packet, uint16_t size)
 	if (m_version > CSE_VERSION_0x14)
 		cse_alife_item::state_read(packet, size);
 
-	if (m_version == CSE_VERSION_0x2e) {
+	if (m_version >= CSE_VERSION_0x28 && m_version <= CSE_VERSION_0x2e) {
 		packet.r_u32();
 		packet.skip_sz();
 		packet.skip_sz();
@@ -2524,7 +2524,7 @@ void cse_alife_item_weapon::state_read(xr_packet& packet, uint16_t size)
 	packet.r_u16(m_ammo_current);
 	packet.r_u16(m_ammo_elapsed);
 	packet.r_u8(m_state);
-	if (m_version > CSE_VERSION_0x28)
+	if (m_version >= CSE_VERSION_0x28)
 		packet.r_u8(m_addon_flags);
 	if (m_version > CSE_VERSION_0x2e)
 		packet.r_u8(m_ammo_type);
