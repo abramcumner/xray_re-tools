@@ -9,7 +9,7 @@
 
 class dds_tools: public tools_base {
 public:
-			dds_tools();
+	dds_tools();
 	virtual void	process(const cl_parser& cl);
 
 protected:

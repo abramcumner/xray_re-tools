@@ -715,10 +715,19 @@ bool level_mesh::check_regular_regular_contacts(const Opcode::AABBTreeCollider& 
 		}
 	} else if (m_aggressive_merge) {
 		for (const Pair *pair = tc.GetPairs(), *end = pair + tc.GetNbPairs(); pair != end; ++pair) {
-			const b_face& face = m_faces[pair->id0 + sm->min_face];
+
+			int index = pair->id0 + sm->min_face;
+			if (index > sm->max_face)// by // FIXME: hack to handle 1-face meshes
+				index = sm->max_face;
+			const b_face& face = m_faces[index];
 			if (check_match(m_inadhesive_shaders, face.surface.eshader))
 				return false;
-			const b_face& face1 = m_faces[pair->id1 + sm1->min_face];
+
+			index = pair->id1 + sm1->min_face;
+			if (index > sm1->max_face)// by // FIXME: hack to handle 1-face meshes
+				index = sm1->max_face;
+
+			const b_face& face1 = m_faces[index];
 			if (check_match(m_inadhesive_shaders, face1.surface.eshader))
 				return false;
 		}

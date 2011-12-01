@@ -1,6 +1,7 @@
 #include "xr_ai_way.h"
 #include "xr_reader.h"
 #include "xr_writer.h"
+#include "xr_string_utils.h"
 
 using namespace xray_re;
 
@@ -9,6 +10,15 @@ void way_point_io::operator()(way_point& point, xr_reader& r) const
 	r.r_fvector3(point.position);
 	point.flags = r.r_u32();
 	r.r_sz(point.name);
+}
+
+void way_point_io_12::operator()(way_point& point, xr_reader& r, int index) const
+{
+	r.r_fvector3(point.position);
+	point.flags = r.r_u32();
+	char buf[8];
+	xr_snprintf(buf, sizeof(buf), "wp%02d", index);
+	point.name = buf;
 }
 
 void way_point_io::operator()(const way_point& point, xr_writer& w) const
@@ -25,6 +35,13 @@ void way_link_io::operator()(way_link& link, xr_reader& r) const
 	link.weight = r.r_float();
 }
 
+void way_link_io_12::operator()(way_link& link, xr_reader& r) const
+{
+	link.from = r.r_u16();
+	link.to = r.r_u16();
+	link.weight = 1.0f;
+}
+
 void way_link_io::operator()(const way_link& link, xr_writer& w) const
 {
 	w.w_u16(link.from);
@@ -39,16 +56,44 @@ void way_path_io::operator()(way_path*& _path, xr_reader& r) const
 	uint16_t version;
 	if (!r.r_chunk<uint16_t>(WAYOBJECT_CHUNK_VERSION, version))
 		xr_not_expected();
-	xr_assert(version == WAYOBJECT_VERSION);
+	xr_assert(version == WAYOBJECT_VERSION || version == WAYOBJECT_VERSION_12);
 
 	if (!r.find_chunk(WAYOBJECT_CHUNK_POINTS))
 		xr_not_expected();
-	r.r_seq(r.r_u16(), path->points, way_point_io());
+
+	switch(version) {
+	case WAYOBJECT_VERSION:
+		r.r_seq(r.r_u16(), path->points, way_point_io());
+		break;
+	case WAYOBJECT_VERSION_12: {
+		int n = r.r_u16();
+		path->points.reserve(n);
+		for (int i = 0; i != n; i++) {
+			path->points.push_back(way_point());
+			way_point_io_12()(path->points.back(), r, i);
+		}
+		}
+		break;
+	default:
+		xr_assert(false);
+	}
+
 	r.debug_find_chunk();
 
 	if (!r.find_chunk(WAYOBJECT_CHUNK_LINKS))
 		xr_not_expected();
-	r.r_seq(r.r_u16(), path->links, way_link_io());
+
+	switch(version) {
+	case WAYOBJECT_VERSION:
+		r.r_seq(r.r_u16(), path->links, way_link_io());
+		break;
+	case WAYOBJECT_VERSION_12:
+		r.r_seq(r.r_u16(), path->links, way_link_io_12());
+		break;
+	default:
+		xr_assert(false);
+	}
+
 	r.debug_find_chunk();
 
 	if (!r.find_chunk(WAYOBJECT_CHUNK_NAME))

@@ -141,6 +141,14 @@ void level_tools::process(const cl_parser& cl)
 		//load system ini from build for create spawn entity correctly
 		//load_system_ini("$temp_game_data$");
 
+		//substitute settings from profile
+		if (m_ini->line_exist(m_sect_profile, "settings")) {
+			const char* section = m_ini->r_string(m_sect_profile, "settings");
+			const char* s = m_ini->r_string(section, "ladders_gamemtl");
+			if (s)
+				m_ladders_gamemtl = s;
+		}
+
 		m_level = new xr_level;
 		if (m_level->load("$temp_game_data$", "$temp_level$"))
 			reconstruct_scene(name, scene_name);

@@ -158,7 +158,7 @@ void se_actor::state_read(xr_packet& packet, uint16_t size)
 		set_save_marker(packet, SM_LOAD, true, "se_actor");
 	} else if (m_version >= CSE_VERSION_2215 && m_version <= CSE_VERSION_SOC) {
 		// stub
-	} else if (m_version == CSE_VERSION_1580) {
+	} else if (m_version == CSE_VERSION_0x27) {
 		// stub
 	} else {
 		xr_not_implemented();
@@ -641,8 +641,10 @@ void se_sim_faction::state_write(xr_packet& packet)
 void se_zone_anom::state_read(xr_packet& packet, uint16_t size)
 {
 	cse_alife_anomalous_zone::state_read(packet, size);
-	if (packet.r_u8() == 1)		// last_spawn_time
-		xr_not_implemented();
+	if (m_version > CSE_VERSION_0x27) {
+		if (packet.r_u8() == 1)		// last_spawn_time
+			xr_not_implemented();
+	}
 }
 
 void se_zone_anom::state_write(xr_packet& packet)

@@ -49,7 +49,7 @@ void xr_level_glows::load(uint32_t xrlc_version, xr_reader& r)
 			s = r.open_chunk(FSL8_GLOWS);
 		xr_assert(s);
 		load_v5(*s);
-	} else if (xrlc_version == XRLC_VERSION_10) {
+	} else if (xrlc_version == XRLC_VERSION_10 || xrlc_version == XRLC_VERSION_11) {
 		s = r.open_chunk(FSL10_GLOWS);
 		xr_assert(s);
 		load_v5(*s);

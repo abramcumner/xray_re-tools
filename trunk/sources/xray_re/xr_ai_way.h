@@ -20,6 +20,7 @@ enum {
 
 // CWayObject
 const uint16_t WAYOBJECT_VERSION = 0x13;
+const uint16_t WAYOBJECT_VERSION_12 = 0x12;
 
 enum {
 	WAYOBJECT_CHUNK_VERSION	= 0x0001,
@@ -80,9 +81,17 @@ struct way_point_io {
 	void	operator()(const way_point& point, xr_writer& w) const;
 };
 
+struct way_point_io_12 {
+	void	operator()(way_point& point, xr_reader& r, int index) const;
+};
+
 struct way_link_io {
 	void	operator()(way_link& link, xr_reader& r) const;
 	void	operator()(const way_link& link, xr_writer& w) const;
+};
+
+struct way_link_io_12 {
+	void	operator()(way_link& link, xr_reader& r) const;
 };
 
 struct mp_rpoint_io {

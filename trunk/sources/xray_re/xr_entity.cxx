@@ -1323,7 +1323,8 @@ void cse_alife_trader_abstract::state_read(xr_packet& packet, uint16_t size)
 			packet.r_u32(m_money);
 		if (version > CSE_VERSION_0x4b && version < CSE_VERSION_0x62)
 			xr_not_implemented();
-		packet.r_sz(m_specific_character);
+		if (version > CSE_VERSION_0x27)
+			packet.r_sz(m_specific_character);
 		if (version > CSE_VERSION_0x4d)
 			packet.r_u32(m_trader_flags);
 		if (version > CSE_VERSION_0x51 && version < CSE_VERSION_0x60)

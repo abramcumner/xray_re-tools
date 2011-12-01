@@ -101,6 +101,7 @@ bool xr_level::load(const char* game_data_path, const char* level_path)
 		case XRLC_VERSION_8:
 		case XRLC_VERSION_9:
 		case XRLC_VERSION_10:
+		case XRLC_VERSION_11:
 		case XRLC_VERSION_12:
 		case XRLC_VERSION_13:
 		case XRLC_VERSION_14:
@@ -192,7 +193,7 @@ void xr_level::load(uint32_t xrlc_version, const char* game_data_path, const cha
 	if (xrlc_version >= XRLC_VERSION_9 && xrlc_version <= XRLC_VERSION_12) {
 		m_ai = ::load<xr_level_ai>(level_path, "level.ai");
 		m_game = ::load<xr_level_game>(level_path, "level.game");
-		//m_spawn = ::load<xr_level_spawn>(level_path, "level.spawn");
+		m_spawn = ::load<xr_level_spawn>(level_path, "level.spawn");
 		//m_snd_static = ::load<xr_level_snd_static>(level_path, "level.sound_static");
 		m_ps_static = ::load<xr_level_ps_static>(level_path, "level.ps_static");
 

@@ -93,7 +93,7 @@ void xr_level_shaders::load(uint32_t xrlc_version, xr_reader& r)
 		s = r.open_chunk(FSL5_TEXTURES);
 		xr_assert(s);
 		load_textures_v5(*s);
-	} else if (xrlc_version >= XRLC_VERSION_8 && xrlc_version <= XRLC_VERSION_10) {
+	} else if (xrlc_version >= XRLC_VERSION_8 && xrlc_version <= XRLC_VERSION_11) {
 		s = r.open_chunk(FSL8_SHADERS);
 		xr_assert(s);
 		load_v8(*s);
