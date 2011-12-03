@@ -222,9 +222,18 @@ xr_writer* xr_file_system::w_open(const char* path, bool ignore_ro) const
 
 	HANDLE h = CreateFileA(path, GENERIC_WRITE, FILE_SHARE_READ, NULL,
 			CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	assert(h != INVALID_HANDLE_VALUE);
-	if (h == INVALID_HANDLE_VALUE)
-		return 0;
+	//assert(h != INVALID_HANDLE_VALUE);
+	if (h == INVALID_HANDLE_VALUE) {
+		if(GetLastError() == ERROR_PATH_NOT_FOUND) {
+			std::string folder;
+			split_path(path, &folder);
+			if (!create_path(folder))
+				return 0;
+			return w_open(path, ignore_ro);
+		}
+		else
+			return 0;
+	}
 	xr_writer* w = new xr_file_writer_win32(h);
 	if (w == 0)
 		CloseHandle(h);
