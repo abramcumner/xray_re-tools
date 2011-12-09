@@ -25,6 +25,15 @@ namespace xray_re {
 enum ogf_chunk_id {
 	OGF_HEADER		= 0x1,
 
+	//build 729
+	OGF2_TEXTURE        = 0x2,
+	OGF2_TEXTURE_L      = 0x3,
+	OGF2_BBOX           = 0x6,
+	OGF2_VERTICES       = 0x7,
+	OGF2_INDICES        = 0x8,
+	OGF2_VCONTAINER     = 0xb,
+	OGF2_BSPHERE        = 0xc,
+
 	OGF3_TEXTURE		= 0x2,
 	OGF3_TEXTURE_L		= 0x3,
 	OGF3_CHILD_REFS		= 0x5,
@@ -42,8 +51,15 @@ enum ogf_chunk_id {
 	OGF3_CHILDREN		= 0x11,
 	OGF3_S_SMPARAMS		= 0x12,
 	OGF3_ICONTAINER		= 0x13,// build 1865
+	OGF3_S_SMPARAMS_NEW = 0x14,// build 1844
 	OGF3_LODDEF2		= 0x15,// build 1865
 	OGF3_TREEDEF2		= 0x16,// build 1865
+	OGF3_S_USERDATA     = 0x18,// build 1844
+	OGF3_S_IKDATA       = 0x19,// build 1844
+	OGF3_S_MOTIONS_NEW  = 0x1a,// build 1844
+	OGF3_S_DESC         = 0x1b,// build 1844
+	OGF3_S_IKDATA_2     = 0x1C,// build 1842
+	OGF3_S_MOTION_REFS  = 0x1D,// build 1842
 
 	OGF4_TEXTURE		= 0x2,
 	OGF4_VERTICES		= 0x3,
@@ -60,10 +76,10 @@ enum ogf_chunk_id {
 	OGF4_S_MOTIONS		= 0xe,
 	OGF4_S_SMPARAMS		= 0xf,
 	OGF4_S_IKDATA		= 0x10,
-	OGF4_S_USERDATA		= 0x11,
-	OGF4_S_DESC		= 0x12,
-	OGF4_S_MOTION_REFS_0	= 0x13,	// pre-CS format
-	OGF4_SWICONTAINER	= 0x14,
+	OGF4_S_USERDATA		    = 0x11,
+	OGF4_S_DESC             = 0x12,
+	OGF4_S_MOTION_REFS_0    = 0x13,	// pre-CS format
+	OGF4_SWICONTAINER       = 0x14,
 	OGF4_GCONTAINER		= 0x15,
 	OGF4_FASTPATH		= 0x16,
 	OGF4_S_LODS		= 0x17,
@@ -76,8 +92,9 @@ typedef fsphere ogf_bsphere;
 
 // OGF header definitions.
 enum ogf_version {
-	OGF3_VERSION	= 3,
-	OGF4_VERSION	= 4,
+	OGF2_VERSION    = 2,
+	OGF3_VERSION    = 3,
+	OGF4_VERSION    = 4,
 };
 
 enum ogf_model_type {
@@ -93,6 +110,9 @@ enum ogf_model_type {
 	MT3_PROGRESSIVE2	= 0xa,	// FProgressive
 	MT3_LOD			= 0xb,	// FLOD build 1472 - 1865
 	MT3_TREE		= 0xc,	// FTreeVisual build 1472 - 1865
+	//				= 0xd,	// CParticleEffect 1844
+	//				= 0xe,	// CParticleGroup 1844
+	//				= 0xf,	// CSkeletonRigid 1844
 
 	MT4_NORMAL		= 0,	// Fvisual
 	MT4_HIERRARHY		= 0x1,	// FHierrarhyVisual
@@ -129,6 +149,7 @@ enum ogf_vertex_format {
 	OGF_VERTEXFORMAT_FVF		= 0x112,
 
 	OGF3_VERTEXFORMAT_FVF_1L	= 0x12071980,
+	OGF3_VERTEXFORMAT_FVF_2L	= 0x240e3300,
 
 	OGF4_VERTEXFORMAT_FVF_1L	= 0x12071980,
 	OGF4_VERTEXFORMAT_FVF_2L	= 0x240e3300,
@@ -207,9 +228,12 @@ struct ogf4_slide_window {
 };
 
 // Bone and kinematics definitions are mostly shared with editor object.
+const uint32_t OGF3_S_JOINT_IK_DATA_VERSION = 1;
 const uint32_t OGF4_S_JOINT_IK_DATA_VERSION = 1;
 
 // Motions definitions.
+const uint16_t OGF3_S_SMPARAMS_VERSION_1 = 1;	// 1829
+const uint16_t OGF3_S_SMPARAMS_VERSION_3 = 3;	// 1842
 const uint16_t OGF4_S_SMPARAMS_VERSION_3 = 3;	// 2215, 2947+
 const uint16_t OGF4_S_SMPARAMS_VERSION_4 = 4;	// 3120, 3456+
 

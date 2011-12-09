@@ -70,6 +70,13 @@ protected:
 	void	load_motion_defs(xr_ini_file& ini, ogf3_motion_type motion_type, const char* motion_type_section);
 	void	load_loddef2(xr_reader& r);
 	void	load_treedef2(xr_reader& r);
+	void	load_s_smparams_new(xr_reader& r);
+	void	load_s_desc(xr_reader& r);
+	void	load_s_motions_new(xr_reader& r);
+	void	load_s_ikdata(xr_reader& r);
+	void	load_s_userdata(xr_reader& r);
+	void	load_s_ikdata_2(xr_reader& r);
+	void	load_s_motion_refs(xr_reader& r);
 
 	void	setup_ib0();
 
@@ -113,6 +120,10 @@ private:
 	ogf4_5color	m_c_scale;	// OGF_TREEDEF2
 	ogf4_5color	m_c_bias;
 	fmatrix		m_tree_xform;
+
+	std::string	m_source;	// OGF_S_DESC fields which do not fit in xr_object
+	std::string	m_export_tool;
+	uint32_t	m_export_time;
 };
 
 TYPEDEF_STD_VECTOR_PTR(xr_ogf_v3)

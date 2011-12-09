@@ -114,10 +114,14 @@ void xr_vbuf::load_d3d7(xr_reader& r, size_t n, uint32_t fvf)
 	set_size(n);
 	for (size_t i = 0; i != n; ++i) {
 		r.r_fvector3(m_points[i]);
-		if (fvf & D3D_FVF_DIFFUSE)
-			r_qnormal(r, m_normals[i]);
-		else if (fvf & D3D_FVF_NORMAL)
+		if (fvf & D3D_FVF_NORMAL)
 			r.r_fvector3(m_normals[i]);
+		if (fvf & D3D_FVF_DIFFUSE)
+		{
+			fvector3 temp;
+			r_qnormal(r, temp);
+			m_normals[i] = temp;
+		}
 		if (fvf & (D3D_FVF_TEX1|D3D_FVF_TEX2))
 			r.r_fvector2(m_texcoords[i]);
 		if (fvf & D3D_FVF_TEX2)
@@ -278,6 +282,23 @@ void xr_vbuf::load_ogf3(xr_reader& r, size_t n, ogf_vertex_format vf)
 			r.r_fvector3(m_normals[i]);
 			r.r_fvector2(m_texcoords[i]);
 			m_influences[i].set(r.r_u32());
+		}
+		make_signature();
+	} else if (vf == OGF3_VERTEXFORMAT_FVF_2L) {
+		clear();
+		m_influences = new finfluence[n];
+		m_points = new fvector3[n];
+		m_normals = new fvector3[n];
+		m_texcoords = new fvector2[n];
+		set_size(n);
+		for (size_t i = 0; i != n; ++i) {
+			uint16_t bone0 = r.r_u16();
+			uint16_t bone1 = r.r_u16();
+			r.r_fvector3(m_points[i]);
+			r.r_fvector3(m_normals[i]);
+			r.advance(2*sizeof(fvector3));	// skip tangent and binormal
+			m_influences[i].set_wo_reorder(bone0, bone1, r.r_float());//set_wo_reorder нужно для восстановления модели
+			r.r_fvector2(m_texcoords[i]);
 		}
 		make_signature();
 	} else {

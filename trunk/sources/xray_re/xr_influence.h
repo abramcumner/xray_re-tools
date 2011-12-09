@@ -25,6 +25,7 @@ typedef _bone_weight<uint32_t, float> fbone_weight;
 template<typename Tb, typename Tw> struct _influence: public _svector<_bone_weight<Tb, Tw>, 4> {
 	void		set(uint32_t bone0);
 	void		set(uint16_t bone0, uint16_t bone1, float weight0);
+	void		set_wo_reorder(uint16_t bone0, uint16_t bone1, float weight0);
 	void		set(size_t num_bones, const uint16_t* bones, const float* weights);
 	void		reorder();
 };
@@ -79,6 +80,19 @@ void _influence<Tb, Tw>::set(uint16_t bone0, uint16_t bone1, float weight0)
 			push_back(bw1);
 			push_back(bw0);
 		}
+	}
+}
+
+template<typename Tb, typename Tw>
+void _influence<Tb, Tw>::set_wo_reorder(uint16_t bone0, uint16_t bone1, float weight0)
+{
+	if (bone0 == bone1) {
+		push_back(_bone_weight<Tb, Tw>(bone0, Tw(1)));
+	} else {
+		_bone_weight<Tb, Tw> bw0(bone0, Tw(1.f - weight0));
+		_bone_weight<Tb, Tw> bw1(bone1, Tw(weight0));
+		push_back(bw0);
+		push_back(bw1);
 	}
 }
 
