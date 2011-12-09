@@ -900,10 +900,11 @@ void xr_ogf_v3::load_kinematics(xr_reader& r)
 			r.close_chunk(s);
 		} else {
 			s = r.open_chunk(OGF3_S_IKDATA_0);
-			xr_assert(s);
-			load_s_ikdata_0(*s);
-			xr_assert(s->eof());
-			r.close_chunk(s);
+			if (s) {
+				load_s_ikdata_0(*s);
+				xr_assert(s->eof());
+				r.close_chunk(s);
+			}
 		}
 	}
 
