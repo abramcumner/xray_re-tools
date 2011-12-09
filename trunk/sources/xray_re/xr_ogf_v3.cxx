@@ -8,6 +8,7 @@ using namespace xray_re;
 
 struct xr_ogf_v3::bone_io: public xr_bone {
 	void	import(xr_reader& r);
+	void	import_ikdata_0(xr_reader& r);
 	void	import_ikdata(xr_reader& r);
 	void	import_ikdata_2(xr_reader& r);
 	void	define(uint16_t id, const std::string& name);
@@ -691,6 +692,69 @@ void xr_ogf_v3::load_s_ikdata(xr_reader& r)
 	set_chunk_loaded(OGF3_S_IKDATA);
 }
 
+void xr_ogf_v3::bone_io::import_ikdata_0(xr_reader& r)
+{
+	r.r_sz(m_gamemtl);
+	r.r(m_shape);
+	r.r(m_joint_ik_data);
+
+	m_joint_ik_data.friction = 0.0f;
+	m_joint_ik_data.ik_flags = 0;
+	m_joint_ik_data.break_force = 0.0f;
+	m_joint_ik_data.break_torque = 0.0f;
+	r.advance(-16);
+
+	r.r_fvector3(m_bind_rotate);
+	r.r_fvector3(m_bind_offset);
+
+	//std::swap(m_bind_offset.x, m_bind_offset.y);
+	//std::swap(m_bind_rotate.x, m_bind_rotate.y);
+
+	m_bind_length = 0.5f;
+	m_mass = r.r_float();
+	r.r_fvector3(m_center_of_mass);
+}
+
+void fix_bind(xr_bone * bone)
+{
+	for (xr_bone_vec_it it = bone->children().begin(), end = bone->children().end(); it != end; ++it)
+		fix_bind(*it);
+
+	if (!bone->is_root())
+	{
+		fmatrix total, parent, local, parent_i, total_i, local_i;
+		total.set_xyz_i(bone->bind_rotate());
+		total.c.set(bone->bind_offset());
+		parent.set_xyz_i(bone->parent()->bind_rotate());
+		parent.c.set(bone->parent()->bind_offset());
+		parent_i.invert_43(parent);
+		total_i.invert_43(total);
+		local.mul_43(total_i, parent);
+		local_i.invert_43(local);
+
+		bone->bind_offset() = local_i.c;
+		local_i.get_xyz_i(bone->bind_rotate());
+	}
+}
+
+void xr_ogf_v3::load_s_ikdata_0(xr_reader& r)
+{
+	for (xr_bone_vec_it it = m_bones.begin(), end = m_bones.end(); it != end; ++it)
+		static_cast<bone_io*>(*it)->import_ikdata_0(r);
+	set_chunk_loaded(OGF3_S_IKDATA_0);
+
+	//в старых моделях из чанка OGF3_S_IKDATA_0 bind pose костей задается относительно модели
+	//для совместимости надо пересчитать относительно родительской кости
+	for (xr_bone_vec_it it = m_bones.begin(), end = m_bones.end(); it != end; ++it)
+	{
+		if ((*it)->is_root())
+		{
+			fix_bind(*it);
+			break;
+		}
+	}
+}
+
 inline void xr_ogf_v3::bone_io::import_ikdata_2(xr_reader& r)
 {
 	uint32_t version = r.r_u32();
@@ -828,9 +892,19 @@ void xr_ogf_v3::load_kinematics(xr_reader& r)
 		load_s_ikdata_2(*s);
 		xr_assert(s->eof());
 		r.close_chunk(s);
-	} else if (r.find_chunk(OGF3_S_IKDATA)) {
-		load_s_ikdata(r);
-		r.debug_find_chunk();
+	} else {
+		s = r.open_chunk(OGF3_S_IKDATA);
+		if (s) {
+			load_s_ikdata(*s);
+			xr_assert(s->eof());
+			r.close_chunk(s);
+		} else {
+			s = r.open_chunk(OGF3_S_IKDATA_0);
+			xr_assert(s);
+			load_s_ikdata_0(*s);
+			xr_assert(s->eof());
+			r.close_chunk(s);
+		}
 	}
 
 	s = r.open_chunk(OGF3_S_MOTION_REFS);

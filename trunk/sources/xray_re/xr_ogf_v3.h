@@ -77,6 +77,7 @@ protected:
 	void	load_s_userdata(xr_reader& r);
 	void	load_s_ikdata_2(xr_reader& r);
 	void	load_s_motion_refs(xr_reader& r);
+	void	load_s_ikdata_0(xr_reader& r);
 
 	void	setup_ib0();
 
