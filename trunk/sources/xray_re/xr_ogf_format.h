@@ -113,7 +113,7 @@ enum ogf_model_type {
 	MT3_TREE		= 0xc,	// FTreeVisual build 1472 - 1865
 	//				= 0xd,	// CParticleEffect 1844
 	//				= 0xe,	// CParticleGroup 1844
-	//				= 0xf,	// CSkeletonRigid 1844
+	MT3_SKELETON_RIGID	= 0xf,	// CSkeletonRigid 1844
 
 	MT4_NORMAL		= 0,	// Fvisual
 	MT4_HIERRARHY		= 0x1,	// FHierrarhyVisual

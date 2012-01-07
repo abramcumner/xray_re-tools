@@ -61,6 +61,7 @@ bool xr_ogf_v3::hierarchical() const
 	switch (m_model_type) {
 	case MT3_HIERRARHY:
 	case MT3_SKELETON_ANIM:
+	case MT3_SKELETON_RIGID:
 	case MT3_LOD:
 		return true;
 	default:
@@ -908,7 +909,27 @@ void xr_ogf_v3::load_kinematics(xr_reader& r)
 		}
 	}
 
-	s = r.open_chunk(OGF3_S_MOTION_REFS);
+	//переводим координаты вершин из системы относительно кости в систему относительно модели
+	//теперь вершины именно так задаются
+	calculate_bind();
+	for(size_t j = 0; j!= children().size(); ++j)
+	{
+		const xr_vbuf & vb = children()[j]->vb();
+		for (size_t i = 0; i != vb.size(); ++i)
+		{
+			const finfluence * weights =  vb.w() + i;
+			int bone = weights->array[0].bone;
+			fvector3 * pv = const_cast<fvector3 *>(vb.p() + i);
+			const fmatrix& xform = bones()[bone]->bind_xform(); 
+			fvector3 temp;
+			temp.transform(*pv, xform);
+			*pv = temp;
+		}
+	}
+}
+void xr_ogf_v3::load_kinematics_animated(xr_reader& r) {
+	load_kinematics(r);
+	xr_reader* s = r.open_chunk(OGF3_S_MOTION_REFS);
 	if (s) {
 		load_s_motion_refs(*s);
 		r.close_chunk(s);
@@ -940,24 +961,6 @@ void xr_ogf_v3::load_kinematics(xr_reader& r)
 			load_s_motions(*s);
 			assert(s->eof());
 			r.close_chunk(s);
-		}
-	}
-
-	//переводим координаты вершин из системы относительно кости в систему относительно модели
-	//теперь вершины именно так задаются
-	calculate_bind();
-	for(size_t j = 0; j!= children().size(); ++j)
-	{
-		const xr_vbuf & vb = children()[j]->vb();
-		for (size_t i = 0; i != vb.size(); ++i)
-		{
-			const finfluence * weights =  vb.w() + i;
-			int bone = weights->array[0].bone;
-			fvector3 * pv = const_cast<fvector3 *>(vb.p() + i);
-			const fmatrix& xform = bones()[bone]->bind_xform(); 
-			fvector3 temp;
-			temp.transform(*pv, xform);
-			*pv = temp;
 		}
 	}
 }
@@ -1069,7 +1072,7 @@ void xr_ogf_v3::load_ogf(xr_reader& r)
 		m_flags = EOF_PROGRESSIVE;
 		break;
 	case MT3_SKELETON_ANIM:
-		load_kinematics(r);
+		load_kinematics_animated(r);
 		m_flags = EOF_DYNAMIC;
 		break;
 	case MT3_SKELETON_GEOMDEF_PM:
@@ -1099,6 +1102,10 @@ void xr_ogf_v3::load_ogf(xr_reader& r)
 	case MT3_TREE:
 		load_tree_visual(r);
 		m_flags = EOF_STATIC;
+		break;
+	case MT3_SKELETON_RIGID:
+		load_kinematics(r);
+		m_flags = EOF_DYNAMIC;
 		break;
 	default:
 		xr_not_expected();

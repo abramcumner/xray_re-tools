@@ -87,6 +87,7 @@ private:
 	void	load_hierrarhy_visual(xr_reader& r);
 	void	load_progressive_fixed_visual(xr_reader& r);
 	void	load_kinematics(xr_reader& r);
+	void	load_kinematics_animated(xr_reader& r);
 	void	load_skeletonx(xr_reader& r);
 	void	load_skeletonx_pm(xr_reader& r);
 	void	load_skeletonx_st(xr_reader& r);
