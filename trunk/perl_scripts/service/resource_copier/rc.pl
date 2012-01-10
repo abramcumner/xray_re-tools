@@ -165,26 +165,26 @@ GetOptions(
 	'soc' => \$soc,
 ) or die usage();
 my $ignore_hash = ini_file->new('ignore.ini', 'r');
-my $log = IO::File->new('X:\logs\resource_copier.log', 'w');
 if (defined ($level_name && $out)) {
+	my $log = IO::File->new('X:\logs\copy.log', 'w');
 	copy_part();
 	if (defined $soc) {
-		copy_old();
+		copy_old($log);
 	} else {
-		copy_new();
+		copy_new($log);
 	}
-	copy_textures();
+	copy_textures($log);
+	$log->close();
 	print "done!\n";
 } else {
 	die usage();
 }
-$log->close();
 $ignore_hash->close();
 sub is_soc {return defined $soc;}
 sub is_tga {return defined $tga;}
 
 sub get_list {
-	my $type = @_;
+	my ($type, $log) = @_;
 	my $scene;
 	my @names = ();
 	if (::is_soc()) {
@@ -280,10 +280,11 @@ sub copy_part {
 	}
 }
 sub copy_old {
+	my $log = shift;
 ###let's copy *.object files for level###
 	print "copying level objects...\n";
 	print $log "Ignored OBJECTS\n";
-	my @names = get_list('objects');
+	my @names = get_list('objects', $log);
 	my %copied_objects;
 	my %uncopied_objects;
 	foreach my $name (sort {$a cmp $b} @names) {
@@ -305,7 +306,7 @@ sub copy_old {
 ###let's copy sounds for level###
 	print "copying sounds...\n";
 	print $log "\nIgnored SOUNDS\n";
-	my @snd_names = get_list('sounds');
+	my @snd_names = get_list('sounds', $log);
 	my %copied_sounds;
 	my %uncopied_sounds;
 	foreach my $name (sort {$a cmp $b} @snd_names) {
@@ -324,10 +325,11 @@ sub copy_old {
 	}	
 }
 sub copy_new {
+	my $log = shift;
 ###let's copy *.object files for level###
 	print "copying level objects...\n";
 	print $log "Ignored OBJECTS\n";
-	my @names = get_list('objects');
+	my @names = get_list('objects', $log);
 	my %copied_objects;
 	my %uncopied_objects;
 	foreach my $name (sort {$a cmp $b} @names) {
@@ -349,7 +351,7 @@ sub copy_new {
 ###let's copy sounds for level###
 	print "copying sounds...\n";
 	print $log "\nIgnored SOUNDS\n";
-	my @snd_names = get_list('sounds');
+	my @snd_names = get_list('sounds', $log);
 	my %copied_sounds;
 	my %uncopied_sounds;
 	foreach my $name (sort {$a cmp $b} @snd_names) {
@@ -368,6 +370,7 @@ sub copy_new {
 	}	
 }
 sub copy_textures {
+	my $log = shift;
 ###let's form texture list###
 	print "forming texture list...\n";
 	my $log_dir = 'X:\logs\\';
@@ -451,5 +454,6 @@ sub copy_textures {
 			print $log "$uncopied_tga{$log_record}: $log_record\n";
 		}
 	}
+	$log->close();
 }
 #######################################################################
