@@ -167,7 +167,8 @@ static MStatus extract_faces(MFnMesh& mesh_fn, lw_face_vec& faces)
 	for (int i = 0; i != num_polys; ++i) {
 		status = mesh_fn.getPolygonVertices(i, verts);
 		if (!status || verts.length() != 3) {
-			msg("can't handle polygons with 4 or more sides");
+			msg("can't handle polygons with 4 or more sides for mesh %s",
+					mesh_fn.name().asChar());
 			return MS::kInvalidParameter;
 		}
 		lw_face face(verts[2], verts[1], verts[0]);
