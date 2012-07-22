@@ -134,9 +134,9 @@ MStatus maya_dm_reader::reader(const MFileObject& file, const MString& options, 
 	MStatus status = MS::kFailure;
 	if (mode == kImportAccessMode || mode == kOpenAccessMode) {
 		start_progress(2, "Loading DM");
-		const char *path = file.resolvedFullName().asChar();
+		const MString path = file.resolvedFullName();
 		xr_dm* dm = new xr_dm;
-		if (dm->load_dm(path)) {
+		if (dm->load_dm(path.asChar())) {
 			advance_progress();
 			dm->to_object();
 			advance_progress();
@@ -172,9 +172,9 @@ MStatus maya_object_translator::reader(const MFileObject& file, const MString& o
 
 	MStatus status = MS::kFailure;
 	if (mode == kImportAccessMode || mode == kOpenAccessMode) {
-		const char* path = file.resolvedFullName().asChar();
+		const MString path = file.resolvedFullName();
 		xr_object* object = new xr_object;
-		if (object->load_object(path))
+		if (object->load_object(path.asChar()))
 			maya_import_tools(object, &status);
 		else
 			msg("can't open %s", path);
@@ -259,8 +259,8 @@ MStatus maya_ogf_reader::reader(const MFileObject& file, const MString& options,
 	MStatus status = MS::kFailure;
 	if (mode == kImportAccessMode || mode == kOpenAccessMode) {
 		start_progress(2, "Loading OGF");
-		const char* path = file.resolvedFullName().asChar();
-		xr_ogf* ogf = xr_ogf::load_ogf(path);
+		const MString path = file.resolvedFullName();
+		xr_ogf* ogf = xr_ogf::load_ogf(path.asChar());
 		if (ogf) {
 			advance_progress();
 			ogf->to_object();
@@ -298,9 +298,9 @@ MStatus maya_omf_reader::reader(const MFileObject& file, const MString& options,
 	MStatus status = MS::kFailure;
 	if (mode == kImportAccessMode) {
 		start_progress(1, "Loading OMF");
-		const char* path = file.resolvedFullName().asChar();
+		const MString path = file.resolvedFullName();
 		xr_ogf_v4* omf = new xr_ogf_v4;
-		if (omf->load_omf(path)) {
+		if (omf->load_omf(path.asChar())) {
 			advance_progress();
 			maya_import_tools imp_tools;
 			MObject character_obj = imp_tools.lookup_character(&status);
@@ -338,9 +338,9 @@ MStatus maya_skl_translator::reader(const MFileObject& file, const MString& opti
 	MStatus status = MS::kFailure;
 	if (mode == kImportAccessMode) {
 		maya_import_tools imp_tools;
-		const char* path = file.resolvedFullName().asChar();
+		const MString path = file.resolvedFullName();
 		xr_skl_motion* smotion = new xr_skl_motion;
-		if (!smotion->load_skl(path)) {
+		if (!smotion->load_skl(path.asChar())) {
 			msg("can't open %s", path);
 			delete smotion;
 			return MS::kFailure;
@@ -394,9 +394,9 @@ MStatus maya_skls_reader::reader(const MFileObject& file, const MString& options
 	MStatus status = MS::kFailure;
 	if (mode == kImportAccessMode) {
 		maya_import_tools imp_tools;
-		const char* path = file.resolvedFullName().asChar();
+		const MString path = file.resolvedFullName();
 		xr_object* object = new xr_object;
-		if (!object->load_skls(path)) {
+		if (!object->load_skls(path.asChar())) {
 			msg("can't open %s", path);
 			delete object;
 			return MS::kFailure;
