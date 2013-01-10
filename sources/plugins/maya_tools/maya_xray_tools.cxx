@@ -67,8 +67,9 @@ class maya_skl_object_writer: public MPxFileTranslator {
 public:
 	virtual MStatus		writer(const MFileObject& file, const MString& options, FileAccessMode mode);
 	virtual bool		haveWriteMethod() const;
-	virtual MFileKind	identifyFile(const MFileObject& file, const char* buffer, short size) const;
 	virtual MString		defaultExtension() const;
+	virtual MString		filter() const;
+	virtual MFileKind	identifyFile(const MFileObject& file, const char* buffer, short size) const;
 
 	static void*		creator();
 };
@@ -208,10 +209,10 @@ MString maya_object_translator::defaultExtension() const { return MString("objec
 
 MString maya_object_translator::filter() const
 {
-#	if (MAYA_API_VERSION >= 201200) 
+#	if (MAYA_API_VERSION >= 201100) 
 		return MString("*.object");
 #	else
-		return MString("*.ob*");
+		return MString("*.ob-");
 #	endif
 }
 
@@ -244,6 +245,15 @@ MStatus maya_skl_object_writer::writer(const MFileObject& file, const MString& o
 bool maya_skl_object_writer::haveWriteMethod() const { return true; }
 
 MString maya_skl_object_writer::defaultExtension() const { return MString("object"); }
+
+MString maya_skl_object_writer::filter() const
+{
+#	if (MAYA_API_VERSION >= 201100) 
+		return MString("*.object");
+#	else
+		return MString("*.ob-");
+#	endif
+}
 
 MPxFileTranslator::MFileKind maya_skl_object_writer::identifyFile(const MFileObject& file, const char* buffer, short size) const
 {
@@ -417,10 +427,10 @@ MString maya_skls_reader::defaultExtension() const { return MString("skls"); }
 
 MString maya_skls_reader::filter() const
 {
-#	if (MAYA_API_VERSION >= 201200) 
+#	if (MAYA_API_VERSION >= 201100) 
 		return MString("*.skls");
 #	else
-		return MString("*.sk*");
+		return MString("*.sk-");
 #	endif
 }
 
