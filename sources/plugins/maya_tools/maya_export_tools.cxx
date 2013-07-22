@@ -386,7 +386,7 @@ MStatus maya_export_tools::extract_surfaces(MFnMesh& mesh_fn, xr_surfmap_vec& su
 	MObjectArray shading_groups;
 	MIntArray faces;
 	MStatus status = mesh_fn.getConnectedShaders(0, shading_groups, faces);
-	if (!status) {
+	if (!status || shading_groups.length() == 0) {
 		msg("can't get connected shaders for mesh %s", mesh_fn.name().asChar());
 		return MS::kInvalidParameter;
 	}
