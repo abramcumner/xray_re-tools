@@ -68,6 +68,7 @@
 				AdditionalLibraryDirectories="$(OutDir)\libraries"
 				GenerateDebugInformation="true"
 				SubSystem="1"
+				LargeAddressAware="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -225,6 +226,7 @@
 				AdditionalLibraryDirectories="$(OutDir)\libraries"
 				GenerateDebugInformation="false"
 				SubSystem="1"
+				LargeAddressAware="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"

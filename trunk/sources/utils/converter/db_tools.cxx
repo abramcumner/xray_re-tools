@@ -66,7 +66,7 @@ void db_unpacker::process(const cl_parser& cl)
 	}
 
 	const char* source = cl.param(0);
-	std::string prefix, extension;
+	std::string prefix, extension,  mask;
 	xr_file_system::split_path(source, 0, &prefix, &extension);
 
 	unsigned version = DB_VERSION_AUTO;
@@ -102,6 +102,8 @@ void db_unpacker::process(const cl_parser& cl)
 		return;
 	}
 
+	cl.get_string("-flt", mask); if (mask.length()) msg("masking '%s'", mask.c_str()); 
+
 	cl.get_string("-dir", prefix);
 	if (fs.create_path(prefix)) {
 		xr_file_system::append_path_separator(prefix);
@@ -127,18 +129,18 @@ void db_unpacker::process(const cl_parser& cl)
 			const uint8_t* data = static_cast<const uint8_t*>(r->data());
 			switch (version) {
 			case DB_VERSION_1114:
-				extract_1114(prefix, s, data);
+				extract_1114(prefix, mask, s, data);
 				break;
 			case DB_VERSION_2215:
-				extract_2215(prefix, s, data);
+				extract_2215(prefix, mask, s, data);
 				break;
 			case DB_VERSION_2945:
-				extract_2945(prefix, s, data);
+				extract_2945(prefix, mask, s, data);
 				break;
 			case DB_VERSION_2947RU:
 			case DB_VERSION_2947WW:
 			case DB_VERSION_XDB:
-				extract_2947(prefix, s, data);
+				extract_2947(prefix, mask, s, data);
 				break;
 			}
 			r->close_chunk(s);
@@ -181,7 +183,7 @@ static bool write_file(xr_file_system& fs, const std::string& path, const uint8_
 	return success;
 }
 
-void db_unpacker::extract_1114(const std::string& prefix, xr_reader* s, const uint8_t* data) const
+void db_unpacker::extract_1114(const std::string& prefix, const std::string& mask, xr_reader* s, const uint8_t* data) const
 {
 	xr_file_system& fs = xr_file_system::instance();
 	for (std::string temp, path, folder; !s->eof(); ) {
@@ -189,6 +191,12 @@ void db_unpacker::extract_1114(const std::string& prefix, xr_reader* s, const ui
 		unsigned uncompressed = s->r_u32();
 		unsigned offset = s->r_u32();
 		unsigned size = s->r_u32();
+
+		if (mask.length() && (offset != 0))
+		//if (path.compare(path.size()-mask.size(),mask.size(),mask) != 0)
+		if (path.find(mask) == -1)
+		continue;
+
 		if (DB_DEBUG && fs.read_only()) {
 			msg("%s", temp.c_str());
 			msg("  offset: %u", offset);
@@ -215,7 +223,7 @@ void db_unpacker::extract_1114(const std::string& prefix, xr_reader* s, const ui
 	}
 }
 
-void db_unpacker::extract_2215(const std::string& prefix, xr_reader* s, const uint8_t* data) const
+void db_unpacker::extract_2215(const std::string& prefix, const std::string& mask, xr_reader* s, const uint8_t* data) const
 {
 	xr_file_system& fs = xr_file_system::instance();
 	for (std::string path; !s->eof(); ) {
@@ -223,6 +231,12 @@ void db_unpacker::extract_2215(const std::string& prefix, xr_reader* s, const ui
 		unsigned offset = s->r_u32();
 		unsigned size_real = s->r_u32();
 		unsigned size_compressed = s->r_u32();
+
+		if (mask.length() && (offset != 0))
+		//if (path.compare(path.size()-mask.size(),mask.size(),mask) != 0)
+		if (path.find(mask) == -1)
+		continue;
+
 		if (DB_DEBUG && fs.read_only()) {
 			msg("%s", path.c_str());
 			msg("  offset: %u", offset);
@@ -236,7 +250,7 @@ void db_unpacker::extract_2215(const std::string& prefix, xr_reader* s, const ui
 	}
 }
 
-void db_unpacker::extract_2945(const std::string& prefix, xr_reader* s, const uint8_t* data) const
+void db_unpacker::extract_2945(const std::string& prefix, const std::string& mask, xr_reader* s, const uint8_t* data) const
 {
 	xr_file_system& fs = xr_file_system::instance();
 	for (std::string path; !s->eof(); ) {
@@ -245,6 +259,12 @@ void db_unpacker::extract_2945(const std::string& prefix, xr_reader* s, const ui
 		unsigned offset = s->r_u32();
 		unsigned size_real = s->r_u32();
 		unsigned size_compressed = s->r_u32();
+
+		if (mask.length() && (offset != 0))
+		//if (path.compare(path.size()-mask.size(),mask.size(),mask) != 0)
+		if (path.find(mask) == -1)
+		continue;
+
 		if (DB_DEBUG && fs.read_only()) {
 			msg("%s", path.c_str());
 			msg("  crc: 0x%8.8x", crc);
@@ -259,7 +279,7 @@ void db_unpacker::extract_2945(const std::string& prefix, xr_reader* s, const ui
 	}
 }
 
-void db_unpacker::extract_2947(const std::string& prefix, xr_reader* s, const uint8_t* data) const
+void db_unpacker::extract_2947(const std::string& prefix, const std::string& mask, xr_reader* s, const uint8_t* data) const
 {
 	xr_file_system& fs = xr_file_system::instance();
 	for (std::string path; !s->eof(); ) {
@@ -271,6 +291,12 @@ void db_unpacker::extract_2947(const std::string& prefix, xr_reader* s, const ui
 		const char* name = s->skip<char>(name_size);
 		path.append(name, name_size);
 		uint32_t offset = s->r_u32();
+
+		if (mask.length() && (offset != 0))
+		//if (path.compare(path.size()-mask.size(),mask.size(),mask) != 0)
+		if (path.find(mask) == -1)
+		continue;
+
 		if (DB_DEBUG && fs.read_only()) {
 			msg("%s", std::string(name, name_size).c_str());
 			msg("  offset: %u", offset);

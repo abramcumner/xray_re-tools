@@ -49,8 +49,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".."
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;__SSE2__;__SSE__;__MMX__;HAVE_CUDA"
+				AdditionalIncludeDirectories="..;../nvcore"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;__SSE2__;__SSE__;__MMX__"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -70,7 +70,6 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="cudart.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -184,7 +183,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
-				AdditionalIncludeDirectories=".."
+				AdditionalIncludeDirectories="..;../nvcore"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;__SSE2__;__SSE__;__MMX__"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -205,7 +204,6 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="cudart.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -320,7 +318,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
-				AdditionalIncludeDirectories=".."
+				AdditionalIncludeDirectories="..;&quot;$(CUDA_INC_PATH)&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;__SSE2__;__SSE__;__MMX__;HAVE_CUDA"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -342,6 +340,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalDependencies="cudart.lib"
+				AdditionalLibraryDirectories="$(CUDA_LIB_PATH)"
 				SuppressStartupBanner="false"
 			/>
 			<Tool

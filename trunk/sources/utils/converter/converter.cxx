@@ -65,6 +65,7 @@ void usage()
 	printf(" -2947ww	assume world-wide release version and 3120 format\n");
 	printf(" -xdb		assume .xdb or .db archive format\n");
 	printf(" -xdb_ud <FILE>	attach user data from <FILE>\n");
+	printf(" -flt <MASK> 	extract only files, filtered by mask\n");
 }
 
 int main(int argc, char* argv[])
@@ -98,6 +99,7 @@ int main(int argc, char* argv[])
 		{"-fs",		cl_parser::OT_STRING},
 		{"-out",	cl_parser::OT_STRING},
 		{"-dir",	cl_parser::OT_STRING},
+		{"-flt",	cl_parser::OT_STRING},
 
 		{"-ro",		cl_parser::OT_BOOL},
 

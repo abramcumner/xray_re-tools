@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="nvtt"
 	ProjectGUID="{938E23B7-2436-4ECC-B960-6894655447F1}"
 	RootNamespace="nvtt"
@@ -51,8 +51,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..;&quot;$(CUDA_INC_PATH)&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;__SSE2__;__SSE__;__MMX__;HAVE_CUDA"
+				AdditionalIncludeDirectories="..;../nvcore"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;__SSE2__;__SSE__;__MMX__"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -72,8 +72,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="cudart.lib"
-				AdditionalLibraryDirectories="$(CUDA_PATH)\lib\win32"
+				AdditionalLibraryDirectories=""
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -125,7 +124,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				EnableFiberSafeOptimizations="true"
-				AdditionalIncludeDirectories="..;&quot;$(CUDA_INC_PATH)&quot;"
+				AdditionalIncludeDirectories="..;../nvcore"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;__SSE2__;__SSE__;__MMX__"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -146,8 +145,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="cudart.lib"
-				AdditionalLibraryDirectories="&quot;$(CUDA_PATH)\lib\Win32&quot;"
+				AdditionalLibraryDirectories=""
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -573,13 +571,6 @@
 				<File
 					RelativePath="..\nvtt\cuda\CompressKernel.cu"
 					>
-					<FileConfiguration
-						Name="Release_CUDA|Win32"
-						>
-						<Tool
-							Name="Cudart Build Rule"
-						/>
-					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\nvtt\cuda\CudaCompressDXT.cpp"

@@ -55,10 +55,10 @@ public:
 	virtual void		process(const cl_parser& cl);
 
 protected:
-	void			extract_1114(const std::string& prefix, xray_re::xr_reader* s, const uint8_t* data) const;
-	void			extract_2215(const std::string& prefix, xray_re::xr_reader* s, const uint8_t* data) const;
-	void			extract_2945(const std::string& prefix, xray_re::xr_reader* s, const uint8_t* data) const;
-	void			extract_2947(const std::string& prefix, xray_re::xr_reader* s, const uint8_t* data) const;
+	void			extract_1114(const std::string& prefix, const std::string& mask, xray_re::xr_reader* s, const uint8_t* data) const;
+	void			extract_2215(const std::string& prefix, const std::string& mask, xray_re::xr_reader* s, const uint8_t* data) const;
+	void			extract_2945(const std::string& prefix, const std::string& mask, xray_re::xr_reader* s, const uint8_t* data) const;
+	void			extract_2947(const std::string& prefix, const std::string& mask, xray_re::xr_reader* s, const uint8_t* data) const;
 };
 
 class db_packer: public db_tools {

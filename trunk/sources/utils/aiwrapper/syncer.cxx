@@ -347,7 +347,7 @@ void syncer::upgrade(int bld_ver)
 		throw sync_error();
 	gspawn.graph().version() = gspawn.version() = new_ai_version;
 
-	if (bld_ver >= 3502)
+	if (bld_ver >= 3502) {
 		msg("upgrading spawn version");
 	char *PA_UPG_GAME_SPAWN = NULL;
 	char *PA_UPG_GAME_LEVELS = NULL;
@@ -469,7 +469,9 @@ void syncer::upgrade(int bld_ver)
 	msg("saving %s\\%s", PA_UPG_GAME_SPAWN, "all.spawn");
 	if (!gspawn.save(PA_UPG_GAME_SPAWN, "all.spawn"))
 		throw sync_error();
+	}
 }
+
 void syncer::sync_build_aimap()
 {
 	if (up_to_date(m_src_level, "build.aimap", m_tgt_level)) {

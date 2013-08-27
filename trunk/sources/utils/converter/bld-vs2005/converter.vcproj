@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="converter"
 	ProjectGUID="{251A6DE4-30F3-43A4-8315-AB4E306BD58D}"
 	RootNamespace="converter"
@@ -68,6 +68,7 @@
 				AdditionalLibraryDirectories="$(OutDir)\libraries"
 				GenerateDebugInformation="true"
 				SubSystem="1"
+				LargeAddressAware="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -225,9 +226,9 @@
 				AdditionalOptions="/LARGEADDRESSAWARE"
 				AdditionalLibraryDirectories="$(OutDir)\libraries"
 				GenerateManifest="true"
-				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="false"
 				SubSystem="1"
+				LargeAddressAware="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
