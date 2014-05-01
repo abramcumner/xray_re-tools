@@ -154,7 +154,7 @@ static MObject create_texture(const std::string& texture, MStatus* return_status
 
 	MStatus status;
 	MFnDependencyNode texture_fn;
-	MObject texture_obj = texture_fn.create("file", maya_name, &status);
+	MObject texture_obj = texture_fn.create("file", maya_name += "_F", &status);
 	if (!status) {
 		if (return_status)
 			*return_status = status;
@@ -244,7 +244,7 @@ MStatus maya_import_tools::import_surface(const xr_surface* surface, MObject& te
 		msg("can't create shading group");
 		return status;
 	}
-	set_fn.setName(make_maya_name(surface->name(), "_S", "_S"));
+	set_fn.setName(make_maya_name(surface->name(), "_S", "_SG"));
 
 	MPlug ss_plug = set_fn.findPlug("ss", &status);
 	MPlugArray connected_plugs;
