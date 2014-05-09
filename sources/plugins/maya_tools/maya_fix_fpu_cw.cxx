@@ -16,6 +16,6 @@ void fix_fpu_cw()
 	if ((x87_cw & _MCW_PC) == _PC_53 && (x87_cw & _MCW_DN) == _DN_SAVE)
 		return;
 	__control87_2(_PC_53|_DN_SAVE, _MCW_PC|_MCW_DN, &new_x87_cw, 0);
-	xray_re::msg("x87 CW fixup: %8.8x -> %8.8x", x87_cw, new_x87_cw);
+	xray_re::msg("xray_re: x87 CW fixup: %8.8x -> %8.8x", x87_cw, new_x87_cw);
 #endif
 }

@@ -8,6 +8,7 @@
 // i- X-Ray skeletal motions (.skls;*.skl)
 
 #define NOMINMAX
+#include <maya/MGlobal.h>
 #include <maya/MFnPlugin.h>
 #include <maya/MPxFileTranslator.h>
 #include "maya_import_tools.h"
@@ -28,6 +29,7 @@ using namespace xray_re;
 
 const char PLUGIN_VENDOR[] = "ZENOBIAN mod team";
 const char PLUGIN_VERSION[] = __DATE__;
+const char BUILD_DATE[] = __DATE__ " at " __TIME__;
 
 const MString dm_reader("X-Ray game detail object");
 const MString object_translator("X-Ray object");
@@ -144,7 +146,8 @@ MStatus maya_dm_reader::reader(const MFileObject& file, const MString& options, 
 			end_progress();
 			maya_import_tools(dm, &status);
 		} else {
-			msg("can't open %s", path);
+			msg("xray_re: can't open %s", path);
+			MGlobal::displayError(MString("xray_re: can't open ") + path);
 			end_progress();
 		}
 		delete dm;
@@ -177,8 +180,10 @@ MStatus maya_object_translator::reader(const MFileObject& file, const MString& o
 		xr_object* object = new xr_object;
 		if (object->load_object(path.asChar()))
 			maya_import_tools(object, &status);
-		else
-			msg("can't open %s", path);
+		else {
+			msg("xray_re: can't open %s", path);
+			MGlobal::displayError(MString("xray_re: can't open ") + path);
+		}
 		delete object;
 	}
 	return status;
@@ -279,7 +284,8 @@ MStatus maya_ogf_reader::reader(const MFileObject& file, const MString& options,
 			maya_import_tools(ogf, &status);
 			delete ogf;
 		} else {
-			msg("can't open %s", path);
+			msg("xray_re: can't open %s", path);
+			MGlobal::displayError(MString("xray_re: can't open ") + path);
 			end_progress();
 		}
 	}
@@ -320,7 +326,8 @@ MStatus maya_omf_reader::reader(const MFileObject& file, const MString& options,
 			}
 			end_progress();
 		} else {
-			msg("can't open %s", path);
+			msg("xray_re: can't open %s", path);
+			MGlobal::displayError(MString("xray_re: can't open ") + path);
 			end_progress();
 		}
 		delete omf;
@@ -351,7 +358,8 @@ MStatus maya_skl_translator::reader(const MFileObject& file, const MString& opti
 		const MString path = file.resolvedFullName();
 		xr_skl_motion* smotion = new xr_skl_motion;
 		if (!smotion->load_skl(path.asChar())) {
-			msg("can't open %s", path);
+			msg("xray_re: can't open %s", path);
+			MGlobal::displayError(MString("xray_re: can't open ") + path);
 			delete smotion;
 			return MS::kFailure;
 		}
@@ -407,7 +415,8 @@ MStatus maya_skls_reader::reader(const MFileObject& file, const MString& options
 		const MString path = file.resolvedFullName();
 		xr_object* object = new xr_object;
 		if (!object->load_skls(path.asChar())) {
-			msg("can't open %s", path);
+			msg("xray_re: can't open %s", path);
+			MGlobal::displayError(MString("xray_re: can't open ") + path);
 			delete object;
 			return MS::kFailure;
 		}
@@ -448,10 +457,15 @@ MStatus initializePlugin(MObject obj)
 	MString fs_spec("$MAYA_LOCATION\\bin\\xray_path.ltx");
 	xr_file_system& fs = xr_file_system::instance();
 	if (!fs.initialize(fs_spec.expandEnvironmentVariablesAndTilde().asChar())) {
-		msg("can't initialize the file system");
+		msg("xray_re: can't initialize the file system");
+		MGlobal::displayError("xray_re: can't initialize the file system");
 		return MS::kFailure;
 	}
-	xr_log::instance().init("xrayMayaTools", "xray_tools");
+	xr_log::instance().init("xrayMayaTools");
+	msg("X-Ray Maya tools for Maya %s ", MGlobal::mayaVersion().asChar());
+	MGlobal::displayInfo(MString("X-Ray Maya tools for Maya ") + MGlobal::mayaVersion());
+	msg("xray_re built on %s ", BUILD_DATE);
+	MGlobal::displayInfo(MString("xray_re built on ") + BUILD_DATE);
 
 	MFnPlugin plugin_fn(obj, PLUGIN_VENDOR, PLUGIN_VERSION);
 	if (!(status = maya_xray_material::initialize(plugin_fn)))

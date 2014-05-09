@@ -33,9 +33,9 @@ void xr_log::init(const char* name, const char* prefix)
 		m_buf_p += n;
 	}
 	if (m_log == 0)
-		diagnostic("log started (console only)");
+		diagnostic("xray_re: log started (console only)");
 	else
-		diagnostic("log started (console and %s.log)", name);
+		diagnostic("xray_re: log started (console and %s.log)", name);
 }
 
 void xr_log::diagnostic(const char* format, va_list ap)
@@ -53,8 +53,11 @@ void xr_log::diagnostic(const char* format, va_list ap)
 		m_buf_p[n] = '\n';
 		m_buf_p[n + 1] = '\0';
 		// exclude prefix for the file output
-//		fputs(m_buf_p, stderr);
+#	if (MAYA_API_VERSION >= 201300) 
+		fputs(m_buf_p, stderr);
+#	else
 		std::cerr << m_buf_p;
+#	endif
 #if defined(DEBUG) && defined(WIN32)
 		OutputDebugString(m_buf_p);
 #endif

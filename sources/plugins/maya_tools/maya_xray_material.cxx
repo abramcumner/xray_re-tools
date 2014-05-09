@@ -293,7 +293,8 @@ MStatus maya_xray_material::init()
 		}
 		enum_attr_fn.setDefault("default");
 	} else {
-		msg("can't open %s", "shaders.xr");
+		msg("xray_re: can't open %s", "shaders.xr");
+		MGlobal::displayError("xray_re: can't open shaders.xr");
 	}
 	if (shaders_lib.names().empty())
 		enum_attr_fn.addField("default", 0);
@@ -314,7 +315,8 @@ MStatus maya_xray_material::init()
 		}
 		enum_attr_fn.setDefault("default");
 	} else {
-		msg("can't open %s", "shaders_xrlc.xr");
+		msg("xray_re: can't open %s", "shaders_xrlc.xr");
+		MGlobal::displayError("xray_re: can't open shaders_xrlc.xr");
 	}
 	if (shaders_xrlc_lib.shaders().empty())
 		enum_attr_fn.addField("default", 0);
@@ -334,7 +336,8 @@ MStatus maya_xray_material::init()
 			CHECK_MSTATUS(enum_attr_fn.addField(field, i++));
 		}
 	} else {
-		msg("can't open %s", "gamemtl.xr");
+		msg("xray_re: can't open %s", "gamemtl.xr");
+		MGlobal::displayError("xray_re: can't open gamemtl.xr");
 	}
 	if (gamemtls_lib.materials().empty())
 		enum_attr_fn.addField("default", 0);
@@ -671,7 +674,8 @@ MStatus maya_xray_material::compute(const MPlug& plug, MDataBlock& block)
 		}
 		return MS::kSuccess;
 	}
-	msg("unexpected plug %s", plug.name().asChar());
+	msg("xray_re: unexpected plug %s", plug.name().asChar());
+	MGlobal::displayError(MString("xray_re: unexpected plug ") + plug.name().asChar());
 	return MS::kUnknownParameter;
 }
 

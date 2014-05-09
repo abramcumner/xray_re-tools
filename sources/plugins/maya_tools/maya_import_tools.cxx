@@ -210,7 +210,9 @@ static void set_xraymtl_attr(MFnDependencyNode& dep_fn, const char* name, const 
 				temp[i] = '/';
 			short index = attr_fn.fieldIndex(temp.c_str(), &status);
 			if (!status) {
-				msg("can't set attribute %s to %s", name, value.c_str());
+				msg("xray_re: can't set attribute %s to %s", name, value.c_str());
+				MGlobal::displayError(MString("xray_re: can't set attribute ") +
+					name + " to " + value.c_str());
 				return;
 			}
 			plug.setShort(index);
@@ -225,7 +227,8 @@ MStatus maya_import_tools::import_surface(const xr_surface* surface, MObject& te
 	MObject shader_obj = shader_fn.create("XRayMtl",
 			make_maya_name(surface->name(), "_S", "_M"), &status);
 	if (!status) {
-		msg("can't create shader");
+		msg("xray_re: can't create shader");
+		MGlobal::displayError("xray_re: can't create shader");
 		return status;
 	}
 
@@ -241,7 +244,8 @@ MStatus maya_import_tools::import_surface(const xr_surface* surface, MObject& te
 	MFnSet set_fn;
 	MObject set_obj = set_fn.create(MSelectionList(), MFnSet::kRenderableOnly, &status);
 	if (!status) {
-		msg("can't create shading group");
+		msg("xray_re: can't create shading group");
+		MGlobal::displayError("xray_re: can't create shading group");
 		return status;
 	}
 	set_fn.setName(make_maya_name(surface->name(), "_S", "_SG"));
@@ -284,7 +288,8 @@ MStatus maya_import_tools::import_bone(const xr_bone* bone, MObject& parent_obj)
 	MFnIkJoint joint_fn;
 	MObject joint_obj = joint_fn.create(parent_obj, &status);
 	if (!status) {
-		msg("can't create joint %s", bone->name().c_str());
+		msg("xray_re: can't create joint %s", bone->name().c_str());
+		MGlobal::displayError(MString("xray_re: can't create joint ") + bone->name().c_str());
 		return status;
 	}
 	joint_fn.setName(bone->name().c_str());
@@ -328,7 +333,9 @@ MStatus maya_import_tools::import_mesh(const xr_mesh* mesh, const xr_bone_vec& b
 	MFnTransform transform_fn;
 	MObject transform_obj = transform_fn.create(MObject::kNullObj, &status);
 	if (!status) {
-		msg("can't create mesh %s transform", mesh->name().c_str());
+		msg("xray_re: can't create mesh %s transform", mesh->name().c_str());
+		MGlobal::displayError(MString("xray_re: can't create mesh ") +
+			mesh->name().c_str() + " transform");
 		return status;
 	}
 	transform_fn.setName(make_maya_name(mesh->name(), "Shape"));
@@ -385,14 +392,16 @@ MStatus maya_import_tools::import_mesh(const xr_mesh* mesh, const xr_bone_vec& b
 			vertices, poly_counts, poly_connects, u_values, v_values,
 			transform_obj, &status);
 	if (!status) {
-		msg("can't create mesh %s", mesh->name().c_str());
+		msg("xray_re: can't create mesh %s", mesh->name().c_str());
+		MGlobal::displayError(MString("xray_re: can't create mesh ") + mesh->name().c_str());
 		return status;
 	}
 	mesh_fn.setName(make_maya_name(mesh->name(), "Shape", "Shape"));
 
 	// temporary safety measure
 	if (mesh_fn.numPolygons() != faces.size()) {
-		msg("mesh polygon count was changed");
+		msg("xray_re: mesh polygon count was changed");
+		MGlobal::displayError("xray_re: mesh polygon count was changed");
 		return MS::kFailure;
 	}
 
@@ -431,7 +440,8 @@ MStatus maya_import_tools::import_mesh(const xr_mesh* mesh, const xr_bone_vec& b
 		const xr_surfmap* smap = *it;
 		MObject& set_obj = m_sets[smap->surface->name()];
 		if (set_obj.isNull()) {
-			msg("null shading group object");
+			msg("xray_re: null shading group object");
+			MGlobal::displayError("xray_re: null shading group object");
 			return MS::kFailure;
 		}
 
@@ -456,7 +466,8 @@ MStatus maya_import_tools::import_mesh(const xr_mesh* mesh, const xr_bone_vec& b
 	}
 
 	if (mesh_fn.numVertices() != points.size()) {
-		msg("mesh vertex count was changed");
+		msg("xray_re: mesh vertex count was changed");
+		MGlobal::displayError("xray_re: mesh vertex count was changed");
 		return MS::kFailure;
 	}
 
@@ -473,7 +484,8 @@ MStatus maya_import_tools::import_mesh(const xr_mesh* mesh, const xr_bone_vec& b
 		MStringArray result;
 		status = MGlobal::executeCommand(command, result);
 		if (!status) {
-			msg("can't create skin cluster");
+			msg("xray_re: can't create skin cluster");
+			MGlobal::displayError("xray_re: can't create skin cluster");
 			return status;
 		}
 
@@ -547,7 +559,7 @@ MObject maya_import_tools::lookup_character(MStatus* return_status)
 	MSelectionList selection_list;
 	MStatus status = MGlobal::getActiveSelectionList(selection_list);
 	if (selection_list.isEmpty()) {
-		MGlobal::displayError("nothing is selected");
+		MGlobal::displayError("xray_re: nothing is selected");
 		if (return_status)
 			*return_status = MS::kInvalidParameter;
 		return MObject::kNullObj;
@@ -555,7 +567,7 @@ MObject maya_import_tools::lookup_character(MStatus* return_status)
 	MObject character_obj;
 	selection_list.getDependNode(0, character_obj);
 	if (!character_obj.hasFn(MFn::kCharacter)) {
-		MGlobal::displayError("selected object is not a character");
+		MGlobal::displayError("xray_re: selected object is not a character");
 		if (return_status)
 			*return_status = MS::kInvalidParameter;
 		return MObject::kNullObj;
@@ -571,7 +583,8 @@ MObject maya_import_tools::lookup_character(MStatus* return_status)
 		MObject& joint_obj = m_joints[joint_fn.name().asChar()];
 		if (joint_obj.isNull()) {
 			joint_obj = member_obj;
-			msg("found bone %s", joint_fn.name().asChar());
+			msg("xray_re: found bone %s", joint_fn.name().asChar());
+			MGlobal::displayInfo(MString("xray_re: found bone ") + joint_fn.name().asChar());
 		}
 	}
 	if (return_status)
@@ -651,7 +664,8 @@ MStatus maya_import_tools::import_motion(const xray_re::xr_skl_motion* smotion, 
 	MObject clip_obj = clip_fn.createSourceClip(MTime(start_time, MTime::kSeconds),
 			MTime(end_time - start_time, MTime::kSeconds), dg_modifier, &status);
 	if (!status) {
-		msg("can't create clip %s", clip_name.asChar());
+		msg("xray_re: can't create clip %s", clip_name.asChar());
+		MGlobal::displayError(MString("xray_re: can't create clip ") + clip_name.asChar());
 		return status;
 	}
 	clip_fn.setName(clip_name);
@@ -665,8 +679,10 @@ MStatus maya_import_tools::import_motion(const xray_re::xr_skl_motion* smotion, 
 		const xr_bone_motion* bmotion = *it;
 		maya_object_map_it joint_it = m_joints.find(bmotion->name());
 		if (joint_it == m_joints.end()) {
-			msg("can't find bone %s referenced by motion %s",
-					bmotion->name().c_str(), smotion->name().c_str());
+			msg("xray_re: can't find bone %s referenced by motion %s",
+				bmotion->name().c_str(), smotion->name().c_str());
+			MGlobal::displayError(MString("xray_re: can't find bone ") +
+				bmotion->name().c_str() + " referenced by motion " + smotion->name().c_str());
 			continue;
 		}
 		MFnTransform joint_fn(joint_it->second, &status);

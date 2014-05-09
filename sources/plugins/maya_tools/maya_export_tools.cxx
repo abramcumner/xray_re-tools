@@ -39,10 +39,13 @@ static MStatus extract_bones(MFnSkinCluster& skin_fn, xr_bone_vec& bones)
 	skin_fn.influenceObjects(joints, &status);
 	unsigned num_joints = joints.length();
 	if (num_joints == 0) {
-		msg("can't find any influence object");
+		msg("xray_re: can't find any influence object");
+		MGlobal::displayError("xray_re: can't find any influence object");
 		return MS::kInvalidParameter;
 	} else if (num_joints > MAX_BONES) {
-		msg("too many bones (%u > %u)", num_joints, MAX_BONES);
+		msg("xray_re: too many joints (%u of %u possible)", num_joints, MAX_BONES);
+		MGlobal::displayError(MString("xray_re: too many joints ") +
+			"(" + num_joints + " of " + MAX_BONES + " possible)");
 	}
 
 	bones.resize(num_joints);
@@ -51,8 +54,10 @@ static MStatus extract_bones(MFnSkinCluster& skin_fn, xr_bone_vec& bones)
 	for (unsigned i = num_joints; i != 0;) {
 		MFnIkJoint joint_fn(joints[--i], &status);
 		if (!status) {
-			msg("can't handle non-joint node %s",
-					joints[i].partialPathName().asChar());
+			msg("xray_re: can't handle non-joint node %s",
+				joints[i].partialPathName().asChar());
+			MGlobal::displayError(MString("xray_re: can't handle non-joint node ") +
+				joints[i].partialPathName().asChar());
 			return status;
 		}
 		command += joint_fn.partialPathName();
@@ -65,7 +70,8 @@ static MStatus extract_bones(MFnSkinCluster& skin_fn, xr_bone_vec& bones)
 
 		unsigned num_parents = joint_fn.parentCount();
 		if (num_parents > 1) {
-			msg("can't handle multi-parented joint %s", name);
+			msg("xray_re: can't handle multi-parented joint %s", name);
+			MGlobal::displayError(MString("xray_re: can't handle multi-parented joint ") + name);
 			return MS::kInvalidParameter;
 		} else if (num_parents == 1) {
 			MObject parent_obj = joint_fn.parent(0);
@@ -85,24 +91,29 @@ static MStatus extract_bones(MFnSkinCluster& skin_fn, xr_bone_vec& bones)
 				root = bone;
 				continue;
 			} else {
-				msg("can't handle multiple root joints in skeleton");
+				msg("xray_re: can't handle multiple root joints in skeleton");
+				MGlobal::displayError("xray_re: can't handle multiple root joints in skeleton");
 				return MS::kInvalidParameter;
 			}
 		}
 		xr_bone* parent = find_by_name(bones, bone->parent_name());
 		if (parent == 0) {
-			msg("can't find parent bone %s", bone->parent_name().c_str());
+			msg("xray_re: can't find parent bone %s", bone->parent_name().c_str());
+			MGlobal::displayError(MString("xray_re: can't find parent bone ") +
+				bone->parent_name().c_str());
 			return MS::kFailure;
 		}
 		parent->children().push_back(bone);
 	}
 	if (root == 0) {
-		msg("can't find root joint");
+		msg("xray_re: can't find root joint");
+		MGlobal::displayError("xray_re: can't find root joint");
 		return MS::kInvalidParameter;
 	}
 
 	if (!(status = MGlobal::executeCommand(command))) {
-		msg("can't set skeleton to bind pose");
+		msg("xray_re: can't set skeleton to bind pose");
+		MGlobal::displayError("xray_re: can't set skeleton to bind pose");
 		return MS::kFailure;
 	}
 
@@ -132,8 +143,10 @@ static MStatus extract_points(MFnMesh& mesh_fn, std::vector<fvector3>& points, f
 
 	int num_points = mesh_fn.numVertices();
 	if (num_points < 4) {
-		msg("can't export mesh %s with less than four vertices",
-				mesh_fn.name().asChar());
+		msg("xray_re: can't export mesh %s with less than four vertices",
+			mesh_fn.name().asChar());
+		MGlobal::displayError(MString("xray_re: can't export mesh ") +
+			mesh_fn.name().asChar() + " with less than four vertices");
 		return MS::kInvalidParameter;
 	}
 	points.reserve(size_t(num_points & INT_MAX));
@@ -158,8 +171,10 @@ static MStatus extract_faces(MFnMesh& mesh_fn, lw_face_vec& faces)
 	// FIXME: it would be nice to support automatic triangulation using getTriangles() etc.
 	int num_polys = mesh_fn.numPolygons(&status);
 	if (num_polys < 2) {
-		msg("can't export mesh %s with less than two faces",
-				mesh_fn.name().asChar());
+		msg("xray_re: can't export mesh %s with less than two faces",
+			mesh_fn.name().asChar());
+		MGlobal::displayError(MString("xray_re: can't export mesh ") +
+			mesh_fn.name().asChar() + " with less than two faces");
 		return MS::kInvalidParameter;
 	}
 	faces.reserve(size_t(num_polys & INT_MAX));
@@ -167,8 +182,10 @@ static MStatus extract_faces(MFnMesh& mesh_fn, lw_face_vec& faces)
 	for (int i = 0; i != num_polys; ++i) {
 		status = mesh_fn.getPolygonVertices(i, verts);
 		if (!status || verts.length() != 3) {
-			msg("can't handle polygons with 4 or more sides for mesh %s",
-					mesh_fn.name().asChar());
+			msg("xray_re: can't handle polygons with 4 or more sides for mesh %s",
+				mesh_fn.name().asChar());
+			MGlobal::displayError(MString("xray_re: can't handle polygons with 4 or more sides for mesh ") +
+				mesh_fn.name().asChar());
 			return MS::kInvalidParameter;
 		}
 		lw_face face(verts[2], verts[1], verts[0]);
@@ -190,7 +207,10 @@ static MStatus extract_uvs(MFnMesh& mesh_fn, lw_face_vec& faces,
 
 		fvector2 uv0;
 		if (!it.getUV(uv0.xy)) {
-			msg("can't extract shared UVs for vert %"PRIu32, vert_idx);
+			msg("xray_re: can't extract shared UVs for vert %"PRIu32" on mesh %s",
+				vert_idx, mesh_fn.name().asChar());
+			MGlobal::displayError(MString("xray_re: can't extract shared UVs for vert ") +
+				vert_idx + " on mesh " + mesh_fn.name().asChar());
 			return MS::kInvalidParameter;
 		}
 		uv0.v = 1.f - uv0.v;
@@ -213,7 +233,9 @@ static MStatus extract_uvs(MFnMesh& mesh_fn, lw_face_vec& faces,
 
 			fvector2 uv;
 			if (!it.getUV(face_idx, uv.xy)) {
-				msg("can't extract UVs for vert %" PRIu32 " face %"PRIu32, vert_idx, face_idx);
+				msg("xray_re: can't extract UVs for vert %"PRIu32" face %"PRIu32, vert_idx, face_idx);
+				MGlobal::displayWarning(MString("xray_re: can't extract UVs for vert ") +
+					vert_idx + " face " + face_idx);
 				uv = uv0;
 			}
 			uv.v = 1.f - uv.v;
@@ -266,14 +288,17 @@ static MStatus extract_weights(MFnMesh& mesh_fn, MFnSkinCluster& skin_fn,
 		MFnIkJoint joint_fn(joints[joint_idx], &status);
 		CHECK_MSTATUS(status);
 
-msg("joint=%s", joint_fn.name().asChar());
+		msg("xray_re: joint=%s", joint_fn.name().asChar());
+		MGlobal::displayInfo(MString("xray_re: joint=") + joint_fn.name().asChar());
 
 		xr_weight_vmap* weight_vmap = new xr_weight_vmap(joint_fn.name().asChar());
 		weight_vmap->reserve(weights.length());
 		uint32_t vmap_idx = uint32_t(vmaps.size() & UINT32_MAX);
 		vmaps.push_back(weight_vmap);
 
-msg("  num_affected=%u, num_weights=%u", affected.length(), weights.length());
+		msg("         num_affected=%u, num_weights=%u", affected.length(), weights.length());
+		MGlobal::displayInfo(MString("         num_affected=") + affected.length() +
+			" ," + " num_weights=" + weights.length());
 
 		// FIXME: is it enough to expect the single element in the list here?
 		for (unsigned i = affected.length(), k = weights.length(); i != 0;) {
@@ -322,7 +347,8 @@ static void get_xraymtl_attr(MFnDependencyNode& dep_fn, const char* name, std::s
 			}
 		}
 	}
-	msg("can't get attribute %s", name);
+	msg("xray_re: can't get attribute %s", name);
+	MGlobal::displayWarning(MString("xray_re: can't get attribute ") + name);
 }
 
 xr_surface* maya_export_tools::create_surface(const char* surf_name, MFnSet& set_fn)
@@ -352,7 +378,8 @@ xr_surface* maya_export_tools::create_surface(const char* surf_name, MFnSet& set
 		}
 	}
 	if (shader_obj.isNull()) {
-		msg("can't find shader node for surface %s", surf_name);
+		msg("xray_re: can't find shader node for surface %s", surf_name);
+		MGlobal::displayError(MString("xray_re: can't find shader node for surface ") + surf_name);
 		return surface;
 	}
 
@@ -387,7 +414,9 @@ MStatus maya_export_tools::extract_surfaces(MFnMesh& mesh_fn, xr_surfmap_vec& su
 	MIntArray faces;
 	MStatus status = mesh_fn.getConnectedShaders(0, shading_groups, faces);
 	if (!status || shading_groups.length() == 0) {
-		msg("can't get connected shaders for mesh %s", mesh_fn.name().asChar());
+		msg("xray_re: can't get connected shaders for mesh %s", mesh_fn.name().asChar());
+		MGlobal::displayError(MString("xray_re: can't get connected shaders for mesh ") +
+			mesh_fn.fullPathName().asChar());
 		return MS::kInvalidParameter;
 	}
 	surfmaps.resize(shading_groups.length());
@@ -452,7 +481,8 @@ static MStatus extract_smoothing_groups(MFnMesh& mesh_fn, std::vector<uint32_t>&
 		CHECK_MSTATUS(status);
 		unsigned n = connected.length();
 		if (n != 3) {
-			msg("can't build smoothing groups");
+			msg("xray_re: can't build smoothing groups");
+			MGlobal::displayError(MString("xray_re: can't build smoothing groups"));
 			delete[] temp_edges;
 			delete[] temp_faces;
 			return MS::kInvalidParameter;
@@ -653,7 +683,8 @@ MStatus maya_export_tools::export_object(const char* path, bool selection_only)
 	MObjectArray mesh_objs;
 	collect_meshes(mesh_objs, selection_only);
 	if (mesh_objs.length() == 0) {
-		msg("can't find any mesh to export");
+		msg("xray_re: can't find any mesh to export");
+		MGlobal::displayError("xray_re: can't find any mesh to export");
 		return MS::kFailure;
 	}
 
@@ -675,14 +706,16 @@ static MStatus find_mesh_and_skin(MObject* mesh_obj, MObject* skin_obj, bool sel
 	collect_meshes(mesh_objs, selection_only);
 	switch (mesh_objs.length()) {
 	case 0:
-		msg("can't find any mesh to export");
+		msg("xray_re: can't find any mesh to export");
+		MGlobal::displayError("xray_re: can't find any mesh to export");
 		return MS::kFailure;
 
 	case 1:
 		break;
 
 	default:
-		msg("can't handle multiple meshes in skeletal object");
+		msg("xray_re: can't handle multiple meshes in skeletal object");
+		MGlobal::displayError("xray_re: can't handle multiple meshes in skeletal object");
 		return MS::kFailure;
 	}
 
@@ -692,7 +725,8 @@ static MStatus find_mesh_and_skin(MObject* mesh_obj, MObject* skin_obj, bool sel
 		MFnSkinCluster skin_fn(skin_obj);
 		MObjectArray affected;
 		skin_fn.getOutputGeometry(affected);
-		msg("skin cluster %s", skin_fn.name().asChar());
+		msg("xray_re: skin cluster %s", skin_fn.name().asChar());
+		MGlobal::displayInfo(MString("xray_re: skin cluster ") + skin_fn.name().asChar());
 		for (unsigned i = affected.length(); i != 0;) {
 			if (affected[--i] == mesh_objs[0])
 				skin_objs.append(skin_obj);
@@ -700,14 +734,16 @@ static MStatus find_mesh_and_skin(MObject* mesh_obj, MObject* skin_obj, bool sel
 	}
 	switch (skin_objs.length()) {
 	case 0:
-		msg("can't find skin cluster for mesh");
+		msg("xray_re: can't find skin cluster for mesh");
+		MGlobal::displayError("xray_re: can't find skin cluster for mesh");
 		return MS::kFailure;
 
 	case 1:
 		break;
 
 	default:
-		msg("can't handle multiple skin clusters in skeletal object");
+		msg("xray_re: can't handle multiple skin clusters in skeletal object");
+		MGlobal::displayError("xray_re: can't handle multiple skin clusters in skeletal object");
 		return MS::kFailure;
 	}
 
@@ -739,7 +775,8 @@ MStatus maya_export_tools::export_skl_object(const char* path, bool selection_on
 MStatus maya_export_tools::export_skl(const char* path, bool selection_only)
 {
 	if (MTime::uiUnit() != MTime::kNTSCFrame)
-		msg("warning: motion export with non-NTSC frame frequency was not tested");
+		msg("xray_re: motion export with non-NTSC frame frequency was not tested!");
+		MGlobal::displayWarning("xray_re: motion export with non-NTSC frame frequency was not tested!");
 
 	MObject skin_obj;
 	MStatus status = find_mesh_and_skin(0, &skin_obj, selection_only);
@@ -751,15 +788,17 @@ MStatus maya_export_tools::export_skl(const char* path, bool selection_only)
 	skin_fn.influenceObjects(joints, &status);
 	unsigned num_joints = joints.length();
 	if (num_joints == 0) {
-		msg("can't find any influence object");
+		msg("xray_re: can't find any influence object");
+		MGlobal::displayError("xray_re: can't find any influence object");
 		return MS::kFailure;
 	}
 	xr_bone_motion_vec bmotions(num_joints);
 	for (unsigned i = num_joints; i != 0;) {
 		MFnIkJoint joint_fn(joints[--i], &status);
 		if (!status) {
-			msg("can't handle non-joint node %s",
-					joints[i].partialPathName().asChar());
+			msg("xray_re: can't handle non-joint node %s", joints[i].partialPathName().asChar());
+			MGlobal::displayWarning(MString("xray_re: can't handle non-joint node ") +
+				joints[i].partialPathName().asChar());
 			return status;
 		}
 		xr_bone_motion* bmotion = new xr_bone_motion(joint_fn.name().asChar());
@@ -771,7 +810,8 @@ MStatus maya_export_tools::export_skl(const char* path, bool selection_only)
 
 	int32_t frame_start = int32_t(MAnimControl::minTime().as(MTime::kNTSCFrame));
 	int32_t frame_end = int32_t(MAnimControl::maxTime().as(MTime::kNTSCFrame));
-	msg("range=%d - %d", frame_start, frame_end);
+	msg("xray_re: animation range=%d-%d", frame_start, frame_end);
+	MGlobal::displayInfo(MString("xray_re: animation range=") + frame_start + "-" + frame_end);
 
 	for (int32_t frame = frame_start; frame != frame_end; ++frame) {
 		MGlobal::viewFrame(MTime(double(frame), MTime::kNTSCFrame));
@@ -796,6 +836,7 @@ MStatus maya_export_tools::export_skl(const char* path, bool selection_only)
 		}
 	}
 	xr_skl_motion* smotion = new xr_skl_motion;
+
 	smotion->name() = "unnamed";
 	smotion->fps() = 30.f;
 	smotion->set_frame_range(frame_start, frame_end);
