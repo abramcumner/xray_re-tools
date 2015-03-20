@@ -136,9 +136,9 @@ void level_tools::reconstruct_sound_envs()
 		xr_sound_env_object* new_sound_env = new xr_sound_env_object(*m_scene);
 		new_sound_env->co_name() = name.get();
 		new_sound_env->co_position() = box->xform.c;
+		new_sound_env->co_scale().set(box->xform.i.normalize_magn(), box->xform.j.normalize_magn(),
+			box->xform.k.normalize_magn());
 		box->xform.get_xyz(new_sound_env->co_rotation());
-		new_sound_env->co_scale().set(box->xform.i.normalize_magn(),
-				box->xform.j.normalize_magn(), box->xform.k.normalize_magn());
 		new_sound_env->inner() = env_ids.at(box->inner);
 		new_sound_env->outer() = env_ids.at(box->outer);
 		delete box;
