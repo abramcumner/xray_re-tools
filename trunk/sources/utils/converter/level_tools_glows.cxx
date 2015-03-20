@@ -22,6 +22,20 @@ void level_tools::reconstruct_glows()
 	xr_name_gen name("glow");
 	for (glow_data_vec_cit it = glows.begin(), end = glows.end(); it != end; ++it, name.next()) {
 		const glow_data* glow = *it;
+
+		bool is_duplicate = false;
+		for (glow_data_vec_cit it1 = it; ++it1 != end;) {
+			const glow_data* glow1 = *it1;
+			if (glow->position == glow1->position) {
+				const fvector3& p = glow1->position;
+				msg("ignoring glow (%s) at %.2f, %.2f, %.2f", "duplicate", p.x, p.y, p.z);
+				is_duplicate = true;
+				break;
+			}
+		}
+		if (is_duplicate)
+			continue;
+
 		xr_glow_object* new_glow = new xr_glow_object(*m_scene);
 		new_glow->co_name() = name.get();
 		new_glow->co_position() = glow->position;
