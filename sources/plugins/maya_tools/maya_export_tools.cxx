@@ -168,6 +168,12 @@ static MStatus extract_faces(MFnMesh& mesh_fn, lw_face_vec& faces)
 {
 	MStatus status;
 
+	MItMeshPolygon it(mesh_fn.object());
+	if (it.isLamina()) {
+		msg("xray_re: lamina faces found in mesh %s", mesh_fn.name().asChar());
+		MGlobal::displayWarning(MString("xray_re: lamina faces found in mesh ") +
+			mesh_fn.name().asChar());
+	}
 	// FIXME: it would be nice to support automatic triangulation using getTriangles() etc.
 	int num_polys = mesh_fn.numPolygons(&status);
 	if (num_polys < 2) {
