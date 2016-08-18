@@ -1,9 +1,12 @@
 #define NOMINMAX
 #include <climits>
+#pragma warning(push)
+#pragma warning(disable: 4595)
 #include <nvimage/Image.h>
 #include <nvimage/DirectDrawSurface.h>
 #include <nvmath/Color.h>
 #include <nvtt/nvtt.h>
+#pragma warning(pop)
 #include "xr_image.h"
 #include "xr_file_system.h"
 
