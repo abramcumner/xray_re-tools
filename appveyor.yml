@@ -26,8 +26,6 @@ after_build:
 artifacts:
 - path: .\dist\xray_re-tools_$(appveyor_repo_tag_name).7z
   name: release
-  on:
-    appveyor_repo_tag: true
 
 deploy:
 - provider: GitHub
