@@ -28,7 +28,7 @@ artifacts:
   name: release
   on:
     appveyor_repo_tag: true
-	
+
 deploy:
 - provider: GitHub
   auth_token:
