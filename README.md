@@ -13,3 +13,5 @@ Binaries
 [latest build](https://ci.appveyor.com/api/projects/abramcumner/xray-re-tools/artifacts/xray_re-tools_latest.7z)
 
 And see [Release](https://github.com/abramcumner/xray_re-tools/releases) section.
+
+[Visual C++ Redistributable for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145) is required to run programs.
