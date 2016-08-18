@@ -48,11 +48,13 @@
 #define IS_NEGATIVE_FLOAT(x)	(IR(x)&SIGN_BITMASK)
 */
 
+#if _MSC_VER < 1800
 inline double sqrt_assert(const double f)
 {
 	nvDebugCheck(f >= 0.0f);
 	return sqrt(f);
 }
+#endif
 
 inline float sqrtf_assert(const float f)
 {
@@ -60,11 +62,13 @@ inline float sqrtf_assert(const float f)
 	return sqrtf(f);
 }
 
+#if _MSC_VER < 1800
 inline double acos_assert(const double f)
 {
 	nvDebugCheck(f >= -1.0f && f <= 1.0f);
 	return acos(f);
 }
+#endif
 
 inline float acosf_assert(const float f)
 {
@@ -72,11 +76,13 @@ inline float acosf_assert(const float f)
 	return acosf(f);
 }
 
+#if _MSC_VER < 1800
 inline double asin_assert(const double f)
 {
 	nvDebugCheck(f >= -1.0f && f <= 1.0f);
 	return asin(f);
 }
+#endif
 
 inline float asinf_assert(const float f)
 {

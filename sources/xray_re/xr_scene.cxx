@@ -281,7 +281,7 @@ bool xr_scene::load(const char* name)
 	}
 	xr_assert(version == SCENE_VERSION);
 	if (version != SCENE_VERSION) {
-		msg("unexpected scene version %"PRIu32, version);
+		msg("unexpected scene version %" PRIu32, version);
 		xr_not_expected();
 	}
 

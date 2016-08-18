@@ -52,7 +52,7 @@ void level_tools::reconstruct_ai_map()
 		new_node->packed_y = uint16_t(clamp<int>(qy + 1, 0, UINT16_MAX));
 		new_node->packed_z = int16_t(clamp<int>(qz, INT16_MIN, INT16_MAX));
 	}
-	msg("found %"PRIuSIZET" (of %"PRIuSIZET") no-return nodes", num_no_return, ai->num_nodes());
+	msg("found %" PRIuSIZET " (of %" PRIuSIZET ") no-return nodes", num_no_return, ai->num_nodes());
 
 	m_level->clear_ai();
 }

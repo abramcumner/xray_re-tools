@@ -302,7 +302,7 @@ void db_unpacker::extract_2947(const std::string& prefix, const std::string& mas
 			msg("  offset: %u", offset);
 			msg("  size (real): %u", size_real);
 			msg("  size (compressed): %u", size_compressed);
-			msg("  crc: 0x%8.8"PRIx32, crc);
+			msg("  crc: 0x%8.8" PRIx32, crc);
 		} else if (offset == 0) {
 			fs.create_path(path);
 		} else {

@@ -5,6 +5,9 @@
 #include <string>
 #include <vector>
 #ifdef _MSC_VER
+#if _MSC_VER >= 1900
+#define _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
+#endif
 #include <hash_map>
 #else
 #include <map>

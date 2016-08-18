@@ -44,7 +44,7 @@ void level_tools::reconstruct_sectors()
 	m_scene_sectors->reserve(m_sectors->size());
 
 	m_default_sector_idx = get_default_sector_idx();
-	msg("selected sector #%u (of %"PRIuSIZET") as default", m_default_sector_idx, m_sectors->size());
+	msg("selected sector #%u (of %" PRIuSIZET ") as default", m_default_sector_idx, m_sectors->size());
 
 	uint16_t sector_idx = 0;
 	unsigned seed = 0;

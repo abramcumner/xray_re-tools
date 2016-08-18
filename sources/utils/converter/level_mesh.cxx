@@ -288,7 +288,7 @@ size_t level_mesh::create_submeshes(b_submesh_vec& mu_submeshes, b_submesh_vec& 
 			submeshes.push_back(new b_submesh(tag++, it->sector));
 		}
 	}
-	msg("immediate fake/MU joins: %"PRIuSIZET, num_immediate_joins);
+	msg("immediate fake/MU joins: %" PRIuSIZET, num_immediate_joins);
 
 	size_t num_mu_models = 0;
 	if (num_mu_instances) {
@@ -482,7 +482,7 @@ void level_mesh::merge_orphans(b_submesh_vec& orphans, size_t num_groups, bool c
 {
 	if (orphans.empty())
 		return;
-	msg("merging %"PRIuSIZET" orphan(s)", orphans.size());
+	msg("merging %" PRIuSIZET " orphan(s)", orphans.size());
 	uint32_t min_tag = m_free_tag, max_tag = min_tag + uint32_t(num_groups & UINT32_MAX) - 1;
 	for (b_submesh_vec_it it = orphans.begin(), end = orphans.end(); it != end;) {
 		b_submesh* sm = *it++;
@@ -510,7 +510,7 @@ void level_mesh::merge_orphans(b_submesh_vec& orphans, size_t num_groups, bool c
 			tag1 = tag2;
 			min_dist1 = min_dist2;
 		}
-		msg("nearest: %"PRIu32" (%.2f)", tag1, min_dist1);
+		msg("nearest: %" PRIu32 " (%.2f)", tag1, min_dist1);
 		merge(m_instances.at(tag1), sm);
 		delete sm;
 	}
@@ -647,7 +647,7 @@ void level_mesh::merge_mu_fake_submeshes(b_submesh_vec& mu_submeshes, b_submesh_
 		}
 	}
 	trim_container(mu_submeshes);
-	msg("non-fake (residue) submeshes: %"PRIuSIZET, num_residue);
+	msg("non-fake (residue) submeshes: %" PRIuSIZET, num_residue);
 
 	msg("cross-merging fake submeshes");
 	b_collision_vec contacts;
@@ -676,7 +676,7 @@ void level_mesh::merge_mu_fake_submeshes(b_submesh_vec& mu_submeshes, b_submesh_
 	msg("assigning contact groups (fake)");
 	b_submesh_vec orphans;
 	size_t num_groups = assign_contact_groups(fake_submeshes, contacts, orphans);
-	msg("total groups (fake): %"PRIuSIZET, num_groups);
+	msg("total groups (fake): %" PRIuSIZET, num_groups);
 
 	// put everything in a separate object for now
 	m_instances.resize(m_instances.size() + num_groups, 0);
@@ -778,12 +778,12 @@ void level_mesh::merge_regular_submeshes(b_submesh_vec& submeshes, size_t num_mo
 			}
 		}
 	}
-	msg("contacts (with redundancy): %"PRIuSIZET, contacts.size());
+	msg("contacts (with redundancy): %" PRIuSIZET, contacts.size());
 
 	msg("assigning contact groups (regular)");
 	b_submesh_vec orphans;
 	size_t num_groups = assign_contact_groups(submeshes, contacts, orphans);
-	msg("total groups (regular): %"PRIuSIZET, num_groups);
+	msg("total groups (regular): %" PRIuSIZET, num_groups);
 
 	msg("building regular models");
 	m_models.reserve(num_models_hint + num_groups);
@@ -817,9 +817,9 @@ void level_mesh::create_models()
 	msg("building edge-connected submeshes");
 	b_submesh_vec mu_submeshes, fake_submeshes, submeshes;
 	num_models_hint += create_submeshes(mu_submeshes, fake_submeshes, submeshes);
-	msg("submeshes (MU): %"PRIuSIZET, mu_submeshes.size());
-	msg("submeshes (fake): %"PRIuSIZET, fake_submeshes.size());
-	msg("submeshes (regular): %"PRIuSIZET, submeshes.size());
+	msg("submeshes (MU): %" PRIuSIZET, mu_submeshes.size());
+	msg("submeshes (fake): %" PRIuSIZET, fake_submeshes.size());
+	msg("submeshes (regular): %" PRIuSIZET, submeshes.size());
 
 	msg("reordering faces");
 	reorder_faces();

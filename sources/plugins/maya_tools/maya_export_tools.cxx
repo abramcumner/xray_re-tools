@@ -212,7 +212,7 @@ static MStatus extract_uvs(MFnMesh& mesh_fn, lw_face_vec& faces,
 
 			fvector2 uv;
 			if (!it.getUV(face_idx, uv.xy)) {
-				msg("can't extract UVs for vert %"PRIu32" face %"PRIu32, vert_idx, face_idx);
+				msg("can't extract UVs for vert %" PRIu32 " face %"PRIu32, vert_idx, face_idx);
 				uv = uv0;
 			}
 			uv.v = 1.f - uv.v;

@@ -516,7 +516,7 @@ void level_tools::configure(level_mesh* mesh) const
 	if (m_ini->line_exist(m_sect_profile, "fake_mu_gamemtls")) {
 		const char* section = m_ini->r_string(m_sect_profile, "fake_mu_gamemtls");
 		for (size_t i = 0; m_ini->r_line(section, i, &pattern, 0); ++i) {
-//msg("fake_mu_gamemtl%"PRIuSIZET": %s", i, pattern);
+//msg("fake_mu_gamemtl%" PRIuSIZET ": %s", i, pattern);
 			const xr_gamemtl* gamemtl;
 			if ((gamemtl = m_gamemtls_lib->get_material(pattern)))
 				mesh->add_fake_mu_gamemtl(gamemtl->id);
@@ -525,7 +525,7 @@ void level_tools::configure(level_mesh* mesh) const
 	if (m_ini->line_exist(m_sect_profile, "fake_gamemtls")) {
 		const char* section = m_ini->r_string(m_sect_profile, "fake_gamemtls");
 		for (size_t i = 0; m_ini->r_line(section, i, &pattern, 0); ++i) {
-//msg("fake_gamemtl%"PRIuSIZET": %s", i, pattern);
+//msg("fake_gamemtl%" PRIuSIZET ": %s", i, pattern);
 			const xr_gamemtl* gamemtl;
 			if ((gamemtl = m_gamemtls_lib->get_material(pattern)))
 				mesh->add_fake_gamemtl(gamemtl->id);
@@ -534,7 +534,7 @@ void level_tools::configure(level_mesh* mesh) const
 	if (m_ini->line_exist(m_sect_profile, "inadhesive_shaders")) {
 		const char* section = m_ini->r_string(m_sect_profile, "inadhesive_shaders");
 		for (size_t i = 0; m_ini->r_line(section, i, &pattern, 0); ++i) {
-//msg("inadhesive_shader%"PRIuSIZET": %s", i, pattern);
+//msg("inadhesive_shader%" PRIuSIZET ": %s", i, pattern);
 			uint16_t eshader = 0;
 			for (std::vector<std::string>::const_iterator it = m_shaders->begin(),
 					end = m_shaders->end(); it != end; ++it, ++eshader) {

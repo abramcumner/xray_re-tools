@@ -33,7 +33,7 @@ void dm_tools::process(const cl_parser& cl)
 				msg("shader: %s", dm->shader().c_str());
 				msg("texture: %s", dm->texture().c_str());
 				msg("scale (min/max): %f/%f", dm->min_scale(), dm->max_scale());
-				msg("flags: %8.8"PRIx32, dm->flags());
+				msg("flags: %8.8" PRIx32, dm->flags());
 				break;
 			default:
 				break;

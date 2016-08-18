@@ -1,5 +1,8 @@
 #include <list>
 #ifdef _MSC_VER
+#if _MSC_VER >= 1900
+#define _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
+#endif
 #include <hash_map>
 #else
 #include <map>
@@ -144,7 +147,7 @@ bool level_mesh::search_path(uint32_t v0, uint32_t v1)
 	if (cost_v1 == xr_numeric_limits<float>::max()) {
 		const fvector3& p0 = m_points[v0];
 		const fvector3& p1 = m_points[v1];
-		msg("no edge path from %"PRIu32" (%f, %f, %f) to %"PRIu32" (%f, %f, %f)",
+		msg("no edge path from %" PRIu32 " (%f, %f, %f) to %" PRIu32 " (%f, %f, %f)",
 				v0, p0.x, p0.y, p0.z, v1, p1.x, p1.y, p1.z);
 //		create_debug_face(v0, v1);
 		return false;
@@ -272,7 +275,7 @@ void level_mesh::update_span(b_span& span, uint_fast32_t v0, uint_fast32_t v1,
 uint32_t* level_mesh::remap_cform_verts(const xr_cform& cform) const
 {
 	const cf_vertex_vec& verts = cform.vertices();
-	msg("mapping %"PRIuSIZET" CFORM verts to %"PRIuSIZET" visual", verts.size(), m_points.size());
+	msg("mapping %" PRIuSIZET " CFORM verts to %" PRIuSIZET " visual", verts.size(), m_points.size());
 
 	uint32_t* cf2m = new uint32_t[verts.size()];
 	xr_uninitialized_fill_n(cf2m, verts.size(), BAD_IDX);
@@ -294,7 +297,7 @@ uint32_t* level_mesh::remap_cform_verts(const xr_cform& cform) const
 			++num_matches;
 		}
 	}
-	msg("got %"PRIuSIZET" matches", num_matches);
+	msg("got %" PRIuSIZET " matches", num_matches);
 	return cf2m;
 }
 

@@ -9,11 +9,11 @@ using namespace xray_re;
 void level_mesh::build(float normal_tolerance)
 {
 	size_t num_faces = m_faces.size();
-	msg("compacting %"PRIuSIZET" verts, %"PRIuSIZET" faces", m_vb.size(), num_faces);
+	msg("compacting %" PRIuSIZET " verts, %" PRIuSIZET " faces", m_vb.size(), num_faces);
 	clock_t time = clock();
 	xr_mesh_builder::compact_geometry();
 	time = clock() - time;
-	msg("got %"PRIuSIZET" points, %"PRIuSIZET" normals, %"PRIuSIZET" uvs in %.3fs",
+	msg("got %" PRIuSIZET " points, %" PRIuSIZET " normals, %" PRIuSIZET " uvs in %.3fs",
 			m_points.size(), m_normals.size(), m_texcoords.size(), float(time)/1000);
 
 	msg("cleaning %s", "geometry");
@@ -21,13 +21,13 @@ void level_mesh::build(float normal_tolerance)
 	time = clock();
 	remove_duplicate_faces();
 	time = clock() - time;
-	msg("removed %"PRIuSIZET" %s faces in %.3fs", num_faces - m_faces.size(), "duplicate", float(time)/1000);
+	msg("removed %" PRIuSIZET " %s faces in %.3fs", num_faces - m_faces.size(), "duplicate", float(time)/1000);
 
 	num_faces = m_faces.size();
 	time = clock();
 	remove_back_faces(normal_tolerance);
 	time = clock() - time;
-	msg("removed %"PRIuSIZET" %s faces in %.3fs", num_faces - m_faces.size(), "back", float(time)/1000);
+	msg("removed %" PRIuSIZET " %s faces in %.3fs", num_faces - m_faces.size(), "back", float(time)/1000);
 }
 
 void level_mesh::create_mappings(lw_face_vec& faces, lw_vmref_vec& vmrefs, xr_vmap_vec& vmaps,

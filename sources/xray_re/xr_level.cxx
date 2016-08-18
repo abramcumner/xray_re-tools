@@ -110,7 +110,7 @@ bool xr_level::load(const char* game_data_path, const char* level_path)
 			status = true;
 			break;
 		default:
-			msg("unknown xrLC version %"PRIu32, xrlc_version);
+			msg("unknown xrLC version %" PRIu32, xrlc_version);
 			break;
 		}
 	}
