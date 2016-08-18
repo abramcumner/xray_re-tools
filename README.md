@@ -12,4 +12,4 @@ Binaries
 
 [latest build](https://ci.appveyor.com/api/projects/abramcumner/xray-re-tools/artifacts/xray_re-tools_latest.7z)
 
-And see Release section.
+And see [Release](https://github.com/abramcumner/xray_re-tools/releases) section.
