@@ -77,7 +77,7 @@ struct write_point_ini { void operator()(const way_point_le& point, xr_ini_write
 
 	n = xr_snprintf(buf, sizeof(buffer), "wp_%d_name", id);
 	if (n > 0)
-		w->write(buf, point.name);
+		w->write(buf, point.name, false);
 
 	n = xr_snprintf(buf, sizeof(buffer), "wp_%d_pos", id);
 	if (n > 0)
@@ -85,7 +85,7 @@ struct write_point_ini { void operator()(const way_point_le& point, xr_ini_write
 
 	n = sprintf_s(buf, sizeof(buffer), "wp_%d_selected", id);
 	if (n > 0)
-		w->write(buf, "off");
+		w->write(buf, "off", false);
 }};
 
 void xr_way_object::save_v12(xr_ini_writer* w) const
