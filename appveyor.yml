@@ -2,10 +2,6 @@ version: $(APPVEYOR_REPO_TAG_NAME).{build}
 configuration: Release
 platform: Win32
 
-skip_commits:
-  files:
-    - '*.md'
-
 build:
   project: bld-vs2015\EngineToolset_vs2015.sln
   verbosity: minimal
