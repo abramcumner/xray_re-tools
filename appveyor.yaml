@@ -1,0 +1,36 @@
+version: $(APPVEYOR_REPO_TAG_NAME).{build}
+configuration: Release
+platform: x64
+
+build:
+  project: bld-vs2015\EngineToolset_vs2015.sln
+  verbosity: minimal
+
+after_build:
+- cmd: >-
+    md dist
+    cd dist
+    copy ..\binaries\%PLATFORM%-%CONFIGURATION%\converter.exe .\
+    copy ..\binaries\%PLATFORM%-%CONFIGURATION%\aiwrapper.exe .\
+    copy ..\etc\* .\
+    md docs
+    copy ..\docs\* .\docs\
+    md docs\howto
+    copy ..\docs\howto\* .\docs\howto
+    md docs\tools
+    copy ..\docs\tools\* .\docs\tools
+    7z a xray_re-tools_%APPVEYOR_REPO_TAG_NAME%.7z *
+    copy xray_re-tools_%APPVEYOR_REPO_TAG_NAME%.7z xray_re-tools_latest.7z
+    appveyor PushArtifact xray_re-tools_latest.7z
+
+artifacts:
+- path: .\dist\xray_re-tools_$(appveyor_repo_tag_name).7z
+  name: release
+
+deploy:
+- provider: GitHub
+  auth_token:
+    secure: pXJeBrB1oq+/lPsy2jphy4dRQ542dkJRbAEOD3y/YgSVsoRTSgIt01EI92q9whrl
+  artifact: release
+  on:
+    appveyor_repo_tag: true
