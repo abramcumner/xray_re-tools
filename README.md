@@ -1,6 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/igqht08v92l56k7t?svg=true)](https://ci.appveyor.com/project/abramcumner/xray-re-tools)
-
-[![latest build]](https://ci.appveyor.com/api/projects/abramcumner/xray-re-tools/artifacts/xray_re-tools_latest.7z)
+[![Build status](https://ci.appveyor.com/api/projects/status/igqht08v92l56k7t?svg=true)](https://ci.appveyor.com/project/abramcumner/xray-re-tools) [latest build](https://ci.appveyor.com/api/projects/abramcumner/xray-re-tools/artifacts/xray_re-tools_latest.7z)
 
 xray_re-tools
 -------------
