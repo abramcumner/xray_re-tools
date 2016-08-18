@@ -27,7 +27,7 @@ void xr_particle_object::save_v12(xr_ini_writer* w) const
 {
 	xr_custom_object::save_v12(w);
 
-	w->write("game_type", "65535");
+	w->write("game_type", 65535);
 	w->write("ref_name", m_reference, false);
 	w->write("version", CPSOBJECT_VERSION_V12);
 }
