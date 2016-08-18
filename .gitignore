@@ -1,0 +1,5 @@
+/intermediate
+*.suo
+*.opendb
+*.VC.db
+/binaries
