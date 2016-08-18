@@ -1,0 +1,720 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\xr_file_system.cxx">
+      <Filter>file system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_file_system_win32.cxx">
+      <Filter>file system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_ini_file.cxx">
+      <Filter>file system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_lzhuf.cxx">
+      <Filter>file system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_reader.cxx">
+      <Filter>file system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_reader_scrambler.cxx">
+      <Filter>file system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scrambler.cxx">
+      <Filter>file system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_writer.cxx">
+      <Filter>file system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_ai_cross_table.cxx">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_ai_graph.cxx">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_ai_way.cxx">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_clsid.cxx">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_entity.cxx">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_entity_factory.cxx">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_entity_script.cxx">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_entity_zenobian.cxx">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_game_graph.cxx">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_game_spawn.cxx">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_packet.cxx">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_bone.cxx">
+      <Filter>kinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_envelope.cxx">
+      <Filter>kinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_influence.cxx">
+      <Filter>kinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_motion.cxx">
+      <Filter>kinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_obj_motion.cxx">
+      <Filter>kinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_skeleton.cxx">
+      <Filter>kinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_skl_motion.cxx">
+      <Filter>kinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_envelope_eval.cxx">
+      <Filter>kinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_blender.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_build_lights.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_cform.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_d3d_light.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_details.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_gamemtls_lib.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_ai.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_cform.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_details.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_dm.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_env_mod.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_fog_vol.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_game.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_gct.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_gct_v9.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_geom.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_glows.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_graph.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_hom.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_lights.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_ltx.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_portals.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_ps_static.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_sectors.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_shaders.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_snd_env.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_snd_static.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_som.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_spawn.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_visuals.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_level_wallmarks.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_shaders_lib.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_shaders_xrlc_lib.cxx">
+      <Filter>level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_matrix.cxx">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_quaternion.cxx">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_vector3.cxx">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_build_err.cxx">
+      <Filter>mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_geom_buf.cxx">
+      <Filter>mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_mesh.cxx">
+      <Filter>mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_mesh_builder.cxx">
+      <Filter>mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_mesh_vbuf.cxx">
+      <Filter>mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_cl_parser.cxx">
+      <Filter>misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_guid.cxx">
+      <Filter>misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_image.cxx">
+      <Filter>misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_image_bmp.cxx">
+      <Filter>misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_image_dds.cxx">
+      <Filter>misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_image_tga.cxx">
+      <Filter>misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_log.cxx">
+      <Filter>misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_name_gen.cxx">
+      <Filter>misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_sound_thumbnail.cxx">
+      <Filter>misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_texture_thumbnail.cxx">
+      <Filter>misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_dm.cxx">
+      <Filter>object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_object.cxx">
+      <Filter>object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_ogf.cxx">
+      <Filter>object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_ogf_v3.cxx">
+      <Filter>object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_ogf_v4.cxx">
+      <Filter>object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_surface.cxx">
+      <Filter>object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_ai_map.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_details.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_glows.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_groups.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_lights.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_objects.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_part.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_particles.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_portals.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_revision.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_sectors.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_shapes.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_sound_envs.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_sound_srcs.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_spawns.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_visuals.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_wallmarks.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xr_scene_ways.cxx">
+      <Filter>scene</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\xr_file_system.h">
+      <Filter>file system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_file_system_win32.h">
+      <Filter>file system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_ini_file.h">
+      <Filter>file system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_lzhuf.h">
+      <Filter>file system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_reader.h">
+      <Filter>file system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scrambler.h">
+      <Filter>file system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_writer.h">
+      <Filter>file system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_ai_cross_table.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_ai_graph.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_ai_map.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_ai_version.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_ai_way.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_clsid.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_entity.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_entity_factory.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_entity_script.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_entity_zenobian.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_game_graph.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_game_spawn.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_packet.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_bone.h">
+      <Filter>kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_envelope.h">
+      <Filter>kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_influence.h">
+      <Filter>kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_motion.h">
+      <Filter>kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_obj_motion.h">
+      <Filter>kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_skeleton.h">
+      <Filter>kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_skl_motion.h">
+      <Filter>kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_blender.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_build_lights.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_cform.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_d3d_lights.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_details.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_gamemtls_lib.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_ai.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_cform.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_details.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_dm.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_env_mod.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_fog_vol.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_game.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_gct.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_geom.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_glows.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_graph.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_hom.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_lights.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_ltx.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_portals.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_ps_static.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_sectors.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_shaders.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_snd_env.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_snd_static.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_som.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_spawn.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_version.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_visuals.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_level_wallmarks.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_shaders_lib.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_shaders_xrlc_lib.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_wallmarks.h">
+      <Filter>level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_aabb.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_cylinder.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_limits.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_math.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_matrix.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_obb.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_plane.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_quaternion.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_rect.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_shape.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_sphere.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_vector2.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_vector3.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_vector4.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_build_err.h">
+      <Filter>mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_geom_buf.h">
+      <Filter>mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_mesh.h">
+      <Filter>mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_mesh_builder.h">
+      <Filter>mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_mesh_utils.h">
+      <Filter>mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_mesh_vbuf.h">
+      <Filter>mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_remapper.h">
+      <Filter>mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_cl_parser.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_color.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_fixed_vector.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_guid.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_image.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_log.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_name_gen.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_sound_thumbnail.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_string_utils.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_texture_thumbnail.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_thumbnail.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_types.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_utils.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_dm.h">
+      <Filter>object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_object.h">
+      <Filter>object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_object_format.h">
+      <Filter>object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_ogf.h">
+      <Filter>object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_ogf_format.h">
+      <Filter>object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_ogf_v3.h">
+      <Filter>object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_ogf_v4.h">
+      <Filter>object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_surface.h">
+      <Filter>object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_ai_map.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_common.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_details.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_glows.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_groups.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_lights.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_objects.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_part.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_particles.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_portals.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_revision.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_sectors.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_shapes.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_sound_envs.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_sound_srcs.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_spawns.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_visuals.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_wallmarks.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_scene_ways.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="file system">
+      <UniqueIdentifier>{e60c0997-e59e-4e58-afa8-5b9981f571b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="game">
+      <UniqueIdentifier>{0b5f9870-3620-4557-8f51-19d083f1483b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kinematics">
+      <UniqueIdentifier>{4cab2fa6-67df-4246-ae97-3076b26b1f03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="level">
+      <UniqueIdentifier>{09be5c43-1019-4e03-bc1d-9e344a7cf278}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="math">
+      <UniqueIdentifier>{addb9bf7-1358-4236-b87c-957b96317e31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mesh">
+      <UniqueIdentifier>{543d7adc-a929-40f5-a29e-dd9e22c56ecf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="misc">
+      <UniqueIdentifier>{9e69af1d-d8d2-4a93-aecb-432444c8d81b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="object">
+      <UniqueIdentifier>{f803e53e-dacf-4af9-927a-7df409c29b6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene">
+      <UniqueIdentifier>{a208c921-acad-4aa1-83d1-129105eaf7b3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
