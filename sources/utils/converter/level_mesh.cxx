@@ -89,6 +89,16 @@ void level_mesh::push(uint16_t sector, const xr_vbuf& vb, const xr_ibuf& ib,
 	xr_mesh_builder::__push(vb, ib, 0, face_template);
 }
 
+void level_mesh::push(uint16_t sector, const xr_vbuf& vb, const xr_ibuf& ib,
+	uint16_t texture, uint16_t eshader, const fmatrix& xform)
+{
+	b_face face_template(sector);
+	face_template.surface.set(texture, eshader);
+	if (vb.has_lightmaps())
+		face_template.surface.flags |= RSF_LIGHTMAP;
+	xr_mesh_builder::__push(vb, ib, &xform, face_template);
+}
+
 void level_mesh::push(uint16_t sector, const xr_vbuf& vb, const xr_ibuf& ib, const fmatrix& xform,
 		uint16_t texture, uint16_t eshader, uint16_t gamemtl)
 {

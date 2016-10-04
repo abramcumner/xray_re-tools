@@ -344,7 +344,14 @@ void level_tools::push_subdivisions_v13(level_mesh* mesh, uint16_t sector_idx, u
 	} else if (ogf->hierarchical()) {
 		for (std::vector<uint32_t>::const_iterator it = ogf->children_l().begin(),
 				end = ogf->children_l().end(); it != end; ++it) {
-			push_subdivisions_v13(mesh, sector_idx, *it);
+			const xr_ogf* child = m_subdivisions->at(*it);
+			const xr_ogf_v4* child_4 = reinterpret_cast<const xr_ogf_v4*>(child);
+			if (child->model_type() == MT4_TREE_ST || child->model_type() == MT4_TREE_PM) {
+				mesh->push(sector_idx, child->vb(), child->ib(), m_uniq_textures[child->texture_l()],
+					m_uniq_shaders[child->shader_l()], child_4->xform());
+			}
+			else
+				push_subdivisions_v13(mesh, sector_idx, *it);
 		}
 	} else if (is_compiled_wallmark(ogf->shader_l())) {
 		// FIXME: restore wallmarks here even if there is no redundant level.wallmarks

@@ -125,6 +125,8 @@ public:
 					uint16_t texture, uint16_t eshader);
 	void		push(uint16_t sector, const xray_re::shape_def& shape, const xray_re::fmatrix& xform0,
 					uint16_t texture, uint16_t eshader, uint16_t gamemtl);
+	void		push(uint16_t sector, const xray_re::xr_vbuf& vb, const xray_re::xr_ibuf& ib, uint16_t texture, uint16_t eshader,
+					const xray_re::fmatrix& xform);
 	void		restore_game_materials(const xray_re::xr_cform& cform);
 	void		separate_terrain(uint16_t texture);
 	void		separate_terrain(uint16_t texture, const xray_re::details_header& header,
