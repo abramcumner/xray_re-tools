@@ -314,7 +314,7 @@ bool xr_ini_file::parse(const char* p, const char* end, const char* path)
 			} else {
 				item->value.clear();
 			}
-		} else if (section == 0 && c == '#') {
+		} else if (c == '#') {
 			++p;
 			c = read_name(&p, end, sizeof(temp), temp);
 			if (c != '\"' || std::strcmp(temp, "include") != 0) {
