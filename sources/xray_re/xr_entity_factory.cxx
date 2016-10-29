@@ -5,6 +5,7 @@
 #include "xr_file_system.h"
 #include "xr_ini_file.h"
 #include "xr_utils.h"
+#include "xr_entity_la.h"
 
 using namespace xray_re;
 
@@ -287,6 +288,16 @@ void xr_entity_factory::init()
 	m_clsids.push_back(new factory_item<se_zone_torrid>("ZS_TORRD"));
 	m_clsids.push_back(new factory_item<se_weapon_shotgun>("WP_ASHTG"));
 
+	//LA new script classes
+	m_clsids.push_back(new factory_item<se_monster>("SM_KARLO"));
+	m_clsids.push_back(new factory_item<se_monster>("SM_RAT"));
+	m_clsids.push_back(new factory_item<se_shelter>("LA_SHELT"));
+	m_clsids.push_back(new factory_item<se_item>("IS_ATTCH"));
+	m_clsids.push_back(new factory_item<se_zone_anom>("ZS_NOGRA"));
+	m_clsids.push_back(new factory_item<se_zone_visual>("ZS_RUSTY"));
+	m_clsids.push_back(new factory_item<se_safe>("LA_PHSAF"));
+	m_clsids.push_back(new factory_item<cse_turret_mgun>("W_TURRET"));
+
 	// prepare for bisection
 	std::sort(m_clsids.begin(), m_clsids.end(), clsid_pred());
 }
@@ -304,14 +315,20 @@ cse_abstract* xr_entity_factory::create(const char* name)
 	if (m_system_ini == 0)
 		m_system_ini = new xr_ini_file(PA_GAME_CONFIG, "system.ltx");
 
-	if (m_system_ini->section_exist(name)) {
-		xr_clsid clsid(m_system_ini->r_clsid(name, "class"));
-		std::vector<factory_item_base*>::iterator it = lower_bound_if(
-				m_clsids.begin(), m_clsids.end(), clsid_pred2(clsid));
-		if (it != m_clsids.end() && (*it)->clsid() == clsid)
-			return (*it)->create();
+	if (!m_system_ini->section_exist(name)) {
+		msg("can't find entity %s", name);
+		return 0;
 	}
-	msg("can't create entity %s", name);
+
+	xr_clsid clsid(m_system_ini->r_clsid(name, "class"));
+	std::vector<factory_item_base*>::iterator it = lower_bound_if(
+			m_clsids.begin(), m_clsids.end(), clsid_pred2(clsid));
+	if (it != m_clsids.end() && (*it)->clsid() == clsid)
+		return (*it)->create();
+
+	char clsid_name[9] = {};
+	clsid.get(clsid_name);
+	msg("can't create entity %s, %s", name, clsid_name);
 	return 0;
 }
 

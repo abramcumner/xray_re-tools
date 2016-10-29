@@ -313,6 +313,9 @@
     <ClCompile Include="..\xr_scene_ways.cxx">
       <Filter>scene</Filter>
     </ClCompile>
+    <ClCompile Include="..\xr_entity_la.cxx">
+      <Filter>game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\xr_file_system.h">
@@ -686,6 +689,9 @@
     </ClInclude>
     <ClInclude Include="..\xr_scene_ways.h">
       <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xr_entity_la.h">
+      <Filter>game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

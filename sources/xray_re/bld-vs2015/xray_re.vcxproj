@@ -199,6 +199,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\xr_dm.cxx" />
+    <ClCompile Include="..\xr_entity_la.cxx" />
     <ClCompile Include="..\xr_object.cxx" />
     <ClCompile Include="..\xr_ogf.cxx" />
     <ClCompile Include="..\xr_ogf_v3.cxx" />
@@ -305,6 +306,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\xr_dm.h" />
+    <ClInclude Include="..\xr_entity_la.h" />
     <ClInclude Include="..\xr_object.h" />
     <ClInclude Include="..\xr_object_format.h" />
     <ClInclude Include="..\xr_ogf.h" />
