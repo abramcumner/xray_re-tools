@@ -163,7 +163,7 @@ static int skip_blank(const char** pp, const char* end)
 {
 	for (const char* p = *pp; p != end; ++p) {
 		int c = *p;
-		if (c == ' ' || c == '\t' || c == '\r') {
+		if (c == ' ' || c == '\t') {
 			// skip whitespace
 			continue;
 		}
@@ -173,14 +173,14 @@ static int skip_blank(const char** pp, const char* end)
 				if (p == end)
 					goto eof_reached;
 				c = *p;
-				if (c == '\n') {
+				if (c == '\n' || c == '\r') {
 					*pp = p;
 					return IF_EOL;
 				}
 			}
 		}
 		*pp = p;
-		return c == '\n' ? IF_EOL : c;
+		return (c == '\n' || c == '\r')? IF_EOL : c;
 	}
 eof_reached:
 	*pp = end;
@@ -351,6 +351,10 @@ bool xr_ini_file::parse(const char* p, const char* end, const char* path)
 
 bool xr_ini_file::load_include(const char* path)
 {
+	if (strstr(path, "la_objects.ltx") != nullptr) {
+		msg("!!!");
+	}
+
 	xr_file_system& fs = xr_file_system::instance();
 	xr_reader* r = fs.r_open(path);
 	if (r == 0) {
