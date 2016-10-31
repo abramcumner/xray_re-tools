@@ -296,6 +296,7 @@ void xr_entity_factory::init()
 	m_clsids.push_back(new factory_item<se_zone_anom>("ZS_NOGRA"));
 	m_clsids.push_back(new factory_item<se_zone_visual>("ZS_RUSTY"));
 	m_clsids.push_back(new factory_item<se_safe>("LA_PHSAF"));
+	m_clsids.push_back(new factory_item<se_safe>("LA_SAFE"));
 	m_clsids.push_back(new factory_item<cse_turret_mgun>("W_TURRET"));
 
 	// prepare for bisection
