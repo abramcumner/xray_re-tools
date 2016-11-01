@@ -159,6 +159,11 @@ static inline bool is_name(int c)
 	return std::isalnum(c) || std::strchr("@$_-?:.\\", c) != 0;
 }
 
+static bool is_eol(int c)
+{
+	return c == '\n' || c == '\r';
+}
+
 static int skip_blank(const char** pp, const char* end)
 {
 	for (const char* p = *pp; p != end; ++p) {
@@ -173,14 +178,18 @@ static int skip_blank(const char** pp, const char* end)
 				if (p == end)
 					goto eof_reached;
 				c = *p;
-				if (c == '\n' || c == '\r') {
+				if (is_eol(c)) {
+					if ((p + 1) != end && *(p + 1) == '\n')
+						p++;
 					*pp = p;
 					return IF_EOL;
 				}
 			}
 		}
+		if (is_eol(c) && (p + 1) != end && *(p + 1) == '\n')
+			p++;
 		*pp = p;
-		return (c == '\n' || c == '\r')? IF_EOL : c;
+		return is_eol(c)? IF_EOL : c;
 	}
 eof_reached:
 	*pp = end;
@@ -351,10 +360,6 @@ bool xr_ini_file::parse(const char* p, const char* end, const char* path)
 
 bool xr_ini_file::load_include(const char* path)
 {
-	if (strstr(path, "la_objects.ltx") != nullptr) {
-		msg("!!!");
-	}
-
 	xr_file_system& fs = xr_file_system::instance();
 	xr_reader* r = fs.r_open(path);
 	if (r == 0) {
