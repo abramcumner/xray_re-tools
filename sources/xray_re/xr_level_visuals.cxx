@@ -76,7 +76,7 @@ void xr_level_visuals::load(uint32_t xrlc_version, xr_reader& r, const xr_level_
 {
 	xr_reader* s = 0;
 
-	if (xrlc_version <= XRLC_VERSION_8)
+	if (xrlc_version < XRLC_VERSION_8)
 		s = r.open_chunk(FSL5_VISUALS);
 	else
 		s = r.open_chunk(FSL8_VISUALS);

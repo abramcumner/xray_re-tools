@@ -93,12 +93,12 @@ bool xr_level::load(const char* game_data_path, const char* level_path)
 		m_xrlc_quality = r->r_u16();
 		switch (xrlc_version) {
 		case XRLC_VERSION_5:
+		case XRLC_VERSION_8:
 			{
 				char buf[124];
 				r->r_cseq(sizeof(buf), buf);
 			}
 			// fall through
-		case XRLC_VERSION_8:
 		case XRLC_VERSION_9:
 		case XRLC_VERSION_10:
 		case XRLC_VERSION_11:
