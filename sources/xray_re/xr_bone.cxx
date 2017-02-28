@@ -134,7 +134,19 @@ void xr_bone::save_data(xr_writer& w) const
 
 	w.open_chunk(BONE_CHUNK_IK_JOINT);
 	w.w_u32(m_joint_ik_data.type);
-	w.w_cseq<s_joint_limit>(3, m_joint_ik_data.limits);
+
+	//w.w_cseq<s_joint_limit>(3, m_joint_ik_data.limits);
+	for (int i = 0; i < 3; ++i) //invert limits for AE
+	{
+		fvector2 vec = m_joint_ik_data.limits[i].limit;
+		float tmp = vec.x;
+		vec.x = -vec.y;
+		vec.y = -tmp;
+		w.w_fvector2(vec);
+		w.w_float(m_joint_ik_data.limits[i].spring_factor);
+		w.w_float(m_joint_ik_data.limits[i].damping_factor);
+	}
+
 	w.w_float(m_joint_ik_data.spring_factor);
 	w.w_float(m_joint_ik_data.damping_factor);
 	w.close_chunk();
