@@ -124,11 +124,11 @@ static MStatus extract_bones(MFnSkinCluster& skin_fn, xr_bone_vec& bones)
 		MVector t = joint_fn.getTranslation(MSpace::kTransform, &status);
 		CHECK_MSTATUS(status);
 		bone->bind_offset().set(float(MDistance(t.x, MDistance::kCentimeters).asMeters()),
-				float(MDistance(t.y, MDistance::kCentimeters).asMeters()),
-				float(MDistance(-t.z, MDistance::kCentimeters).asMeters()));
+								float(MDistance(t.y, MDistance::kCentimeters).asMeters()),
+								float(MDistance(-t.z, MDistance::kCentimeters).asMeters()));
 
 		MEulerRotation r;
-		status = joint_fn.getRotation(r);
+		status = joint_fn.getRotation(r);	// Issue #15
 		CHECK_MSTATUS(status);
 		r.reorderIt(MEulerRotation::kZXY);
 		bone->bind_rotate().set(float(-r.x), float(-r.y), float(r.z));
@@ -157,8 +157,8 @@ static MStatus extract_points(MFnMesh& mesh_fn, std::vector<fvector3>& points, f
 		mesh_fn.getPoint(i, p0);
 		p0.cartesianize();
 		aabb.extend(p.set(float(MDistance(p0.x, MDistance::kCentimeters).asMeters()),
-				float(MDistance(p0.y, MDistance::kCentimeters).asMeters()),
-				float(MDistance(-p0.z, MDistance::kCentimeters).asMeters())));
+						  float(MDistance(p0.y, MDistance::kCentimeters).asMeters()),
+						  float(MDistance(-p0.z, MDistance::kCentimeters).asMeters())));
 		points.push_back(p);
 	}
 	return status;
@@ -169,6 +169,7 @@ static MStatus extract_faces(MFnMesh& mesh_fn, lw_face_vec& faces)
 	MStatus status;
 
 	MItMeshPolygon it(mesh_fn.object());
+	// Не лучшее место для этого кода: lamina обнаруживаются не во всех случаях.
 	if (it.isLamina()) {
 		msg("xray_re: lamina faces found in mesh %s", mesh_fn.name().asChar());
 		MGlobal::displayWarning(MString("xray_re: lamina faces found in mesh ") +
@@ -176,6 +177,7 @@ static MStatus extract_faces(MFnMesh& mesh_fn, lw_face_vec& faces)
 	}
 	// FIXME: it would be nice to support automatic triangulation using getTriangles() etc.
 	int num_polys = mesh_fn.numPolygons(&status);
+	// Иногда одиночные треугольники - не ошибка моделлера. Может быть, стоит это учесть?
 	if (num_polys < 2) {
 		msg("xray_re: can't export mesh %s with less than two faces",
 			mesh_fn.name().asChar());
@@ -383,6 +385,7 @@ xr_surface* maya_export_tools::create_surface(const char* surf_name, MFnSet& set
 				shader_obj = obj;
 		}
 	}
+	// Поверхность без какого-либо шейдера (баг Майи или ошибка диза)
 	if (shader_obj.isNull()) {
 		msg("xray_re: can't find shader node for surface %s", surf_name);
 		MGlobal::displayError(MString("xray_re: can't find shader node for surface ") + surf_name);
@@ -391,11 +394,22 @@ xr_surface* maya_export_tools::create_surface(const char* surf_name, MFnSet& set
 
 	MFnDependencyNode shader_fn(shader_obj);
 	shader_fn.findPlug("c").connectedTo(connected_plugs, true, false);
+	// Атрибут color не подключен к текстуре
+	if (connected_plugs.length() == 0) {
+		msg("xray_re: can't find texture node connected to the color attribute on %s", surf_name);
+		MGlobal::displayWarning(MString("xray_re: can't find texture node connected to the color attribute on ") + surf_name);
+		// Выделить объекты с проблемным шейдером
+		MString command("hyperShade -objects ");
+		command += surf_name;
+		MGlobal::executeCommand(command, true, false);
+	}
+
 	for (unsigned i = connected_plugs.length(); i != 0;) {
 		MFnDependencyNode dep_fn(connected_plugs[--i].node());
 		if (dep_fn.typeName() == "file") {
 			MString file_path = dep_fn.findPlug("ftn").asString();
-			if (file_path.numChars()) {
+			// Если путь пустой, то это тоже ненормально
+			if (file_path.numChars() != 0) {
 				int i, j;
 				if ((i = file_path.rindexW('/')) < 0)
 					i = file_path.rindexW('\\');
@@ -407,6 +421,10 @@ xr_surface* maya_export_tools::create_surface(const char* surf_name, MFnSet& set
 				} else {
 					surface->texture() = name.asChar();
 				}
+			} else {
+				msg("xray_re: texture node connected to the color attribute on the %s, but path to the texture isn't specified", surf_name);
+				MGlobal::displayWarning(MString("xray_re: texture node connected to the color attribute ")
+					+ surf_name + (", but path to the texture isn't specified"));
 			}
 			break;
 		}
@@ -419,6 +437,7 @@ MStatus maya_export_tools::extract_surfaces(MFnMesh& mesh_fn, xr_surfmap_vec& su
 	MObjectArray shading_groups;
 	MIntArray faces;
 	MStatus status = mesh_fn.getConnectedShaders(0, shading_groups, faces);
+	// Для случая, когда у поверхности пропадает Shading Group (баг Майи)
 	if (!status || shading_groups.length() == 0) {
 		msg("xray_re: can't get connected shaders for mesh %s", mesh_fn.name().asChar());
 		MGlobal::displayError(MString("xray_re: can't get connected shaders for mesh ") +
