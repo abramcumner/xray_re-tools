@@ -1455,9 +1455,13 @@ void cse_alife_human_abstract::state_read(xr_packet& packet, uint16_t size)
 			}
 		}
 		packet.r_seq(packet.r_u32(), m_equipment_preferences);
-		xr_assert(m_equipment_preferences.size() == 5);
+		if (m_equipment_preferences.size() != 5)
+			msg("wrong size equipment_preferences %" PRIuSIZET ", expected %d %s (%s)", m_equipment_preferences.size(), 5, name_replace().c_str(),
+				name().c_str());
 		packet.r_seq(packet.r_u32(), m_main_weapon_preferences);
-		xr_assert(m_main_weapon_preferences.size() == 4);
+		if (m_main_weapon_preferences.size() != 4)
+			msg("wrong size main_weapon_preferences %" PRIuSIZET ", expected %d %s (%s)", m_main_weapon_preferences.size(), 4, name_replace().c_str(),
+				name().c_str());
 	}
 	if (m_version >= CSE_VERSION_0x6e && m_version < 0x70)
 		packet.r_u16(m_smart_terrain_id);
