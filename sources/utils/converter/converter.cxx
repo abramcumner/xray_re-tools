@@ -46,6 +46,7 @@ void usage()
 	printf("	maya	make single object for importing into Maya/3ds Max (default)\n");
 	printf("	le	split into terrain, merged edge-linked groups, MU models\n");
 	printf("	le2	split into terrain, raw edge-linked groups, MU models\n");
+	printf(" -terrain	make terrain object only from faces with terrain texture\n");
 	printf(" -with_lods	produce LOD textures for MU models\n");
 	printf(" -fancy <SPEC>	scale detail models and fix fences according to <SPEC>\n\n");
 	printf("OGG/WAV options:\n");
@@ -111,6 +112,7 @@ int main(int argc, char* argv[])
 		{"-dbgcfrm",	cl_parser::OT_BOOL},
 		{"-dbgmrg",	cl_parser::OT_BOOL},
 		{"-use_mt",	cl_parser::OT_BOOL},
+		{"-terrain", cl_parser::OT_BOOL},
 
 		{"-fancy",	cl_parser::OT_STRING},
 	};

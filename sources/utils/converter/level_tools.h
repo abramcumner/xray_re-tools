@@ -49,9 +49,10 @@ public:
 
 	enum {
 		RF_WITH_LODS	= 0x01,
-		RF_USE_MT	= 0x02,
+		RF_USE_MT	    = 0x02,
 		RF_DEBUG_CFORM	= 0x04,
 		RF_DEBUG_MERGE	= 0x08,
+		RF_TERRAIN      = 0x10,
 	};
 
 private:

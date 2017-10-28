@@ -657,8 +657,10 @@ void level_tools::export_for_level_editor(level_mesh* mesh)
 	uint16_t terrain_texture = get_terrain_texture();
 	if (m_scene->details() && terrain_texture != UINT16_MAX) {
 		msg("separating terrain");
-		mesh->separate_terrain(terrain_texture,
-				m_scene->details()->header(), m_scene->details()->slots());
+		if (m_rflags & RF_TERRAIN)
+			mesh->separate_terrain(terrain_texture);
+		else
+			mesh->separate_terrain(terrain_texture, m_scene->details()->header(), m_scene->details()->slots());
 	}
 
 	xr_name_gen model_name("part", false);

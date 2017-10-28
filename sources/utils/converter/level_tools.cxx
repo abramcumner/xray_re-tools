@@ -94,6 +94,8 @@ void level_tools::process(const cl_parser& cl)
 		m_rflags |= RF_DEBUG_CFORM;
 	if (cl.get_bool("-dbgmrg"))
 		m_rflags |= RF_DEBUG_MERGE;
+	if (cl.get_bool("-terrain"))
+		m_rflags |= RF_TERRAIN;
 
 	const char* scene_name = 0;
 	if (cl.get_string("-out", scene_name)) {
