@@ -38,6 +38,7 @@ const MString ogf_reader("X-Ray game object");
 const MString omf_reader("X-Ray game skeletal motions");
 const MString skl_translator("X-Ray skeletal motion");
 const MString skls_reader("X-Ray skeletal motions");
+const MString anm_writer("X-Ray object motion");
 
 class maya_dm_reader: public MPxFileTranslator {
 public:
@@ -119,6 +120,17 @@ public:
 	virtual MString		defaultExtension() const;
 	virtual MString		filter() const;
 	virtual MFileKind	identifyFile(const MFileObject& file, const char* buffer, short size) const;
+
+	static void*		creator();
+};
+
+class maya_anm_writer: public MPxFileTranslator {
+public:
+	virtual MStatus		writer(const MFileObject& file, const MString& options, FileAccessMode mode);
+	virtual bool		haveWriteMethod() const;
+	virtual MString		defaultExtension() const;
+	virtual MString		filter() const;
+	virtual MFileKind	identifyFile(const MFileObject& file, const char *buffer, short size) const;
 
 	static void*		creator();
 };
@@ -450,6 +462,36 @@ MPxFileTranslator::MFileKind maya_skls_reader::identifyFile(const MFileObject& f
 
 void* maya_skls_reader::creator() { return new maya_skls_reader; }
 
+MStatus maya_anm_writer::writer(const MFileObject& file, const MString& options, FileAccessMode mode)
+{
+	fix_fpu_cw();
+
+	switch(mode)
+	{
+	case kExportAccessMode:
+	case kSaveAccessMode:
+	case kExportActiveAccessMode:
+		break;
+	default:
+		return MS::kFailure;
+	}
+
+	return maya_export_tools().export_anm(file.resolvedFullName().asChar(), mode == kExportActiveAccessMode);
+}
+
+bool maya_anm_writer::haveWriteMethod() const { return true; }
+
+MString maya_anm_writer::defaultExtension() const { return MString("anm"); }
+
+MString maya_anm_writer::filter() const { return MString("*.anm"); }
+
+MPxFileTranslator::MFileKind maya_anm_writer::identifyFile(const MFileObject& file, const char* buffer, short size) const
+{
+	return extract_extension(file) == defaultExtension() ? kIsMyFileType : kNotMyFileType;
+}
+
+void* maya_anm_writer::creator() { return new maya_anm_writer; }
+
 MStatus initializePlugin(MObject obj)
 {
 	MStatus status;
@@ -484,6 +526,8 @@ MStatus initializePlugin(MObject obj)
 		return status;
 	if (!(status = plugin_fn.registerFileTranslator(skls_reader, "", maya_skls_reader::creator, "", "", true)))
 		return status;
+	if (!(status = plugin_fn.registerFileTranslator(anm_writer, "", maya_anm_writer::creator, "", "", true)))
+		return status;
 
 	return status;
 }
@@ -499,6 +543,7 @@ MStatus uninitializePlugin(MObject obj)
 	plugin_fn.deregisterFileTranslator(omf_reader);
 	plugin_fn.deregisterFileTranslator(skl_translator);
 	plugin_fn.deregisterFileTranslator(skls_reader);
+	plugin_fn.deregisterFileTranslator(anm_writer);
 
 	return MS::kSuccess;
 }

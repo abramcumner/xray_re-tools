@@ -37,6 +37,7 @@ public:
 	MStatus			export_object(const char* path, bool selection_only = false);
 	MStatus			export_skl_object(const char* path, bool selection_only = false);
 	MStatus			export_skl(const char* path, bool selection_only = false);
+	MStatus			export_anm(const char* path, bool selection_only = false);
 
 private:
 	MStatus			extract_surfaces(MFnMesh& mesh_fn, std::vector<xray_re::xr_surfmap*>& surfmaps);
