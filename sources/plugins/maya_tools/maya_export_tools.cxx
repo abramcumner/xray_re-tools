@@ -23,6 +23,7 @@
 #include <maya/MPlugArray.h>
 #include <maya/MPointArray.h>
 #include <maya/MSelectionList.h>
+#include <maya/MMatrix.h>
 #include "maya_export_tools.h"
 #include "xr_object.h"
 #include "xr_skl_motion.h"
@@ -162,15 +163,16 @@ static MStatus extract_bones(MFnSkinCluster& skin_fn, xr_bone_vec& bones)
 		MFnIkJoint joint_fn(joints[--i]);
 		xr_bone* bone = bones[i];
 
-		MVector t = joint_fn.getTranslation(MSpace::kTransform, &status);
+		MTransformationMatrix mat = joint_fn.transformationMatrix(&status);
+		CHECK_MSTATUS(status);
+
+		MVector t = mat.getTranslation(MSpace::kTransform, &status);
 		CHECK_MSTATUS(status);
 		bone->bind_offset().set(float(MDistance(t.x, MDistance::kCentimeters).asMeters()),
 								float(MDistance(t.y, MDistance::kCentimeters).asMeters()),
 								float(MDistance(-t.z, MDistance::kCentimeters).asMeters()));
 
-		MEulerRotation r;
-		status = joint_fn.getRotation(r);	// Issue #15
-		CHECK_MSTATUS(status);
+		MEulerRotation r = mat.eulerRotation();
 		r.reorderIt(MEulerRotation::kZXY);
 		bone->bind_rotate().set(float(-r.x), float(-r.y), float(r.z));
 	}
@@ -948,15 +950,16 @@ MStatus maya_export_tools::export_skl(const char* path, bool selection_only)
 			MFnIkJoint joint_fn(joints[--i]);
 			xr_envelope* const* envelopes = bmotions[i]->envelopes();
 
-			MVector t = joint_fn.getTranslation(MSpace::kTransform, &status);
+			MTransformationMatrix mat = joint_fn.transformationMatrix(&status);
+			CHECK_MSTATUS(status);
+
+			MVector t = mat.getTranslation(MSpace::kTransform, &status);
 			CHECK_MSTATUS(status);
 			envelopes[0]->insert_key(time, float(MDistance(t.x, MDistance::kCentimeters).asMeters()));
 			envelopes[1]->insert_key(time, float(MDistance(t.y, MDistance::kCentimeters).asMeters()));
 			envelopes[2]->insert_key(time, float(MDistance(-t.z, MDistance::kCentimeters).asMeters()));
 
-			MEulerRotation r;
-			status = joint_fn.getRotation(r);
-			CHECK_MSTATUS(status);
+			MEulerRotation r = mat.eulerRotation();
 			r.reorderIt(MEulerRotation::kZXY);
 			envelopes[4]->insert_key(time, float(-r.x));
 			envelopes[3]->insert_key(time, float(-r.y));
