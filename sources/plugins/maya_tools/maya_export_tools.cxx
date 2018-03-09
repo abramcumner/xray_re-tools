@@ -29,8 +29,48 @@
 #include "xr_envelope.h"
 #include "xr_utils.h"
 #include "xr_obj_motion.h"
+#include "xr_sdk_version.h"
 
 using namespace xray_re;
+
+static MStatus parse_options(const MString& options, xray_re::sdk_version* target_sdk)
+{
+	MStatus status;
+	MStringArray params;
+
+	if (!(status = options.split(';', params)))
+		return status;
+
+	for (int i = 0; i < params.length(); i++)
+	{
+		MStringArray key_value;
+		if (!(status = params[i].split('=', key_value)))
+			return status;
+
+		if (key_value.length() < 2)
+			continue;
+
+		if (target_sdk && key_value[0] == "sdk_ver")
+		{
+			if (key_value[1] == "756")
+				*target_sdk = xray_re::SDK_VER_756;
+			else if (key_value[1] == "1098")
+				*target_sdk = xray_re::SDK_VER_1098;
+			else if (key_value[1] == "1850")
+				*target_sdk = xray_re::SDK_VER_1850;
+			else if (key_value[1] == "0.4")
+				*target_sdk = xray_re::SDK_VER_0_4;
+			else if (key_value[1] == "0.5")
+				*target_sdk = xray_re::SDK_VER_0_5;
+			else if (key_value[1] == "0.6")
+				*target_sdk = xray_re::SDK_VER_0_6;
+			else if (key_value[1] == "0.7")
+				*target_sdk = xray_re::SDK_VER_0_7;
+		}
+	}
+
+	return MS::kSuccess;
+}
 
 static MStatus extract_bones(MFnSkinCluster& skin_fn, xr_bone_vec& bones)
 {
@@ -478,7 +518,7 @@ struct temp_face {
 };
 
 // FIXME: consider using 3ds Max smoothing groups.
-static MStatus extract_smoothing_groups(MFnMesh& mesh_fn, std::vector<uint32_t>& sgroups)
+static MStatus extract_smoothing_groups_soc(MFnMesh& mesh_fn, std::vector<uint32_t>& sgroups)
 {
 	MStatus status = MS::kSuccess;
 
@@ -561,6 +601,42 @@ static MStatus extract_smoothing_groups(MFnMesh& mesh_fn, std::vector<uint32_t>&
 	return status;
 }
 
+static MStatus extract_smoothing_groups_cs(MFnMesh& mesh_fn, std::vector<uint32_t>& sgroups)
+{
+	MStatus status = MS::kSuccess;
+	MIntArray connected;
+
+	std::vector<bool> smooth_edge(mesh_fn.numEdges());
+	for (MItMeshEdge it(mesh_fn.object()); !it.isDone(); it.next()) {
+		smooth_edge[it.index()] = it.isSmooth();
+	}
+
+	int num_faces = mesh_fn.numPolygons();
+	sgroups.assign(num_faces, 0);
+
+	for (MItMeshPolygon it(mesh_fn.object()); !it.isDone(); it.next()) {
+		status = it.getEdges(connected);
+		CHECK_MSTATUS(status);
+		unsigned n = connected.length();
+		if (n != 3) {
+			msg("xray_re: can't build smoothing groups");
+			MGlobal::displayError(MString("xray_re: can't build smoothing groups"));
+			return MS::kInvalidParameter;
+		}
+		uint32_t smooth = 0;
+		for (int i = 0; i < 3; i++) {
+			int edge_index = connected[i];
+			if (smooth_edge[edge_index])
+				continue;
+			int shift = (4 - i) % 3;
+			smooth |= 1 << shift;
+		}
+		sgroups[it.index()] = smooth;
+	}
+
+	return status;
+}
+
 void maya_export_tools::commit_surfaces(xr_surface_vec& surfaces)
 {
 	surfaces.reserve(m_shared_surfaces.size());
@@ -570,7 +646,7 @@ void maya_export_tools::commit_surfaces(xr_surface_vec& surfaces)
 	}
 }
 
-xr_object* maya_export_tools::create_object(MObjectArray& mesh_objs)
+xr_object* maya_export_tools::create_object(MObjectArray& mesh_objs, xray_re::sdk_version target_sdk)
 {
 	MStatus status;
 
@@ -597,8 +673,16 @@ xr_object* maya_export_tools::create_object(MObjectArray& mesh_objs)
 		if (!(status = extract_surfaces(mesh_fn, mesh->surfmaps())))
 			goto fail;
 
-		if (!(status = extract_smoothing_groups(mesh_fn, mesh->sgroups())))
-			goto fail;
+		if (target_sdk <= xray_re::SDK_VER_0_4)
+		{
+			if (!(status = extract_smoothing_groups_soc(mesh_fn, mesh->sgroups())))
+				goto fail;
+		}
+		else
+		{
+			if (!(status = extract_smoothing_groups_cs(mesh_fn, mesh->sgroups())))
+				goto fail;
+		}
 	}
 
 	commit_surfaces(object->surfaces());
@@ -610,7 +694,7 @@ fail:
 	return 0;
 }
 
-xr_object* maya_export_tools::create_skl_object(MObject& mesh_obj, MObject& skin_obj)
+xr_object* maya_export_tools::create_skl_object(MObject& mesh_obj, MObject& skin_obj, xray_re::sdk_version target_sdk)
 {
 	MStatus status;
 
@@ -643,8 +727,16 @@ xr_object* maya_export_tools::create_skl_object(MObject& mesh_obj, MObject& skin
 	if (!(status = extract_surfaces(mesh_fn, mesh->surfmaps())))
 		goto fail;
 
-	if (!(status = extract_smoothing_groups(mesh_fn, mesh->sgroups())))
-		goto fail;
+	if (target_sdk <= xray_re::SDK_VER_0_4)
+	{
+		if (!(status = extract_smoothing_groups_soc(mesh_fn, mesh->sgroups())))
+			goto fail;
+	}
+	else
+	{
+		if (!(status = extract_smoothing_groups_cs(mesh_fn, mesh->sgroups())))
+			goto fail;
+	}
 
 	object->partitions().push_back(new xr_partition(object->bones()));
 
@@ -704,7 +796,7 @@ static void collect_meshes(MObjectArray& mesh_objs, bool selection_only)
 	}
 }
 
-MStatus maya_export_tools::export_object(const char* path, bool selection_only)
+MStatus maya_export_tools::export_object(const char* path, bool selection_only, const MString& options)
 {
 	MObjectArray mesh_objs;
 	collect_meshes(mesh_objs, selection_only);
@@ -714,10 +806,15 @@ MStatus maya_export_tools::export_object(const char* path, bool selection_only)
 		return MS::kFailure;
 	}
 
+	xray_re::sdk_version target_sdk = xray_re::SDK_VER_0_4;
+	MStatus status = parse_options(options, &target_sdk);
+	if (!status)
+		return status;
+
 	m_skeletal = false;
 
-	MStatus status = MS::kFailure;
-	if (xr_object* object = create_object(mesh_objs)) {
+	status = MS::kFailure;
+	if (xr_object* object = create_object(mesh_objs, target_sdk)) {
 		if (object->save_object(path))
 			status = MS::kSuccess;
 		delete object;
@@ -780,17 +877,22 @@ static MStatus find_mesh_and_skin(MObject* mesh_obj, MObject* skin_obj, bool sel
 	return MS::kSuccess;
 }
 
-MStatus maya_export_tools::export_skl_object(const char* path, bool selection_only)
+MStatus maya_export_tools::export_skl_object(const char* path, bool selection_only, const MString& options)
 {
 	MObject mesh_obj, skin_obj;
 	MStatus status = find_mesh_and_skin(&mesh_obj, &skin_obj, selection_only);
 	if (!status)
 		return status;
 
+	xray_re::sdk_version target_sdk = xray_re::SDK_VER_0_4;
+	status = parse_options(options, &target_sdk);
+	if (!status)
+		return status;
+
 	m_skeletal = true;
 
 	status = MS::kFailure;
-	if (xr_object* object = create_skl_object(mesh_obj, skin_obj)) {
+	if (xr_object* object = create_skl_object(mesh_obj, skin_obj, target_sdk)) {
 		if (object->save_object(path))
 			status = MS::kSuccess;
 		delete object;

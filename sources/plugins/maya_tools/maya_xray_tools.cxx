@@ -24,6 +24,7 @@
 #include "xr_ogf_v4.h"
 #include "xr_skl_motion.h"
 #include "xr_object.h"
+#include "xr_sdk_version.h"
 
 using namespace xray_re;
 
@@ -215,7 +216,7 @@ MStatus maya_object_translator::writer(const MFileObject& file, const MString& o
 	}
 
 	return maya_export_tools().export_object(file.resolvedFullName().asChar(),
-			mode == kExportActiveAccessMode);
+			mode == kExportActiveAccessMode, options);
 }
 
 bool maya_object_translator::haveReadMethod() const { return true; }
@@ -256,7 +257,7 @@ MStatus maya_skl_object_writer::writer(const MFileObject& file, const MString& o
 	}
 
 	return maya_export_tools().export_skl_object(file.resolvedFullName().asChar(),
-			mode == kExportActiveAccessMode);
+			mode == kExportActiveAccessMode, options);
 }
 
 bool maya_skl_object_writer::haveWriteMethod() const { return true; }
@@ -512,9 +513,9 @@ MStatus initializePlugin(MObject obj)
 	MFnPlugin plugin_fn(obj, PLUGIN_VENDOR, PLUGIN_VERSION);
 	if (!(status = maya_xray_material::initialize(plugin_fn)))
 		return status;
-	if (!(status = plugin_fn.registerFileTranslator(object_translator, "", maya_object_translator::creator, "", "", true)))
+	if (!(status = plugin_fn.registerFileTranslator(object_translator, "", maya_object_translator::creator, "xray_re_object_export_options", "", true)))
 		return status;
-	if (!(status = plugin_fn.registerFileTranslator(skl_object_writer, "", maya_skl_object_writer::creator, "", "", true)))
+	if (!(status = plugin_fn.registerFileTranslator(skl_object_writer, "", maya_skl_object_writer::creator, "xray_re_object_export_options", "", true)))
 		return status;
 	if (!(status = plugin_fn.registerFileTranslator(dm_reader, "", maya_dm_reader::creator, "", "", true)))
 		return status;

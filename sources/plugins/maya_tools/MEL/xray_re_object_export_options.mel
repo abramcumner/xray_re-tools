@@ -1,0 +1,47 @@
+global proc int xray_re_object_export_options(string $parent, string $action, string $options, string $callback)
+{
+	string $sdk_ver_params[] = { "0.4", "0.5", "0.6", "0.7" };
+	string $sdk_ver_names[] =  { "ver_0_4", "ver_0_5", "ver_0_6", "ver_0_7" };
+	int $i, $j;
+
+	if($action == "post")
+	{
+		setParent $parent;
+		columnLayout -adj true;
+		
+		text -label "Target SDK version:";
+
+		radioCollection "sdk_ver";
+		for($i = 0; $i < size($sdk_ver_params); $i++)
+			radioButton -label $sdk_ver_params[$i] $sdk_ver_names[$i];
+
+		string $params[];
+		tokenize($options, ";", $params);
+		for($i = 0; $i < size($params); $i++)
+		{
+			string $kv[];
+			tokenize($params[$i], "=", $kv);
+
+			if(size($kv) < 2)
+				continue;
+			
+			if($kv[0] == "sdk_ver")
+				for($j = 0; $j < size($sdk_ver_params); $j++)
+					if($sdk_ver_params[$j] == $kv[1])
+						radioCollection -edit -select $sdk_ver_names[$j] "sdk_ver";
+		}
+	}
+	else if($action == "query")
+	{
+		$options = "";
+
+		string $sdk_version = `radioCollection -q -sl "sdk_ver"`;
+		for($i = 0; $i < size($sdk_ver_names); $i++)
+			if($sdk_ver_names[$i] == $sdk_version)
+				$options += "sdk_ver=" + $sdk_ver_params[$i] + ";";
+
+		eval($callback + " \"" + $options + "\"");
+	}
+
+	return 1;
+}

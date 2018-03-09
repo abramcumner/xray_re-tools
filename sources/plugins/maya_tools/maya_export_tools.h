@@ -14,10 +14,13 @@
 #endif
 #include <maya/MStatus.h>
 
+#include "xr_sdk_version.h"
+
 class MObject;
 class MObjectArray;
 class MFnMesh;
 class MFnSet;
+class MString;
 
 namespace xray_re {
 	class xr_object;
@@ -34,16 +37,16 @@ typedef xr_surface_map::iterator xr_surface_map_it;
 
 class maya_export_tools {
 public:
-	MStatus			export_object(const char* path, bool selection_only = false);
-	MStatus			export_skl_object(const char* path, bool selection_only = false);
+	MStatus			export_object(const char* path, bool selection_only = false, const MString& options = "");
+	MStatus			export_skl_object(const char* path, bool selection_only = false, const MString& options = "");
 	MStatus			export_skl(const char* path, bool selection_only = false);
 	MStatus			export_anm(const char* path, bool selection_only = false);
 
 private:
 	MStatus			extract_surfaces(MFnMesh& mesh_fn, std::vector<xray_re::xr_surfmap*>& surfmaps);
 	xray_re::xr_surface*	create_surface(const char* surf_name, MFnSet& set_fn);
-	xray_re::xr_object*	create_object(MObjectArray& mesh_objs);
-	xray_re::xr_object*	create_skl_object(MObject& mesh_obj, MObject& skin_obj);
+	xray_re::xr_object*	create_object(MObjectArray& mesh_objs, xray_re::sdk_version target_sdk = xray_re::SDK_VER_0_4);
+	xray_re::xr_object*	create_skl_object(MObject& mesh_obj, MObject& skin_obj, xray_re::sdk_version target_sdk = xray_re::SDK_VER_0_4);
 
 	void			commit_surfaces(std::vector<xray_re::xr_surface*>& surfaces);
 
