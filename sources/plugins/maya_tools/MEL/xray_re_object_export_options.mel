@@ -1,7 +1,8 @@
 global proc int xray_re_object_export_options(string $parent, string $action, string $options, string $callback)
 {
-	string $sdk_ver_params[] = { "0.4", "0.5", "0.6", "0.7" };
-	string $sdk_ver_names[] =  { "ver_0_4", "ver_0_5", "ver_0_6", "ver_0_7" };
+	string $sdk_ver_params[] = { "0.4", "0.6"};
+	string $sdk_ver_names[] =  { "ver_0_4", "ver_0_6" };
+	string $sdk_ver_labels[] = { "0.4", "0.6/0.7" };
 	int $i, $j;
 
 	if($action == "post")
@@ -13,7 +14,7 @@ global proc int xray_re_object_export_options(string $parent, string $action, st
 
 		radioCollection "sdk_ver";
 		for($i = 0; $i < size($sdk_ver_params); $i++)
-			radioButton -label $sdk_ver_params[$i] $sdk_ver_names[$i];
+			radioButton -label $sdk_ver_labels[$i] $sdk_ver_names[$i];
 
 		string $params[];
 		tokenize($options, ";", $params);
