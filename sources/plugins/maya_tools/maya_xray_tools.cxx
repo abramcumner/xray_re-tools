@@ -39,7 +39,7 @@ const MString ogf_reader("X-Ray game object");
 const MString omf_reader("X-Ray game skeletal motions");
 const MString skl_translator("X-Ray skeletal motion");
 const MString skls_reader("X-Ray skeletal motions");
-const MString anm_writer("X-Ray object motion");
+const MString anm_writer("X-Ray camera motion");
 
 class maya_dm_reader: public MPxFileTranslator {
 public:
