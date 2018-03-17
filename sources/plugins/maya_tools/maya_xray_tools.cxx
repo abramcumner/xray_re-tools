@@ -230,7 +230,7 @@ MString maya_object_translator::filter() const
 #	if (MAYA_API_VERSION >= 201100) 
 		return MString("*.object");
 #	else
-		return MString("*.ob-");
+		return MString("*.ob*");
 #	endif
 }
 
@@ -269,7 +269,7 @@ MString maya_skl_object_writer::filter() const
 #	if (MAYA_API_VERSION >= 201100) 
 		return MString("*.object");
 #	else
-		return MString("*.ob-");
+		return MString("*.ob*");
 #	endif
 }
 
@@ -452,7 +452,7 @@ MString maya_skls_reader::filter() const
 #	if (MAYA_API_VERSION >= 201100) 
 		return MString("*.skls");
 #	else
-		return MString("*.sk-");
+		return MString("*.sk*");
 #	endif
 }
 
