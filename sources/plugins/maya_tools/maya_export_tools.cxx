@@ -42,7 +42,7 @@ static MStatus parse_options(const MString& options, xray_re::sdk_version* targe
 	if (!(status = options.split(';', params)))
 		return status;
 
-	for (int i = 0; i < params.length(); i++)
+	for (size_t i = 0; i < params.length(); i++)
 	{
 		MStringArray key_value;
 		if (!(status = params[i].split('=', key_value)))
@@ -1038,7 +1038,7 @@ MStatus maya_export_tools::export_anm(const char *path, bool selection_only)
 	MAnimControl::setCurrentTime(saved_time);
 
 	char name[_MAX_FNAME];
-	_splitpath(path, NULL, NULL, name, NULL);
+	_splitpath_s(path, NULL, 0, NULL, 0, name, sizeof(name), NULL, 0);
 
 	anm.name() = name;
 	anm.fps() = 30.f;
