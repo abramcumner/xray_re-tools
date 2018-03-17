@@ -24,6 +24,7 @@
 #include <maya/MItDependencyGraph.h>
 #include <maya/MItDependencyNodes.h>
 #include <maya/MItMeshEdge.h>
+#include <maya/MItMeshPolygon.h>
 #include <maya/MPlugArray.h>
 #include <maya/MPointArray.h>
 #include <maya/MProgressWindow.h>
@@ -36,11 +37,38 @@
 
 using namespace xray_re;
 
+static MStatus parse_options(const MString& options, xray_re::sdk_version* target_sdk)
+{
+	MStatus status;
+	MStringArray params;
+
+	if (!(status = options.split(';', params)))
+		return status;
+
+	for (size_t i = 0; i < params.length(); i++)
+	{
+		MStringArray key_value;
+		if (!(status = params[i].split('=', key_value)))
+			return status;
+
+		if (key_value.length() < 2)
+			continue;
+
+		if (target_sdk && key_value[0] == "sdk_ver")
+		{
+			xray_re::sdk_version ver = xray_re::sdk_version_from_string(key_value[1].asChar());
+			*target_sdk = (ver == xray_re::SDK_VER_UNKNOWN ? xray_re::SDK_VER_0_4 : ver);
+		}
+	}
+
+	return MS::kSuccess;
+}
+
 static MObject create_texture(const std::string& texture, MStatus* return_status = 0);
 
-maya_import_tools::maya_import_tools(const xray_re::xr_object* object, MStatus* return_status)
+maya_import_tools::maya_import_tools(const xray_re::xr_object* object, MStatus* return_status, const MString& options)
 {
-	MStatus status = import_object(object);
+	MStatus status = import_object(object, options);
 	if (return_status)
 		*return_status = status;
 }
@@ -59,9 +87,13 @@ static MString make_maya_name(const std::string& base, const char* old_suffix, c
 		return MString(base.c_str(), int(pos & INT_MAX)) + suffix;
 }
 
-MStatus maya_import_tools::import_object(const xr_object* object)
+MStatus maya_import_tools::import_object(const xr_object* object, const MString& options)
 {
 	MStatus status = MS::kSuccess;
+
+	xray_re::sdk_version sdk_ver = xray_re::SDK_VER_0_4;
+	if (!(status = parse_options(options, &sdk_ver)))
+		return status;
 
 	const xr_bone_vec& bones = object->bones();
 
@@ -99,7 +131,7 @@ MStatus maya_import_tools::import_object(const xr_object* object)
 	start_progress(object->meshes().size(), "Importing meshes");
 	for (xr_mesh_vec_cit it = object->meshes().begin(),
 			end = object->meshes().end(); it != end; ++it) {
-		if (!(status = import_mesh(*it, bones)))
+		if (!(status = import_mesh(*it, bones, sdk_ver)))
 			break;
 		advance_progress();
 	}
@@ -326,7 +358,7 @@ static inline void append_uvs(const std::vector<fvector2>& uvs, MFloatArray& u_v
 	}
 }
 
-MStatus maya_import_tools::import_mesh(const xr_mesh* mesh, const xr_bone_vec& bones)
+MStatus maya_import_tools::import_mesh(const xr_mesh* mesh, const xr_bone_vec& bones, xray_re::sdk_version sdk_ver)
 {
 	MStatus status;
 
@@ -412,20 +444,33 @@ MStatus maya_import_tools::import_mesh(const xr_mesh* mesh, const xr_bone_vec& b
 		for (MItMeshEdge it(mesh_obj); !it.isDone(); it.next())
 			it.setSmoothing(false);
 	} else {
+		
 		MIntArray connected;
 		const std::vector<uint32_t>& sgroups = mesh->sgroups();
-		if (mesh->flags() & EMF_3DSMAX) {
-			for (MItMeshEdge it(mesh_obj); !it.isDone(); it.next()) {
-				it.getConnectedFaces(connected, &status);
-				it.setSmoothing(status && connected.length() == 2 &&
-						(sgroups[connected[0]] & sgroups[connected[1]]) != 0);
+		if (sdk_ver <= xray_re::SDK_VER_0_4) {
+			if (mesh->flags() & EMF_3DSMAX) {
+				for (MItMeshEdge it(mesh_obj); !it.isDone(); it.next()) {
+					it.getConnectedFaces(connected, &status);
+					it.setSmoothing(status && connected.length() == 2 &&
+							(sgroups[connected[0]] & sgroups[connected[1]]) != 0);
+				}
+			} else {
+				for (MItMeshEdge it(mesh_obj); !it.isDone(); it.next()) {
+					it.getConnectedFaces(connected, &status);
+					it.setSmoothing(status && connected.length() == 2 &&
+							sgroups[connected[0]] != EMESH_NO_SG &&
+							sgroups[connected[0]] == sgroups[connected[1]]);
+				}
 			}
 		} else {
-			for (MItMeshEdge it(mesh_obj); !it.isDone(); it.next()) {
-				it.getConnectedFaces(connected, &status);
-				it.setSmoothing(status && connected.length() == 2 &&
-						sgroups[connected[0]] != EMESH_NO_SG &&
-						sgroups[connected[0]] == sgroups[connected[1]]);
+			for (MItMeshPolygon it(mesh_obj); !it.isDone(); it.next()) {
+				status = it.getEdges(connected);
+				if (!status)
+					return MS::kFailure;
+
+				mesh_fn.setEdgeSmoothing(connected[0], !(sgroups[it.index()] & 0x2));
+				mesh_fn.setEdgeSmoothing(connected[1], !(sgroups[it.index()] & 0x1));
+				mesh_fn.setEdgeSmoothing(connected[2], !(sgroups[it.index()] & 0x4));
 			}
 		}
 	}

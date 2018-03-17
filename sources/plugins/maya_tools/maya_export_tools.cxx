@@ -53,20 +53,8 @@ static MStatus parse_options(const MString& options, xray_re::sdk_version* targe
 
 		if (target_sdk && key_value[0] == "sdk_ver")
 		{
-			if (key_value[1] == "756")
-				*target_sdk = xray_re::SDK_VER_756;
-			else if (key_value[1] == "1098")
-				*target_sdk = xray_re::SDK_VER_1098;
-			else if (key_value[1] == "1850")
-				*target_sdk = xray_re::SDK_VER_1850;
-			else if (key_value[1] == "0.4")
-				*target_sdk = xray_re::SDK_VER_0_4;
-			else if (key_value[1] == "0.5")
-				*target_sdk = xray_re::SDK_VER_0_5;
-			else if (key_value[1] == "0.6")
-				*target_sdk = xray_re::SDK_VER_0_6;
-			else if (key_value[1] == "0.7")
-				*target_sdk = xray_re::SDK_VER_0_7;
+			xray_re::sdk_version ver = xray_re::sdk_version_from_string(key_value[1].asChar());
+			*target_sdk = (ver == xray_re::SDK_VER_UNKNOWN ? xray_re::SDK_VER_0_4 : ver);
 		}
 	}
 

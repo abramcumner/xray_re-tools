@@ -192,7 +192,7 @@ MStatus maya_object_translator::reader(const MFileObject& file, const MString& o
 		const MString path = file.resolvedFullName();
 		xr_object* object = new xr_object;
 		if (object->load_object(path.asChar()))
-			maya_import_tools(object, &status);
+			maya_import_tools(object, &status, options);
 		else {
 			msg("xray_re: can't open %s", path);
 			MGlobal::displayError(MString("xray_re: can't open ") + path);
@@ -513,9 +513,9 @@ MStatus initializePlugin(MObject obj)
 	MFnPlugin plugin_fn(obj, PLUGIN_VENDOR, PLUGIN_VERSION);
 	if (!(status = maya_xray_material::initialize(plugin_fn)))
 		return status;
-	if (!(status = plugin_fn.registerFileTranslator(object_translator, "", maya_object_translator::creator, "xray_re_object_export_options", "", true)))
+	if (!(status = plugin_fn.registerFileTranslator(object_translator, "", maya_object_translator::creator, "xray_re_object_translator_options", "", true)))
 		return status;
-	if (!(status = plugin_fn.registerFileTranslator(skl_object_writer, "", maya_skl_object_writer::creator, "xray_re_object_export_options", "", true)))
+	if (!(status = plugin_fn.registerFileTranslator(skl_object_writer, "", maya_skl_object_writer::creator, "xray_re_object_translator_options", "", true)))
 		return status;
 	if (!(status = plugin_fn.registerFileTranslator(dm_reader, "", maya_dm_reader::creator, "", "", true)))
 		return status;
