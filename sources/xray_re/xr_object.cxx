@@ -59,9 +59,15 @@ void xr_object::clear()
 void xr_object::setup_bones()
 {
 	uint16_t bone_id = 0;
+	const xr_bone* root = NULL;
 	for (xr_bone_vec_it it = m_bones.begin(), end = m_bones.end();
 			it != end; ++it, ++bone_id) {
 		(*it)->setup(bone_id, *this);
+		if ((*it)->parent() == NULL) {
+			if (root != NULL)
+				xr_assert(!"Object contains more than one skeleton");
+			root = *it;
+		}
 	}
 }
 

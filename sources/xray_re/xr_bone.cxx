@@ -209,8 +209,11 @@ void xr_bone::setup(uint16_t id, xr_object& object)
 	m_id = id;
 	if (!m_parent_name.empty()) {
 		m_parent = object.find_bone(m_parent_name);
-		xr_assert(m_parent);
-		m_parent->m_children.push_back(this);
+		
+		if (m_parent)
+			m_parent->m_children.push_back(this);
+		else
+			m_parent_name.clear();
 	}
 }
 
