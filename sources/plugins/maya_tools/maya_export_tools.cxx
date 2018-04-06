@@ -11,6 +11,8 @@
 #include <maya/MFnSingleIndexedComponent.h>
 #include <maya/MFnSkinCluster.h>
 #include <maya/MFnTransform.h>
+#include <maya/MFnCharacter.h>
+#include <maya/MFnClip.h>
 #include <maya/MGlobal.h>
 #include <maya/MIntArray.h>
 #include <maya/MItDag.h>
@@ -968,6 +970,139 @@ MStatus maya_export_tools::export_skl(const char* path, bool selection_only)
 	return status;
 }
 
+static MStatus parse_anim_curve(MObject curve, std::vector<xr_key>& keys)
+{
+	MStatus status;
+	MFnAnimCurve ac(curve, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+
+	size_t num_keys = ac.numKeys(&status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+
+	for(size_t i = 0; i < num_keys; i++)
+	{
+		xr_key key;
+
+		MTime time = ac.time(i, &status);
+		CHECK_MSTATUS_AND_RETURN_IT(status);
+		double value = ac.value(i, &status);
+		CHECK_MSTATUS_AND_RETURN_IT(status);
+
+		key.time = (float)time.as(MTime::kSeconds);
+		key.value = (float)value;
+
+		MFnAnimCurve::TangentType tt = ac.outTangentType(i, &status);
+		CHECK_MSTATUS_AND_RETURN_IT(status);
+
+		if(tt == MFnAnimCurve::kTangentLinear)
+		{
+			key.shape = xr_key::SHAPE_LINE;
+		}
+		else if(tt == MFnAnimCurve::kTangentStep)
+		{
+			key.shape = xr_key::SHAPE_STEP;
+		}
+		else
+		{
+			//MAngle in_angle, out_angle;
+			//double in_weight, out_weight;
+			//status = ac.getTangent(i, in_angle, in_weight, true);
+			//CHECK_MSTATUS_AND_RETURN_IT(status);
+			//status = ac.getTangent(i, out_angle, out_weight, false);
+			//CHECK_MSTATUS_AND_RETURN_IT(status);
+
+			//key.shape = xr_key::SHAPE_SHAPE_HERM;
+			//key.param[0] = (float)in_angle.as(MAngle::kDegrees, &status);
+			//CHECK_MSTATUS_AND_RETURN_IT(status);
+			//key.param[1] = (float)out_angle.as(MAngle::kDegrees, &status);
+			//CHECK_MSTATUS_AND_RETURN_IT(status);
+
+			key.shape = xr_key::SHAPE_TCB;
+			key.bias = 0.f;
+			key.continuity = 0.f;
+			key.tension = 0.f;
+		}
+
+		keys.push_back(key);
+	}
+
+	return MS::kSuccess;
+}
+
+static MStatus parse_character(MObject character, MObject obj, const char* attrname, std::vector<xr_key>& keys)
+{
+	MStatus status;
+	MFnCharacter ch(character, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+
+	size_t num_clips = ch.getScheduledClipCount(&status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+
+	int processed_clips = 0;
+	for(size_t i = 0; i < num_clips; i++)
+	{
+		MFnClip clip(ch.getScheduledClip(i), &status);
+		CHECK_MSTATUS_AND_RETURN_IT(status);
+
+		MObjectArray curves;
+		MPlugArray attrs;
+		status = clip.getMemberAnimCurves(curves, attrs);
+		CHECK_MSTATUS_AND_RETURN_IT(status);
+
+		for(size_t j = 0; j < attrs.length(); j++)
+		{
+			MString name = attrs[j].name(&status);
+			CHECK_MSTATUS_AND_RETURN_IT(status);
+
+			MStringArray arr;
+			status = name.split('.', arr);
+			
+			if(status != MS::kSuccess || arr.length() != 2)
+				return MS::kFailure;
+
+			if(attrs[j].node() == obj && arr[1] == MString(attrname))
+			{
+				status = parse_anim_curve(curves[j], keys);
+				CHECK_MSTATUS_AND_RETURN_IT(status);
+				processed_clips++;
+			}
+		}
+	}
+
+	return processed_clips > 0 ? MS::kSuccess : MS::kFailure;
+}
+
+static MStatus get_anim_keys(MObject node, const char* attrname, std::vector<xr_key>& keys)
+{
+	MStatus status;
+	MFnDependencyNode dn(node, &status);
+	if(status != MS::kSuccess)
+		return MS::kFailure;
+
+	MPlug p = dn.findPlug(attrname, true, &status);
+	if(status != MS::kSuccess)
+		return MS::kFailure;
+
+	MPlugArray connections;
+	p.connectedTo(connections, true, false, &status);
+	if(status != MS::kSuccess || connections.length() == 0)
+		return MS::kFailure;
+
+	for(size_t i = 0; i < connections.length(); i++)
+	{
+		MObject connected = connections[i].node(&status);
+		if(status != MS::kSuccess)
+			return MS::kFailure;
+		
+		if(connected.hasFn(MFn::kAnimCurve))
+			return parse_anim_curve(connected, keys);
+		else if(connected.hasFn(MFn::kCharacter))
+			return parse_character(connected, node, attrname, keys);
+	}
+
+	return MS::kFailure;
+}
+
 MStatus maya_export_tools::export_anm(const char *path, bool selection_only)
 {
 	MSelectionList s_list;
@@ -980,53 +1115,81 @@ MStatus maya_export_tools::export_anm(const char *path, bool selection_only)
 	}
 
 	MStatus status;
-	MDagPath dp;
+	MObject obj;
 
-	status = s_list.getDagPath(0, dp);
-	if(status != MS::kSuccess)
+	status = s_list.getDependNode(0, obj);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+
+	// get anim keys
+	std::vector<xr_key> anim_keys[6];
+
+	if((status = get_anim_keys(obj, "translateX", anim_keys[0])) != MS::kSuccess)
+		return MS::kFailure;
+	if((status = get_anim_keys(obj, "translateY", anim_keys[1])) != MS::kSuccess)
+		return MS::kFailure;
+	if((status = get_anim_keys(obj, "translateZ", anim_keys[2])) != MS::kSuccess)
+		return MS::kFailure;
+	if((status = get_anim_keys(obj, "rotateX", anim_keys[3])) != MS::kSuccess)
+		return MS::kFailure;
+	if((status = get_anim_keys(obj, "rotateY", anim_keys[4])) != MS::kSuccess)
+		return MS::kFailure;
+	if((status = get_anim_keys(obj, "rotateZ", anim_keys[5])) != MS::kSuccess)
 		return MS::kFailure;
 
-	MFnTransform transform(dp, &status);
-
-//	msg("%s\n", objs[0].apiTypeStr());
-	
-	if(status != MS::kSuccess)
-		return MS::kFailure;
-
+	// put them into xr_obj_motion
 	xr_obj_motion anm;
 	anm.create_envelopes();
 	xr_envelope* const* envelopes = anm.envelopes();
 
-	MTime saved_time(MAnimControl::currentTime());
+	size_t i;
+	// translateX
+	for(i = 0; i < anim_keys[0].size(); i++)
+	{
+		xr_key* key = new xr_key(anim_keys[0][i]);
+		key->value = key->value / 100.f;
+		envelopes[0]->insert_key(key);
+	}
+	// translateY
+	for(i = 0; i < anim_keys[1].size(); i++)
+	{
+		xr_key* key = new xr_key(anim_keys[1][i]);
+		key->value = key->value / 100.f;
+		envelopes[1]->insert_key(key);
+	}
+	// translateZ
+	for(i = 0; i < anim_keys[2].size(); i++)
+	{
+		xr_key* key = new xr_key(anim_keys[2][i]);
+		key->value = -key->value / 100.f;
+		envelopes[2]->insert_key(key);
+	}
+	// rotateX
+	for(i = 0; i < anim_keys[3].size(); i++)
+	{
+		xr_key* key = new xr_key(anim_keys[3][i]);
+		key->value = -key->value;
+		envelopes[4]->insert_key(key);
+	}
+	// rotateY
+	for(i = 0; i < anim_keys[4].size(); i++)
+	{
+		xr_key* key = new xr_key(anim_keys[4][i]);
+		key->value = -key->value;
+		envelopes[3]->insert_key(key);
+	}
+	// rotateZ
+	for(i = 0; i < anim_keys[5].size(); i++)
+	{
+		xr_key* key = new xr_key(anim_keys[5][i]);
+		envelopes[5]->insert_key(key);
+	}
+
+	// save it
+	char name[_MAX_FNAME];
+	_splitpath_s(path, NULL, 0, NULL, 0, name, sizeof(name), NULL, 0);
 
 	int32_t frame_start = int32_t(MAnimControl::minTime().as(MTime::kNTSCFrame));
 	int32_t frame_end = int32_t(MAnimControl::maxTime().as(MTime::kNTSCFrame));
-	msg("xray_re: animation range=%d-%d", frame_start, frame_end);
-	MGlobal::displayInfo(MString("xray_re: animation range=") + frame_start + "-" + frame_end);
-
-	for (int32_t frame = frame_start; frame != frame_end; ++frame) {
-		MGlobal::viewFrame(MTime(double(frame), MTime::kNTSCFrame));
-		float time = frame/30.f;
-
-		MVector t = transform.getTranslation(MSpace::kTransform, &status);
-		CHECK_MSTATUS(status);
-		envelopes[0]->insert_key(time, float(MDistance(t.x, MDistance::kCentimeters).asMeters()));
-		envelopes[1]->insert_key(time, float(MDistance(t.y, MDistance::kCentimeters).asMeters()));
-		envelopes[2]->insert_key(time, float(MDistance(-t.z, MDistance::kCentimeters).asMeters()));
-
-		MEulerRotation r;
-		status = transform.getRotation(r);
-		CHECK_MSTATUS(status);
-		r.reorderIt(MEulerRotation::kZXY);
-		envelopes[4]->insert_key(time, float(-r.x));
-		envelopes[3]->insert_key(time, float(-r.y));
-		envelopes[5]->insert_key(time, float(r.z));
-	}
-
-	MAnimControl::setCurrentTime(saved_time);
-
-	char name[_MAX_FNAME];
-	_splitpath_s(path, NULL, 0, NULL, 0, name, sizeof(name), NULL, 0);
 
 	anm.name() = name;
 	anm.fps() = 30.f;
