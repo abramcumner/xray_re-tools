@@ -1,5 +1,8 @@
 #define NOMINMAX
+#include <maya/MTypes.h>
+#if MAYA_API_VERSION >= 20180000
 #include <maya/MCppCompat.h>
+#endif
 #include <maya/MAnimControl.h>
 #include <maya/MDagPath.h>
 #include <maya/MDagPathArray.h>

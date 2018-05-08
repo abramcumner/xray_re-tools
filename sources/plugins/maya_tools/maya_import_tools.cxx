@@ -1,7 +1,10 @@
 // This code is inspired by Maya plugins from NifTools and Valve SDK.
 
 #define NOMINMAX
+#include <maya/MTypes.h>
+#if MAYA_API_VERSION >= 20180000
 #include <maya/MCppCompat.h>
+#endif
 #include <maya/MAnimControl.h>
 #include <maya/MDGModifier.h>
 #include <maya/MDagPath.h>
@@ -435,7 +438,7 @@ MStatus maya_import_tools::import_mesh(const xr_mesh* mesh, const xr_bone_vec& b
 	if (mesh_fn.numPolygons() != faces.size()) {
 		msg("xray_re: mesh polygon count was changed");
 		MGlobal::displayError("xray_re: mesh polygon count was changed");
-		return MS::kFailure;
+//		return MS::kFailure;
 	}
 
 	status = mesh_fn.assignUVs(poly_counts, uv_ids, 0);

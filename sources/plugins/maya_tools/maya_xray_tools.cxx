@@ -8,7 +8,10 @@
 // i- X-Ray skeletal motions (.skls;*.skl)
 
 #define NOMINMAX
+#include <maya/MTypes.h>
+#if MAYA_API_VERSION >= 20180000
 #include <maya/MCppCompat.h>
+#endif
 #include <maya/MGlobal.h>
 #include <maya/MFnPlugin.h>
 #include <maya/MPxFileTranslator.h>
