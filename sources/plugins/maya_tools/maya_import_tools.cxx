@@ -1,6 +1,7 @@
 // This code is inspired by Maya plugins from NifTools and Valve SDK.
 
 #define NOMINMAX
+#include <maya/MCppCompat.h>
 #include <maya/MAnimControl.h>
 #include <maya/MDGModifier.h>
 #include <maya/MDagPath.h>

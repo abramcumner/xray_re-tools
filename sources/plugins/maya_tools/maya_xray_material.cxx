@@ -39,6 +39,7 @@
 #define NOMINMAX
 #define MNoVersionString
 #define MNoPluginEntry
+#include <maya/MCppCompat.h>
 #include <maya/MGlobal.h>
 #include <maya/MDGModifier.h>
 #include <maya/MFloatVector.h>

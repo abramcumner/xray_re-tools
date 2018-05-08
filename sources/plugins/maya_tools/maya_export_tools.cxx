@@ -1,4 +1,5 @@
 #define NOMINMAX
+#include <maya/MCppCompat.h>
 #include <maya/MAnimControl.h>
 #include <maya/MDagPath.h>
 #include <maya/MDagPathArray.h>
