@@ -60,8 +60,8 @@ public:
 
 	virtual bool	load_object(const char* path);
 	virtual void	load_object(xr_reader& r);
-	virtual bool	save_object(const char* path) const;
-	virtual bool	save_object(const char* path, const std::string& name) const;
+	virtual bool	save_object(const char* path, bool compress = false) const;
+	virtual bool	save_object(const char* path, const std::string& name, bool compress = false) const;
 	virtual void	save_object(xr_writer& w) const;
 
 	virtual bool	load_bones(const char* path);

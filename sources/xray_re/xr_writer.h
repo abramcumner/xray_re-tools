@@ -28,7 +28,7 @@ public:
 
 	void		open_chunk(uint32_t id);
 	void		close_chunk();
-	void		w_raw_chunk(uint32_t id, const void* data, size_t size);
+	void		w_raw_chunk(uint32_t id, const void* data, size_t size, bool compress = false);
 
 	void		w_chunk(uint32_t id, const std::string& s);
 

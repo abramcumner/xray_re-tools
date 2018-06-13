@@ -41,38 +41,20 @@
 
 using namespace xray_re;
 
-static MStatus parse_options(const MString& options, xray_re::sdk_version* target_sdk)
-{
-	MStatus status;
-	MStringArray params;
-
-	if (!(status = options.split(';', params)))
-		return status;
-
-	for (size_t i = 0; i < params.length(); i++)
-	{
-		MStringArray key_value;
-		if (!(status = params[i].split('=', key_value)))
-			return status;
-
-		if (key_value.length() < 2)
-			continue;
-
-		if (target_sdk && key_value[0] == "sdk_ver")
-		{
-			xray_re::sdk_version ver = xray_re::sdk_version_from_string(key_value[1].asChar());
-			*target_sdk = (ver == xray_re::SDK_VER_UNKNOWN ? xray_re::SDK_VER_0_4 : ver);
-		}
-	}
-
-	return MS::kSuccess;
-}
-
 static MObject create_texture(const std::string& texture, MStatus* return_status = 0);
+
+maya_import_tools::maya_import_tools(const MString& options)
+{
+	set_default_options();
+	parse_options(options);
+}
 
 maya_import_tools::maya_import_tools(const xray_re::xr_object* object, MStatus* return_status, const MString& options)
 {
-	MStatus status = import_object(object, options);
+	set_default_options();
+	parse_options(options);
+
+	MStatus status = import_object(object);
 	if (return_status)
 		*return_status = status;
 }
@@ -91,14 +73,9 @@ static MString make_maya_name(const std::string& base, const char* old_suffix, c
 		return MString(base.c_str(), int(pos & INT_MAX)) + suffix;
 }
 
-MStatus maya_import_tools::import_object(const xr_object* object, const MString& options)
+MStatus maya_import_tools::import_object(const xr_object* object)
 {
 	MStatus status = MS::kSuccess;
-
-	xray_re::sdk_version sdk_ver = xray_re::SDK_VER_0_4;
-	if (!(status = parse_options(options, &sdk_ver)))
-		return status;
-
 	const xr_bone_vec& bones = object->bones();
 
 	start_progress(bones.size(), "Importing bones");
@@ -135,7 +112,7 @@ MStatus maya_import_tools::import_object(const xr_object* object, const MString&
 	start_progress(object->meshes().size(), "Importing meshes");
 	for (xr_mesh_vec_cit it = object->meshes().begin(),
 			end = object->meshes().end(); it != end; ++it) {
-		if (!(status = import_mesh(*it, bones, sdk_ver)))
+		if (!(status = import_mesh(*it, bones)))
 			break;
 		advance_progress();
 	}
@@ -362,7 +339,7 @@ static inline void append_uvs(const std::vector<fvector2>& uvs, MFloatArray& u_v
 	}
 }
 
-MStatus maya_import_tools::import_mesh(const xr_mesh* mesh, const xr_bone_vec& bones, xray_re::sdk_version sdk_ver)
+MStatus maya_import_tools::import_mesh(const xr_mesh* mesh, const xr_bone_vec& bones)
 {
 	MStatus status;
 
@@ -451,7 +428,7 @@ MStatus maya_import_tools::import_mesh(const xr_mesh* mesh, const xr_bone_vec& b
 		
 		MIntArray connected;
 		const std::vector<uint32_t>& sgroups = mesh->sgroups();
-		if (sdk_ver <= xray_re::SDK_VER_0_4) {
+		if (m_target_sdk <= xray_re::SDK_VER_0_4) {
 			if (mesh->flags() & EMF_3DSMAX) {
 				for (MItMeshEdge it(mesh_obj); !it.isDone(); it.next()) {
 					it.getConnectedFaces(connected, &status);
@@ -807,4 +784,36 @@ MStatus maya_import_tools::import_motions(const xr_skl_motion_vec& motions, MObj
 	end_progress();
 
 	return status;
+}
+
+void maya_import_tools::set_default_options(void)
+{
+	m_target_sdk = xray_re::SDK_VER_0_4;
+}
+
+MStatus maya_import_tools::parse_options(const MString& options)
+{
+	MStatus status;
+	MStringArray params;
+
+	if (!(status = options.split(';', params)))
+		return status;
+
+	for (size_t i = 0; i < params.length(); i++)
+	{
+		MStringArray key_value;
+		if (!(status = params[i].split('=', key_value)))
+			return status;
+
+		if (key_value.length() < 2)
+			continue;
+
+		if (key_value[0] == "sdk_ver")
+		{
+			xray_re::sdk_version ver = xray_re::sdk_version_from_string(key_value[1].asChar());
+			m_target_sdk = (ver == xray_re::SDK_VER_UNKNOWN ? xray_re::SDK_VER_0_4 : ver);
+		}
+	}
+
+	return MS::kSuccess;
 }

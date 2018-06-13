@@ -40,31 +40,10 @@
 
 using namespace xray_re;
 
-static MStatus parse_options(const MString& options, xray_re::sdk_version* target_sdk)
+maya_export_tools::maya_export_tools(const MString& options)
 {
-	MStatus status;
-	MStringArray params;
-
-	if (!(status = options.split(';', params)))
-		return status;
-
-	for (size_t i = 0; i < params.length(); i++)
-	{
-		MStringArray key_value;
-		if (!(status = params[i].split('=', key_value)))
-			return status;
-
-		if (key_value.length() < 2)
-			continue;
-
-		if (target_sdk && key_value[0] == "sdk_ver")
-		{
-			xray_re::sdk_version ver = xray_re::sdk_version_from_string(key_value[1].asChar());
-			*target_sdk = (ver == xray_re::SDK_VER_UNKNOWN ? xray_re::SDK_VER_0_4 : ver);
-		}
-	}
-
-	return MS::kSuccess;
+	set_default_options();
+	parse_options(options);
 }
 
 static MStatus extract_bones(MFnSkinCluster& skin_fn, xr_bone_vec& bones)
@@ -642,7 +621,7 @@ void maya_export_tools::commit_surfaces(xr_surface_vec& surfaces)
 	}
 }
 
-xr_object* maya_export_tools::create_object(MObjectArray& mesh_objs, xray_re::sdk_version target_sdk)
+xr_object* maya_export_tools::create_object(MObjectArray& mesh_objs)
 {
 	MStatus status;
 
@@ -669,7 +648,7 @@ xr_object* maya_export_tools::create_object(MObjectArray& mesh_objs, xray_re::sd
 		if (!(status = extract_surfaces(mesh_fn, mesh->surfmaps())))
 			goto fail;
 
-		if (target_sdk <= xray_re::SDK_VER_0_4)
+		if (m_target_sdk <= xray_re::SDK_VER_0_4)
 		{
 			if (!(status = extract_smoothing_groups_soc(mesh_fn, mesh->sgroups())))
 				goto fail;
@@ -690,7 +669,7 @@ fail:
 	return 0;
 }
 
-xr_object* maya_export_tools::create_skl_object(MObject& mesh_obj, MObject& skin_obj, xray_re::sdk_version target_sdk)
+xr_object* maya_export_tools::create_skl_object(MObject& mesh_obj, MObject& skin_obj)
 {
 	MStatus status;
 
@@ -723,7 +702,7 @@ xr_object* maya_export_tools::create_skl_object(MObject& mesh_obj, MObject& skin
 	if (!(status = extract_surfaces(mesh_fn, mesh->surfmaps())))
 		goto fail;
 
-	if (target_sdk <= xray_re::SDK_VER_0_4)
+	if (m_target_sdk <= xray_re::SDK_VER_0_4)
 	{
 		if (!(status = extract_smoothing_groups_soc(mesh_fn, mesh->sgroups())))
 			goto fail;
@@ -792,7 +771,7 @@ static void collect_meshes(MObjectArray& mesh_objs, bool selection_only)
 	}
 }
 
-MStatus maya_export_tools::export_object(const char* path, bool selection_only, const MString& options)
+MStatus maya_export_tools::export_object(const char* path, bool selection_only)
 {
 	MObjectArray mesh_objs;
 	collect_meshes(mesh_objs, selection_only);
@@ -802,16 +781,11 @@ MStatus maya_export_tools::export_object(const char* path, bool selection_only, 
 		return MS::kFailure;
 	}
 
-	xray_re::sdk_version target_sdk = xray_re::SDK_VER_0_4;
-	MStatus status = parse_options(options, &target_sdk);
-	if (!status)
-		return status;
-
 	m_skeletal = false;
 
-	status = MS::kFailure;
-	if (xr_object* object = create_object(mesh_objs, target_sdk)) {
-		if (object->save_object(path))
+	MStatus status = MS::kFailure;
+	if (xr_object* object = create_object(mesh_objs)) {
+		if (object->save_object(path, m_compressed))
 			status = MS::kSuccess;
 		delete object;
 	}
@@ -873,23 +847,18 @@ static MStatus find_mesh_and_skin(MObject* mesh_obj, MObject* skin_obj, bool sel
 	return MS::kSuccess;
 }
 
-MStatus maya_export_tools::export_skl_object(const char* path, bool selection_only, const MString& options)
+MStatus maya_export_tools::export_skl_object(const char* path, bool selection_only)
 {
 	MObject mesh_obj, skin_obj;
 	MStatus status = find_mesh_and_skin(&mesh_obj, &skin_obj, selection_only);
 	if (!status)
 		return status;
 
-	xray_re::sdk_version target_sdk = xray_re::SDK_VER_0_4;
-	status = parse_options(options, &target_sdk);
-	if (!status)
-		return status;
-
 	m_skeletal = true;
 
 	status = MS::kFailure;
-	if (xr_object* object = create_skl_object(mesh_obj, skin_obj, target_sdk)) {
-		if (object->save_object(path))
+	if (xr_object* object = create_skl_object(mesh_obj, skin_obj)) {
+		if (object->save_object(path, m_compressed))
 			status = MS::kSuccess;
 		delete object;
 	}
@@ -898,6 +867,8 @@ MStatus maya_export_tools::export_skl_object(const char* path, bool selection_on
 
 MStatus maya_export_tools::export_skl(const char* path, bool selection_only)
 {
+	set_default_options();
+
 	if (MTime::uiUnit() != MTime::kNTSCFrame)
 		msg("xray_re: motion export with non-NTSC frame frequency was not tested!");
 		MGlobal::displayWarning("xray_re: motion export with non-NTSC frame frequency was not tested!");
@@ -1109,6 +1080,8 @@ static MStatus get_anim_keys(MObject node, const char* attrname, std::vector<xr_
 
 MStatus maya_export_tools::export_anm(const char *path, bool selection_only)
 {
+	set_default_options();
+
 	MSelectionList s_list;
 	MGlobal::getActiveSelectionList(s_list);
 
@@ -1200,4 +1173,41 @@ MStatus maya_export_tools::export_anm(const char *path, bool selection_only)
 	anm.set_frame_range(frame_start, frame_end);
 
 	return anm.save_anm(path) ? MS::kSuccess : MS::kFailure;
+}
+
+void maya_export_tools::set_default_options(void)
+{
+	m_target_sdk = xray_re::SDK_VER_0_4;
+	m_compressed = false;
+}
+
+MStatus maya_export_tools::parse_options(const MString& options)
+{
+	MStatus status;
+	MStringArray params;
+
+	if (!(status = options.split(';', params)))
+		return status;
+
+	for (size_t i = 0; i < params.length(); i++)
+	{
+		MStringArray key_value;
+		if (!(status = params[i].split('=', key_value)))
+			return status;
+
+		if (key_value.length() < 2)
+			continue;
+
+		if (key_value[0] == "sdk_ver")
+		{
+			xray_re::sdk_version ver = xray_re::sdk_version_from_string(key_value[1].asChar());
+			m_target_sdk = (ver == xray_re::SDK_VER_UNKNOWN ? xray_re::SDK_VER_0_4 : ver);
+		}
+		else if (key_value[0] == "compressed")
+		{
+			m_compressed = (key_value[1] == "true");
+		}
+	}
+
+	return MS::kSuccess;
 }

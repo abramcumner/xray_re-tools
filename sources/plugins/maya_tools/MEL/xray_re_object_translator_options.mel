@@ -16,6 +16,8 @@ global proc int xray_re_object_translator_options(string $parent, string $action
 		for($i = 0; $i < size($sdk_ver_params); $i++)
 			radioButton -label $sdk_ver_labels[$i] $sdk_ver_names[$i];
 
+		checkBox -label "Compressed" "compressed";
+
 		string $params[];
 		tokenize($options, ";", $params);
 		for($i = 0; $i < size($params); $i++)
@@ -30,6 +32,12 @@ global proc int xray_re_object_translator_options(string $parent, string $action
 				for($j = 0; $j < size($sdk_ver_params); $j++)
 					if($sdk_ver_params[$j] == $kv[1])
 						radioCollection -edit -select $sdk_ver_names[$j] "sdk_ver";
+
+			if($kv[0] == "compressed")
+				if($kv[1] == "true")
+					checkBox -edit -value true "compressed";
+				else
+					checkBox -edit -value false "compressed";
 		}
 	}
 	else if($action == "query")
@@ -40,6 +48,11 @@ global proc int xray_re_object_translator_options(string $parent, string $action
 		for($i = 0; $i < size($sdk_ver_names); $i++)
 			if($sdk_ver_names[$i] == $sdk_version)
 				$options += "sdk_ver=" + $sdk_ver_params[$i] + ";";
+
+		if(`checkBox -q -value "compressed"`)
+			$options += "compressed=true;";
+		else
+			$options += "compressed=false;";
 
 		eval($callback + " \"" + $options + "\"");
 	}

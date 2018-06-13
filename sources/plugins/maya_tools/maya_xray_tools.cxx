@@ -219,8 +219,10 @@ MStatus maya_object_translator::writer(const MFileObject& file, const MString& o
 		return MS::kFailure;
 	}
 
-	return maya_export_tools().export_object(file.resolvedFullName().asChar(),
-			mode == kExportActiveAccessMode, options);
+	maya_export_tools tools(options);
+
+	return tools.export_object(file.resolvedFullName().asChar(),
+		mode == kExportActiveAccessMode);
 }
 
 bool maya_object_translator::haveReadMethod() const { return true; }
@@ -260,8 +262,10 @@ MStatus maya_skl_object_writer::writer(const MFileObject& file, const MString& o
 		return MS::kFailure;
 	}
 
-	return maya_export_tools().export_skl_object(file.resolvedFullName().asChar(),
-			mode == kExportActiveAccessMode, options);
+	maya_export_tools tools(options);
+
+	return tools.export_skl_object(file.resolvedFullName().asChar(),
+		mode == kExportActiveAccessMode);
 }
 
 bool maya_skl_object_writer::haveWriteMethod() const { return true; }

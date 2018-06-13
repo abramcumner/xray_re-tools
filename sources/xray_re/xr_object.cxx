@@ -276,25 +276,27 @@ void xr_object::save_object(xr_writer& w) const
 	w.close_chunk();
 }
 
-bool xr_object::save_object(const char* path) const
+bool xr_object::save_object(const char* path, bool compress) const
 {
-	xr_memory_writer* w = new xr_memory_writer();
-	w->open_chunk(EOBJ_CHUNK_MAIN);
-	save_object(*w);
-	w->close_chunk();
-	bool status = w->save_to(path);
-	delete w;
+	xr_memory_writer w;
+	save_object(w);
+
+	xr_memory_writer file;
+	file.w_raw_chunk(EOBJ_CHUNK_MAIN, w.data(), w.tell(), compress);
+
+	bool status = file.save_to(path);
 	return status;
 }
 
-bool xr_object::save_object(const char* path, const std::string& name) const
+bool xr_object::save_object(const char* path, const std::string& name, bool compress) const
 {
-	xr_memory_writer* w = new xr_memory_writer();
-	w->open_chunk(EOBJ_CHUNK_MAIN);
-	save_object(*w);
-	w->close_chunk();
-	bool status = w->save_to(path, name);
-	delete w;
+	xr_memory_writer w;
+	save_object(w);
+
+	xr_memory_writer file;
+	file.w_raw_chunk(EOBJ_CHUNK_MAIN, w.data(), w.tell(), compress);
+
+	bool status = file.save_to(path, name);
 	return status;
 }
 

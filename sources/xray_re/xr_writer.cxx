@@ -5,6 +5,7 @@
 #include "xr_file_system.h"
 #include "xr_packet.h"
 #include "xr_guid.h"
+#include "xr_lzhuf.h"
 
 using namespace xray_re;
 
@@ -27,11 +28,26 @@ void xr_writer::close_chunk()
 	m_open_chunks.pop();
 }
 
-void xr_writer::w_raw_chunk(uint32_t id, const void* data, size_t size)
+void xr_writer::w_raw_chunk(uint32_t id, const void* data, size_t size, bool compress)
 {
-	w_u32(id);
-	w_size_u32(size);
-	w_raw(data, size);
+	if (compress)
+	{
+		uint8_t* compressed_data;
+		size_t compressed_size;
+		xr_lzhuf::compress(compressed_data, compressed_size, (const uint8_t*)data, size);
+
+		w_u32(id|xr_reader::CHUNK_COMPRESSED);
+		w_size_u32(compressed_size);
+		w_raw(compressed_data, compressed_size);
+
+		free(compressed_data);
+	}
+	else
+	{
+		w_u32(id);
+		w_size_u32(size);
+		w_raw(data, size);
+	}
 }
 
 void xr_writer::w_sz(const std::string& value)
