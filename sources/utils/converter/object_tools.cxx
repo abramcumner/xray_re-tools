@@ -2,6 +2,7 @@
 #include "xr_object.h"
 #include "xr_object_format.h"
 #include "xr_file_system.h"
+#include <regex>
 
 using namespace xray_re;
 
@@ -50,29 +51,82 @@ void object_tools::save_skls(xray_re::xr_object& object, const char* source) con
 	}
 }
 
+void replace_all(std::string& str, const std::string& from, const std::string& to) {
+	if (from.empty())
+		return;
+	size_t start_pos = 0;
+	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+		str.replace(start_pos, from.length(), to);
+		start_pos += to.length();
+	}
+}
+
+void escape_regex(std::string& regex)
+{
+	replace_all(regex, "\\", "\\\\");
+	replace_all(regex, "^", "\\^");
+	replace_all(regex, ".", "\\.");
+	replace_all(regex, "$", "\\$");
+	replace_all(regex, "|", "\\|");
+	replace_all(regex, "(", "\\(");
+	replace_all(regex, ")", "\\)");
+	replace_all(regex, "[", "\\[");
+	replace_all(regex, "]", "\\]");
+	replace_all(regex, "*", "\\*");
+	replace_all(regex, "+", "\\+");
+	replace_all(regex, "?", "\\?");
+	replace_all(regex, "/", "\\/");
+}
+
+std::function<bool(const std::string&)> create_filter(const std::string& motion_name)
+{
+	// filter all
+	if (motion_name == "all")
+		return [](const std::string&) { return true; };
+
+	// filter with regex
+	if (motion_name.size() >= 2 && motion_name.front() == '/' && motion_name.back() == '/') {
+		std::regex re(motion_name.substr(1, motion_name.size() - 2));
+		return [re](const std::string& name) {return std::regex_match(name, re); };
+	}
+
+	// filter with wildcards
+	if (motion_name.find('*') != std::string::npos || motion_name.find('?') != std::string::npos) {
+		std::string re_str(motion_name);
+		escape_regex(re_str);
+		replace_all(re_str, "\\?", ".");
+		replace_all(re_str, "\\*", ".*");
+		std::regex re(re_str);
+		return [re](const std::string& name) {return std::regex_match(name, re); };
+	}
+
+	// filter by name
+	return [motion_name](const std::string& name) {return name == motion_name; };
+}
+
 void object_tools::save_skl(xray_re::xr_object& object, const char* source, const cl_parser& cl) const
 {
+	std::string prefix;
+	xr_file_system::split_path(source, 0, &prefix);
 	std::string motion_name;
 	cl.get_string("-skl", motion_name);
-	xr_skl_motion* smotion = object.find_motion(motion_name);
-	if (smotion) {
-		std::string target;
-		if (m_output_file.empty()) {
-			std::string name;
-			xr_file_system::split_path(source, 0, &name);
-			target = m_output_folder;
-			target += name;
-			target += '_';
-			target += motion_name;
-			target += ".skl";
-		} else {
-			target = m_output_file;
-		}
-		if (!smotion->save_skl(target.c_str()))
+
+	auto filter = create_filter(motion_name);
+
+	bool found = false;
+	for (auto el : object.motions()) {
+		if (!filter(el->name()))
+			continue;
+
+		std::string name{ el->name() };
+		std::string target = m_output_file.empty() ? m_output_folder + prefix + '_' + name + ".skl" : m_output_file;
+		if (!el->save_skl(target.c_str()))
 			msg("can't save %s", target.c_str());
-	} else {
-		msg("can't find motion %s", motion_name.c_str());
+
+		found = true;
 	}
+	if (!found)
+		msg("can't find motion %s", motion_name.c_str());
 }
 
 object_tools::target_format object_tools::get_target_format(const cl_parser& cl) const
