@@ -113,6 +113,8 @@ public:
 	void		init(const uint8_t* data, size_t size);
 	virtual const uint8_t*	buf() const;
 
+	virtual bool is_ini() const { return false; }
+
 private:
 	uint8_t		m_buf[BUFFER_SIZE];
 	size_t		m_w_pos;
@@ -152,6 +154,7 @@ public:
 
 	virtual const uint8_t*	buf() const;
 
+	bool				is_ini() const override { return true; }
 private:
 	xr_ini_writer*	 w;
 	uint32_t		m_counter;

@@ -1454,14 +1454,16 @@ void cse_alife_human_abstract::state_read(xr_packet& packet, uint16_t size)
 					packet.r_u32();
 			}
 		}
-		packet.r_seq(packet.r_u32(), m_equipment_preferences);
-		if (m_equipment_preferences.size() != 5)
-			msg("wrong size equipment_preferences %" PRIuSIZET ", expected %d %s (%s)", m_equipment_preferences.size(), 5, name_replace().c_str(),
-				name().c_str());
-		packet.r_seq(packet.r_u32(), m_main_weapon_preferences);
-		if (m_main_weapon_preferences.size() != 4)
-			msg("wrong size main_weapon_preferences %" PRIuSIZET ", expected %d %s (%s)", m_main_weapon_preferences.size(), 4, name_replace().c_str(),
-				name().c_str());
+		if (!packet.is_ini()) {
+			packet.r_seq(packet.r_u32(), m_equipment_preferences);
+			if (m_equipment_preferences.size() != 5)
+				msg("wrong size equipment_preferences %" PRIuSIZET ", expected %d %s (%s)", m_equipment_preferences.size(), 5, name_replace().c_str(),
+					name().c_str());
+			packet.r_seq(packet.r_u32(), m_main_weapon_preferences);
+			if (m_main_weapon_preferences.size() != 4)
+				msg("wrong size main_weapon_preferences %" PRIuSIZET ", expected %d %s (%s)", m_main_weapon_preferences.size(), 4, name_replace().c_str(),
+					name().c_str());
+		}
 	}
 	if (m_version >= CSE_VERSION_0x6e && m_version < 0x70)
 		packet.r_u16(m_smart_terrain_id);
@@ -1478,10 +1480,12 @@ void cse_alife_human_abstract::state_write(xr_packet& packet)
 	}
 	if (m_version < CSE_VERSION_0x76)
 		packet.w_u32(0);	// m_tpKnownCustomers
-	packet.w_size_u32(m_equipment_preferences.size());
-	packet.w_seq(m_equipment_preferences);
-	packet.w_size_u32(m_main_weapon_preferences.size());
-	packet.w_seq(m_main_weapon_preferences);
+	if (!packet.is_ini()) {
+		packet.w_size_u32(m_equipment_preferences.size());
+		packet.w_seq(m_equipment_preferences);
+		packet.w_size_u32(m_main_weapon_preferences.size());
+		packet.w_seq(m_main_weapon_preferences);
+	}
 	if (m_version >= CSE_VERSION_0x6e && m_version < 0x70)
 		packet.w_u16(m_smart_terrain_id);
 }
