@@ -944,7 +944,7 @@ MStatus maya_export_tools::export_skl(const char* path, bool selection_only)
 
 	return status;
 }
-
+/*
 static MStatus parse_anim_curve(MObject curve, std::vector<xr_key>& keys)
 {
 	MStatus status;
@@ -1167,6 +1167,73 @@ MStatus maya_export_tools::export_anm(const char *path, bool selection_only)
 
 	int32_t frame_start = int32_t(MAnimControl::minTime().as(MTime::kNTSCFrame));
 	int32_t frame_end = int32_t(MAnimControl::maxTime().as(MTime::kNTSCFrame));
+
+	anm.name() = name;
+	anm.fps() = 30.f;
+	anm.set_frame_range(frame_start, frame_end);
+
+	return anm.save_anm(path) ? MS::kSuccess : MS::kFailure;
+}
+*/
+MStatus maya_export_tools::export_anm(const char *path, bool selection_only)
+{
+	MSelectionList s_list;
+	MGlobal::getActiveSelectionList(s_list);
+
+	if(s_list.length() != 1 || !selection_only)
+	{
+		MGlobal::displayInfo("xray_re: select one object to export");
+		return MS::kFailure;
+	}
+
+	MStatus status;
+	MDagPath dp;
+
+	status = s_list.getDagPath(0, dp);
+	if(status != MS::kSuccess)
+		return MS::kFailure;
+
+	MFnTransform transform(dp, &status);
+
+//	msg("%s\n", objs[0].apiTypeStr());
+	
+	if(status != MS::kSuccess)
+		return MS::kFailure;
+
+	xr_obj_motion anm;
+	anm.create_envelopes();
+	xr_envelope* const* envelopes = anm.envelopes();
+
+	MTime saved_time(MAnimControl::currentTime());
+
+	int32_t frame_start = int32_t(MAnimControl::minTime().as(MTime::kNTSCFrame));
+	int32_t frame_end = int32_t(MAnimControl::maxTime().as(MTime::kNTSCFrame));
+	msg("xray_re: animation range=%d-%d", frame_start, frame_end);
+	MGlobal::displayInfo(MString("xray_re: animation range=") + frame_start + "-" + frame_end);
+
+	for (int32_t frame = frame_start; frame != frame_end; ++frame) {
+		MGlobal::viewFrame(MTime(double(frame), MTime::kNTSCFrame));
+		float time = frame/30.f;
+
+		MVector t = transform.getTranslation(MSpace::kTransform, &status);
+		CHECK_MSTATUS(status);
+		envelopes[0]->insert_key(time, float(MDistance(t.x, MDistance::kCentimeters).asMeters()));
+		envelopes[1]->insert_key(time, float(MDistance(t.y, MDistance::kCentimeters).asMeters()));
+		envelopes[2]->insert_key(time, float(MDistance(-t.z, MDistance::kCentimeters).asMeters()));
+
+		MEulerRotation r;
+		status = transform.getRotation(r);
+		CHECK_MSTATUS(status);
+		r.reorderIt(MEulerRotation::kZXY);
+		envelopes[4]->insert_key(time, float(-r.x));
+		envelopes[3]->insert_key(time, float(-r.y));
+		envelopes[5]->insert_key(time, float(r.z));
+	}
+
+	MAnimControl::setCurrentTime(saved_time);
+
+	char name[_MAX_FNAME];
+	_splitpath_s(path, NULL, 0, NULL, 0, name, sizeof(name), NULL, 0);
 
 	anm.name() = name;
 	anm.fps() = 30.f;
