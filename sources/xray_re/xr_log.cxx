@@ -2,6 +2,9 @@
 #include <cstring>
 #include "xr_log.h"
 #include "xr_file_system.h"
+#if defined(DEBUG) && defined(WIN32)
+#  include <Windows.h>// OutputDebugString
+#endif
 
 using namespace xray_re;
 
@@ -50,6 +53,9 @@ void xr_log::diagnostic(const char* format, va_list ap)
 		m_buf_p[n + 1] = '\0';
 		// exclude prefix for the file output
 		fputs(m_buf_p, stderr);
+#if defined(DEBUG) && defined(WIN32)
+		OutputDebugString(m_buf_p);
+#endif
 	}
 }
 
