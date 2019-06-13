@@ -9,7 +9,7 @@ batch_helper::~batch_helper() {}
 bool batch_helper::prepare_target_name(const cl_parser& cl)
 {
 	if (cl.get_string("-dir", m_output_folder)) {
-		if (!xr_file_system::folder_exist(m_output_folder)) {
+		if (!xr_file_system::folder_exist(m_output_folder) && !xr_file_system::instance().create_folder(m_output_folder)) {
 			msg("output folder does not exist");
 			return false;
 		}

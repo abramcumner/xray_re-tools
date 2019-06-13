@@ -106,9 +106,6 @@ std::function<bool(const std::string&)> create_filter(const std::string& motion_
 
 void object_tools::save_skl(xray_re::xr_object& object, const char* source, const cl_parser& cl) const
 {
-	if (m_output_file.empty() && !m_output_folder.empty())
-		xr_file_system::instance().create_path(m_output_folder);
-
 	std::string motion_name;
 	cl.get_string("-skl", motion_name);
 
