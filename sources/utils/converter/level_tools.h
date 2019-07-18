@@ -102,6 +102,7 @@ private:
 	void		split_lod_textures() const;
 
 	uint16_t	get_terrain_texture() const;
+	std::vector<uint16_t> get_terrain_textures() const;
 
 	void		configure(level_mesh* mesh) const;
 	void		export_for_maya(level_mesh* mesh) const;

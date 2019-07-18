@@ -615,6 +615,17 @@ uint16_t level_tools::get_terrain_texture() const
 	return UINT16_MAX;
 }
 
+std::vector<uint16_t> level_tools::get_terrain_textures() const
+{
+	std::vector<uint16_t> result;
+	for (std::vector<std::string>::const_iterator it0 = m_textures->begin(), it = it0,
+		end = m_textures->end(); it != end; ++it) {
+		if (it->compare(0, 8, "terrain\\") == 0)
+			result.push_back(uint16_t((it - it0) & UINT16_MAX));
+	}
+	return result;
+}
+
 void level_tools::export_for_maya(level_mesh* mesh) const
 {
 	uint16_t terrain_texture = get_terrain_texture();
@@ -654,13 +665,15 @@ void level_tools::export_for_maya(level_mesh* mesh) const
 
 void level_tools::export_for_level_editor(level_mesh* mesh)
 {
-	uint16_t terrain_texture = get_terrain_texture();
-	if (m_scene->details() && terrain_texture != UINT16_MAX) {
+	auto terrain_textures = get_terrain_textures();
+	if (m_scene->details() && !terrain_textures.empty()) {
 		msg("separating terrain");
-		if (m_rflags & RF_TERRAIN)
-			mesh->separate_terrain(terrain_texture);
-		else
-			mesh->separate_terrain(terrain_texture, m_scene->details()->header(), m_scene->details()->slots());
+		for (auto terrain_texture : terrain_textures) {
+			if (m_rflags & RF_TERRAIN)
+				mesh->separate_terrain(terrain_texture);
+			else
+				mesh->separate_terrain(terrain_texture, m_scene->details()->header(), m_scene->details()->slots());
+		}
 	}
 
 	xr_name_gen model_name("part", false);
@@ -714,8 +727,8 @@ void level_tools::export_for_level_editor(level_mesh* mesh)
 	for (b_model_vec_cit it = mesh->models().begin(), end = mesh->models().end(); it != end; ++it) {
 		if (it->type() == b_model::MT_TERRAIN) {
 			xr_assert(it->num_instances() == 1);
-			xr_assert(terrain_object == 0);
-			terrain_object = new xr_object(this);
+			if (!terrain_object)
+				terrain_object = new xr_object(this);
 			make_object_ref(terrain_name, "terrain");
 			xr_mesh* mesh1 = mesh->commit(*terrain_object, *it);
 			if (mesh1 != NULL)
