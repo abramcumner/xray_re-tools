@@ -10,6 +10,7 @@
 #include "xr_color.h"
 #include "xr_influence.h"
 #include "xr_ogf_format.h"
+#include <memory>
 
 namespace xray_re {
 
