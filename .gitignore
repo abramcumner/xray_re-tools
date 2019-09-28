@@ -3,3 +3,5 @@
 *.opendb
 *.VC.db
 /binaries
+.vs
+*.user
