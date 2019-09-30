@@ -231,7 +231,7 @@ static MStatus extract_uvs(MFnMesh& mesh_fn, lw_face_vec& faces,
 
 		fvector2 uv0;
 		if (!it.getUV(uv0.xy)) {
-			msg("xray_re: can't extract shared UVs for vert %"PRIu32" on mesh %s",
+			msg("xray_re: can't extract shared UVs for vert %" PRIu32 " on mesh %s",
 				vert_idx, mesh_fn.name().asChar());
 			MGlobal::displayError(MString("xray_re: can't extract shared UVs for vert ") +
 				vert_idx + " on mesh " + mesh_fn.name().asChar());
@@ -257,7 +257,7 @@ static MStatus extract_uvs(MFnMesh& mesh_fn, lw_face_vec& faces,
 
 			fvector2 uv;
 			if (!it.getUV(face_idx, uv.xy)) {
-				msg("xray_re: can't extract UVs for vert %"PRIu32" face %"PRIu32, vert_idx, face_idx);
+				msg("xray_re: can't extract UVs for vert %" PRIu32 " face %" PRIu32, vert_idx, face_idx);
 				MGlobal::displayWarning(MString("xray_re: can't extract UVs for vert ") +
 					vert_idx + " face " + face_idx);
 				uv = uv0;

@@ -1,6 +1,6 @@
 #include <cfloat>
 #include "maya_fix_fpu_cw.h"
-#include "xr_types.h"
+#include <xr_types.h>
 
 // Official GSC plugins for Maya (xrayMaya_export.mll and xrayMaya_material.mll)
 // depend on the xrCore.dll which resets the FPU precision to 24 bits.

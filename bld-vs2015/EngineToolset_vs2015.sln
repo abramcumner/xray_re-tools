@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rd party", "3rd party", "{CC083821-BBEE-453A-93DC-5A1EEB84E724}"
 EndProject
@@ -118,8 +118,10 @@ Global
 		{C28B4754-2914-4255-94C9-17ACFE443585}.Release|x64.ActiveCfg = Release|Win32
 		{83534E46-A188-4F8E-AFF3-9EC9E87DB537}.Debug|Win32.ActiveCfg = Debug|Win32
 		{83534E46-A188-4F8E-AFF3-9EC9E87DB537}.Debug|x64.ActiveCfg = Debug|x64
+		{83534E46-A188-4F8E-AFF3-9EC9E87DB537}.Debug|x64.Build.0 = Debug|x64
 		{83534E46-A188-4F8E-AFF3-9EC9E87DB537}.Release|Win32.ActiveCfg = Release|Win32
 		{83534E46-A188-4F8E-AFF3-9EC9E87DB537}.Release|x64.ActiveCfg = Release|x64
+		{83534E46-A188-4F8E-AFF3-9EC9E87DB537}.Release|x64.Build.0 = Release|x64
 		{2452AC95-6350-401A-8A01-C494B2CF3482}.Debug|Win32.ActiveCfg = Debug|Win32
 		{2452AC95-6350-401A-8A01-C494B2CF3482}.Debug|x64.ActiveCfg = Debug|Win32
 		{2452AC95-6350-401A-8A01-C494B2CF3482}.Release|Win32.ActiveCfg = Release|Win32
@@ -175,5 +177,8 @@ Global
 		{15CBFEFF-7965-41F5-B4E2-21E8795C9159} = {CC083821-BBEE-453A-93DC-5A1EEB84E724}
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC} = {CC083821-BBEE-453A-93DC-5A1EEB84E724}
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD} = {CC083821-BBEE-453A-93DC-5A1EEB84E724}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EE0F2789-89C3-4A00-A504-4AB18C78D695}
 	EndGlobalSection
 EndGlobal
