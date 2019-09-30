@@ -1,0 +1,2 @@
+set COR_PLAT=%PLATFORM%
+IF "%COR_PLAT%" == "Win32" set COR_PLAT=x86
