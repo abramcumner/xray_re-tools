@@ -14,7 +14,7 @@ X-Ray unofficial toolset for complex use with official S.T.A.L.K.E.R. MOD SDK. T
 
 ## Binaries
 
-[latest build](https://ci.appveyor.com/api/projects/abramcumner/xray-re-tools/artifacts/xray_re-tools_latest.7z)
+[latest build](https://ci.appveyor.com/api/projects/abramcumner/xray-re-tools/artifacts/xray_re-tools_latest_x64.7z?job=Platform:%20x64)
 
 And see [Release](https://github.com/abramcumner/xray_re-tools/releases) section.
 
