@@ -1,6 +1,16 @@
 version: $(APPVEYOR_REPO_TAG_NAME).{build}
+image: Visual Studio 2019
 configuration: Release
-platform: Win32
+platform:
+- Win32
+- x64
+shallow_clone: true
+
+before_build:
+- cmd: >-
+    set COR_PLAT=%PLATFORM%
+
+    IF "%COR_PLAT%" == "Win32" set COR_PLAT=x86
 
 build:
   project: bld-vs2015\EngineToolset_vs2015.sln
@@ -18,6 +28,10 @@ after_build:
 
     copy ..\etc\* .\
 
+    copy ..\binaries\%PLATFORM%-%CONFIGURATION%\xrayMayaTools.mll .\
+
+    copy ..\sources\plugins\maya_tools\MEL\* .\
+
     md docs
 
     copy ..\docs\* .\docs\
@@ -30,14 +44,14 @@ after_build:
 
     copy ..\docs\tools\* .\docs\tools
 
-    7z a xray_re-tools_%APPVEYOR_REPO_TAG_NAME%.7z *
+    7z a xray_re-tools_%APPVEYOR_REPO_TAG_NAME%_%COR_PLAT%.7z *
 
-    copy xray_re-tools_%APPVEYOR_REPO_TAG_NAME%.7z xray_re-tools_latest.7z
+    copy xray_re-tools_%APPVEYOR_REPO_TAG_NAME%_%COR_PLAT%.7z xray_re-tools_latest_%COR_PLAT%.7z
 
-    appveyor PushArtifact xray_re-tools_latest.7z
+    appveyor PushArtifact xray_re-tools_latest_%COR_PLAT%.7z
 
 artifacts:
-- path: .\dist\xray_re-tools_$(appveyor_repo_tag_name).7z
+- path: .\dist\xray_re-tools_$(appveyor_repo_tag_name)_$(cor_plat).7z
   name: release
 
 deploy:
