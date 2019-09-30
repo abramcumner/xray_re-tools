@@ -16,7 +16,7 @@ using namespace xray_re;
 
 void usage()
 {
-	printf("X-Ray game asset converter (A.0.1.11 %s)\n", BUILD_DATE);
+	printf("X-Ray game asset converter (A.0.2.0 %s)\n", BUILD_DATE);
 	printf("Vendor: ZENOBIAN mod team\n");
 	printf("Usage: converter <common-options> <format-specific-options> <input-objects>\n\n");
 	printf("Common options:\n");
