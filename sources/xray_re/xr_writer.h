@@ -68,12 +68,14 @@ public:
 
 	void		w_packet(const xr_packet& packet);
 
-	template<typename T> struct f_w: public std::binary_function<T, xr_writer, void> {};
-	struct f_w_sz: public f_w<std::string> {
+	struct f_w_sz {
 		void operator()(const std::string& s, xr_writer& w) { w.w_sz(s); }
 	};
-	template<typename T> struct f_w_const: public std::const_mem_fun1_t<void, T, xr_writer&> {
-		explicit f_w_const(void (T::*_pmf)(xr_writer& w) const): std::const_mem_fun1_t<void, T, xr_writer&>(_pmf) {}
+	template<typename T> struct f_w_const {
+		using mem_func = void (T::*)(xr_writer& w) const;
+		explicit f_w_const(mem_func f): m_f(f) {}
+		void operator()(const T* obj, xr_writer& w) { (obj->*m_f)(w); }
+		mem_func m_f;
 	};
 
 private:
