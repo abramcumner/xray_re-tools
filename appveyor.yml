@@ -8,7 +8,7 @@ shallow_clone: true
 
 before_build:
 - cmd: >-
-    beforebuild.bat
+    build\beforebuild.bat
 
 build:
   project: bld-vs2015\EngineToolset_vs2015.sln
@@ -16,7 +16,7 @@ build:
 
 after_build:
 - cmd: >-
-    afterbuild.bat
+    build\afterbuild.bat
 
 artifacts:
 - path: .\dist\xray_re-tools_$(appveyor_repo_tag_name)_$(cor_plat).7z
