@@ -13,6 +13,7 @@
 #include "xr_file_system.h"
 #include "xr_string_utils.h"
 #include "syncer.h"
+#include <memory>
 
 using namespace xray_re;
 

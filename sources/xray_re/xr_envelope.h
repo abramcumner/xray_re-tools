@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include "xr_types.h"
+#include <memory>
 
 namespace xray_re {
 

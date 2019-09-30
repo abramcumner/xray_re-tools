@@ -2,6 +2,7 @@
 #include "xr_ai_cross_table.h"
 #include "xr_level_gct.h"
 #include "xr_file_system.h"
+#include <memory>
 
 using namespace xray_re;
 

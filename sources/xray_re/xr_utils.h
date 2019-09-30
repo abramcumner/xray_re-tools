@@ -4,6 +4,7 @@
 #ifndef __XR_UTILS_H__
 #define __XR_UTILS_H__
 
+#include <memory>
 #include <string>
 
 namespace xray_re {
