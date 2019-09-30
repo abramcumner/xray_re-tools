@@ -3,8 +3,12 @@ cd dist
 copy ..\binaries\%PLATFORM%-%CONFIGURATION%\converter.exe .\
 copy ..\binaries\%PLATFORM%-%CONFIGURATION%\aiwrapper.exe .\
 copy ..\etc\* .\
-copy ..\binaries\%PLATFORM%-%CONFIGURATION%\xrayMayaTools.mll .\
-copy ..\sources\plugins\maya_tools\MEL\* .\
+
+IF NOT EXIST ..\binaries\%PLATFORM%-%CONFIGURATION%\xrayMayaTools.mll GOTO skip_maya
+md maya
+copy ..\binaries\%PLATFORM%-%CONFIGURATION%\xrayMayaTools.mll .\maya
+copy ..\sources\plugins\maya_tools\MEL\* .\maya
+:skip_maya
 
 md docs
 copy ..\docs\* .\docs\
