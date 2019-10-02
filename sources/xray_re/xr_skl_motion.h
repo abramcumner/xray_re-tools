@@ -78,6 +78,8 @@ public:
 	const xr_bone_motion_vec&	bone_motions() const;
 	xr_bone_motion_vec&		bone_motions();
 
+		int		marks_size();
+
 	uint8_t		bone_motion_flags(uint16_t bone_id) const;
 
 	enum motion_flag {
@@ -126,6 +128,10 @@ inline const xr_bone_motion_vec& xr_skl_motion::bone_motions() const
 inline xr_bone_motion_vec& xr_skl_motion::bone_motions()
 {
 	return m_bone_motions;
+}
+inline int xr_skl_motion::marks_size()
+{
+	return m_marks.size();
 }
 
 } // end of namespace xray_re
