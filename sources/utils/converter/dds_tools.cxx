@@ -97,6 +97,7 @@ void dds_tools::process_folder(const std::string& path)
 	FindClose(h);
 }
 
+#ifdef _CONSOLE
 void dds_tools::process(const cl_parser& cl)
 {
 	if (!check_paths())
@@ -110,3 +111,4 @@ void dds_tools::process(const cl_parser& cl)
 
 	process_folder();
 }
+#endif // _CONSOLE

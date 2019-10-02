@@ -1,5 +1,11 @@
-#include "converter.h"
 #include "tools_base.h"
+#include "xr_file_system.h"
+#include "xr_log.h"
+
+using namespace xray_re;
+
+#ifdef _CONSOLE
+#include "converter.h"
 #include "dm_tools.h"
 #include "ogf_tools.h"
 #include "ogg_tools.h"
@@ -8,11 +14,8 @@
 #include "dds_tools.h"
 #include "db_tools.h"
 #include "xrdemo_tools.h"
-#include "xr_file_system.h"
-#include "xr_log.h"
-#include <time.h>
 
-using namespace xray_re;
+#include <time.h>
 
 void usage()
 {
@@ -246,6 +249,7 @@ int main(int argc, char* argv[])
 	delete tools;
 	return 0;
 }
+#endif // _CONSOLE
 
 void tools_base::check_path(const char* path, bool& status) const
 {

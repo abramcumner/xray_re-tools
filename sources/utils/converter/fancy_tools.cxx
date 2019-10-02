@@ -21,6 +21,7 @@ bool fancy_tools::check_paths() const
 	return status;
 }
 
+#ifdef _CONSOLE
 void fancy_tools::process(const cl_parser& cl)
 {
 	if (!check_paths())
@@ -66,6 +67,7 @@ void fancy_tools::process(const cl_parser& cl)
 			fix_fences(m_ini->r_string(profile, "fix_fences"));
 	}
 }
+#endif // _CONSOLE
 
 static float r_float_safe(const xray_re::xr_ini_file* ini, const char* section, const char* line, float def_value)
 {

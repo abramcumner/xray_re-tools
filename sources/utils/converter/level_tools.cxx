@@ -52,6 +52,7 @@ static bool check_scene_name(const char* p)
 	return true;
 }
 
+#ifdef _CONSOLE
 void level_tools::process(const cl_parser& cl)
 {
 	if (!check_paths())
@@ -160,6 +161,7 @@ void level_tools::process(const cl_parser& cl)
 	}
 	m_level = 0;
 }
+#endif // _CONSOLE
 
 static void build_unique(const std::vector<std::string>* data, std::vector<uint16_t>& uniq_refs)
 {

@@ -5,7 +5,7 @@
 using namespace xray_re;
 
 batch_helper::~batch_helper() {}
-
+#ifdef _CONSOLE
 bool batch_helper::prepare_target_name(const cl_parser& cl)
 {
 	if (cl.get_string("-dir", m_output_folder)) {
@@ -22,6 +22,19 @@ bool batch_helper::prepare_target_name(const cl_parser& cl)
 	}
 	return true;
 }
+#else
+bool batch_helper::prepare_target_name(std::string target) {
+	if (!xr_file_system::folder_exist(target)) {
+		msg("output folder does not exist");
+		return false;
+	}
+
+	m_output_folder = target;
+	xr_file_system::append_path_separator(m_output_folder);
+
+	return true;
+}
+#endif // _CONSOLE
 
 void batch_helper::make_target_name(std::string& target, const char* source, const char* extension) const
 {

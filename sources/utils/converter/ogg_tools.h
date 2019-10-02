@@ -7,8 +7,10 @@
 #include "tools_base.h"
 
 class ogg_tools: public tools_base {
+#ifdef _CONSOLE
 public:
 	virtual void	process(const cl_parser& cl);
+#endif // _CONSOLE
 
 private:
 	bool		check_paths() const;

@@ -58,6 +58,7 @@ static bool write_file(xr_file_system& fs, const std::string& path, const void* 
 	return false;
 }
 
+#ifdef _CONSOLE
 void db_unpacker::process(const cl_parser& cl)
 {
 	if (cl.num_params() != 1) {
@@ -156,6 +157,7 @@ void db_unpacker::process(const cl_parser& cl)
 	}
 	fs.r_close(r);
 }
+#endif // _CONSOLE
 
 static bool write_file(xr_file_system& fs, const std::string& path, const uint8_t* data, uint32_t size_real, uint32_t size_compressed)
 {
@@ -311,6 +313,7 @@ void db_unpacker::extract_2947(const std::string& prefix, const std::string& mas
 	}
 }
 
+#ifdef _CONSOLE
 void db_packer::process(const cl_parser& cl)
 {
 	if (cl.num_params() != 1) {
@@ -418,6 +421,7 @@ void db_packer::process(const cl_parser& cl)
 	delete data;
 	fs.w_close(m_archive);
 }
+#endif // _CONSOLE
 
 void db_packer::process_folder(const std::string& path)
 {

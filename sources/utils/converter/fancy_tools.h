@@ -15,7 +15,10 @@ class fancy_tools: public tools_base {
 public:
 			fancy_tools();
 	virtual		~fancy_tools();
+
+#ifdef _CONSOLE
 	virtual void	process(const cl_parser& cl);
+#endif // _CONSOLE
 
 protected:
 	bool		check_paths() const;

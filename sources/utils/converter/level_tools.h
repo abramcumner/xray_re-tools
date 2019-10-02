@@ -33,12 +33,14 @@ class level_mesh;
 
 class level_tools: public tools_base, xray_re::xr_surface_factory {
 public:
-			level_tools();
-	virtual		~level_tools();
+			 level_tools();
+	virtual	~level_tools();
 
-	virtual void	process(const cl_parser& cl);
-	virtual xray_re::xr_surface*
-			create_surface(const xray_re::xr_raw_surface& raw_surface) const;
+#ifdef _CONSOLE
+	virtual void process(const cl_parser& cl);
+#endif // _CONSOLE
+
+	virtual xray_re::xr_surface* create_surface(const xray_re::xr_raw_surface& raw_surface) const;
 
 	enum {
 		RM_RAW,
@@ -49,7 +51,7 @@ public:
 
 	enum {
 		RF_WITH_LODS	= 0x01,
-		RF_USE_MT	    = 0x02,
+		RF_USE_MT		= 0x02,
 		RF_DEBUG_CFORM	= 0x04,
 		RF_DEBUG_MERGE	= 0x08,
 		RF_TERRAIN      = 0x10,
@@ -119,7 +121,7 @@ private:
 	uint16_t	get_default_sector_idx() const;
 
 private:
-	int			m_rmode;
+	int				m_rmode;
 	uint32_t		m_rflags;	// reconstruction flags
 
 	xray_re::xr_ini_file*	m_ini;

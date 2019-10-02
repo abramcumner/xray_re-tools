@@ -16,7 +16,10 @@ namespace xray_re {
 
 class db_tools: public tools_base {
 public:
+#ifdef _CONSOLE
 	virtual void	process(const cl_parser& cl) = 0;
+#endif // _CONSOLE
+
 	static bool	is_db(const std::string& extension);
 	static bool	is_xdb(const std::string& extension);
 	static bool	is_xrp(const std::string& extension);
@@ -51,8 +54,10 @@ public:
 };
 
 class db_unpacker: public db_tools {
+#ifdef _CONSOLE
 public:
 	virtual void		process(const cl_parser& cl);
+#endif // _CONSOLE
 
 protected:
 	void			extract_1114(const std::string& prefix, const std::string& mask, xray_re::xr_reader* s, const uint8_t* data) const;
@@ -64,17 +69,17 @@ protected:
 class db_packer: public db_tools {
 public:
 	virtual			~db_packer();
-
+#ifdef _CONSOLE
 	virtual void		process(const cl_parser& cl);
-
+#endif // _CONSOLE
 protected:
 	void			process_folder(const std::string& path = "");
 	void			process_file(const std::string& path);
 	void			add_folder(const std::string& path);
 
 protected:
-	xray_re::xr_writer*		m_archive;
-	std::string			m_root;
+	xray_re::xr_writer*			m_archive;
+	std::string					m_root;
 	std::vector<std::string>	m_folders;
 	std::vector<db_file*>		m_files;
 };

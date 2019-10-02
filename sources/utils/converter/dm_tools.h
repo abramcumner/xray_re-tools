@@ -9,7 +9,11 @@
 
 class dm_tools: public object_tools {
 public:
-	virtual void	process(const cl_parser& cl);
+#ifdef _CONSOLE
+	virtual void process(const cl_parser& cl);
+#else
+	virtual void process(const char* source, const char* target, const char* format);
+#endif
 };
 
 #endif

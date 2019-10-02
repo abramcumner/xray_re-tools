@@ -2,7 +2,7 @@
 #include "xr_object.h"
 #include "xr_object_format.h"
 #include "xr_file_system.h"
-#include <regex>
+#include "xr_string_utils.h"
 
 using namespace xray_re;
 
@@ -18,7 +18,7 @@ void object_tools::process(const cl_parser& cl)
 }
 #endif
 
-void object_tools::save_object(xray_re::xr_object& object, const char* source) const
+void object_tools::save_object(xr_object& object, const char* source) const
 {
 	std::string target;
 	make_target_name(target, source, ".object");
@@ -27,6 +27,7 @@ void object_tools::save_object(xray_re::xr_object& object, const char* source) c
 		msg("can't save object in %s", target.c_str());
 }
 
+#ifdef _CONSOLE
 void object_tools::save_bones(xray_re::xr_object& object, const char* source) const
 {
 	if (object.bones().empty()) {
@@ -142,3 +143,18 @@ object_tools::target_format object_tools::get_target_format(const cl_parser& cl)
 		format |= TARGET_OBJECT;
 	return (format & (format - 1)) == 0 ? static_cast<target_format>(format) : TARGET_ERROR;
 }
+#else
+object_tools::target_format object_tools::get_target_format(const char* format) const 
+{
+	if (xr_stricmp(format, "info") == 0)
+		return TARGET_INFO;
+	else if (xr_stricmp(format, "skl") == 0)
+		return TARGET_SKL;
+	else if (xr_stricmp(format, "skls") == 0)
+		return TARGET_SKLS;
+	else if (xr_stricmp(format, "bones") == 0)
+		return TARGET_BONES;
+
+	return TARGET_OBJECT;
+}
+#endif // _CONSOLE

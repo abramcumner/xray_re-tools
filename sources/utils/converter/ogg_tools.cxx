@@ -292,6 +292,7 @@ void ogg_tools::process_folder(const std::string& path)
 	FindClose(h);
 }
 
+#ifdef _CONSOLE
 void ogg_tools::process(const cl_parser& cl)
 {
 	if (!check_paths())
@@ -302,3 +303,4 @@ void ogg_tools::process(const cl_parser& cl)
 
 	process_folder();
 }
+#endif // _CONSOLE

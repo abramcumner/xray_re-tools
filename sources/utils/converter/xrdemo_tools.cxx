@@ -52,6 +52,7 @@ static bool load_xrdemo(xr_obj_motion& omotion, const char* path)
 	return true;
 }
 
+#ifdef _CONSOLE
 void xrdemo_tools::process(const cl_parser& cl)
 {
 	if (!prepare_target_name(cl))
@@ -70,3 +71,4 @@ void xrdemo_tools::process(const cl_parser& cl)
 		}
 	}
 }
+#endif // _CONSOLE

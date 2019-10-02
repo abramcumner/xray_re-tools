@@ -8,8 +8,10 @@
 #include "batch_helper.h"
 
 class xrdemo_tools: public tools_base, public batch_helper {
+#ifdef _CONSOLE
 public:
-	virtual void	process(const cl_parser& cl);
+	virtual void process(const cl_parser& cl);
+#endif // _CONSOLE
 };
 
 #endif
