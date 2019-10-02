@@ -31,6 +31,9 @@ Omf options: +
 	skls
 	skl
 
+29.07.2015:
+Implemented convert omf to skls with marks
+
 Xrdemo options: +
 	anm - one target
 
@@ -317,9 +320,17 @@ void MainWindow::PrepareObjectTools(char* sFilePath) {
 				xr_ogf_v4* omf = new xr_ogf_v4;
 				if (omf->load_omf(sFilePath)) {
 					mFormatPicker->Items->AddRange(mOMFFormats);
-					FillMotionComboBox(omf->motions());
+					xr_skl_motion_vec motions = omf->motions();
 
-					mObjectInfoListBox->Items->Add("Motions count: " + omf->motions().size());
+					FillMotionComboBox(motions);
+					mObjectInfoListBox->Items->Add("Motions count: " + motions.size());
+
+					for (xr_skl_motion_vec_cit it = motions.begin(), end = motions.end(); it != end; ++it) {
+						int marks_size = (*it)->marks_size();
+						if (marks_size > 0) {
+							mObjectInfoListBox->Items->Add(String::Format("Motion [{0}] have [{1}] marks", to_string((*it)->name().c_str()), marks_size));
+						}
+					}
 				} else {
 					// TODO Message about can`t open omf file				
 					msg("can`t load omf");
@@ -335,7 +346,7 @@ void MainWindow::PrepareObjectTools(char* sFilePath) {
 
 					mObjectInfoListBox->Items->Add("Texture: " + to_string(dm->texture().c_str()));
 					mObjectInfoListBox->Items->Add("Shader: " + to_string(dm->shader().c_str()));
-					mObjectInfoListBox->Items->Add("Scale (min/max): " + dm->min_scale() + "/" + dm->max_scale());
+					mObjectInfoListBox->Items->Add("Scale(min/max): " + dm->min_scale() + "/" + dm->max_scale());
 					mObjectInfoListBox->Items->Add("Flags: " + dm->flags());
 				} else {
 					// TODO Message about can`t open dm file				

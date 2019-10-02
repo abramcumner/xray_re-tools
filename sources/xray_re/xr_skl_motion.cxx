@@ -161,7 +161,7 @@ void xr_skl_motion::load(xr_reader& r)
 void xr_skl_motion::save(xr_writer& w) const
 {
 	xr_motion::save(w);
-	w.w_u16(SMOTION_VERSION_6);
+	w.w_u16(SMOTION_VERSION_7);
 	w.w_u8(uint8_t(m_flags & 0xff));
 	w.w_u16(m_bone_or_part);
 	w.w_float(m_speed);
@@ -170,6 +170,11 @@ void xr_skl_motion::save(xr_writer& w) const
 	w.w_float(m_power);
 	w.w_size_u16(m_bone_motions.size());
 	w.w_seq(m_bone_motions, xr_writer::f_w_const<xr_bone_motion>(&xr_bone_motion::save));
+
+	w.w_size_u32(m_marks.size());
+	for (xr_motion_marks_vec_cit it = m_marks.begin(), end = m_marks.end(); it != end; ++it) {
+		(*it)->save(w);
+	}
 }
 
 bool xr_skl_motion::load_skl(const char* path)
