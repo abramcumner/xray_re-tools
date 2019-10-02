@@ -1,6 +1,7 @@
 #pragma once
 
 #pragma unmanaged
+#include "xr_ogf.h"
 #include "xr_skl_motion.h"
 #include "xr_ini_file.h"
 #pragma managed
@@ -73,8 +74,9 @@ namespace ConverterUI {
 		System::Windows::Forms::GroupBox^	groupBox11;
 		System::Windows::Forms::TextBox^	mSceneNameTextBox;
 		System::Windows::Forms::GroupBox^   groupBox12;
-		System::Windows::Forms::Label^		mObjectInfoLabel;
-		System::Windows::Forms::Button^		button7;
+		System::Windows::Forms::ListBox^	mObjectInfoListBox;
+
+		System::Windows::Forms::Button^		button7; // TODO
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
@@ -88,7 +90,7 @@ namespace ConverterUI {
 			this->mFolderPicker = (gcnew System::Windows::Forms::FolderBrowserDialog());
 			this->mMainTab = (gcnew System::Windows::Forms::TabPage());
 			this->groupBox12 = (gcnew System::Windows::Forms::GroupBox());
-			this->mObjectInfoLabel = (gcnew System::Windows::Forms::Label());
+			this->mObjectInfoListBox = (gcnew System::Windows::Forms::ListBox());
 			this->mStartButton = (gcnew System::Windows::Forms::Button());
 			this->groupBox5 = (gcnew System::Windows::Forms::GroupBox());
 			this->mMotionPicker = (gcnew System::Windows::Forms::ComboBox());
@@ -102,6 +104,7 @@ namespace ConverterUI {
 			this->mBrowseFileButton = (gcnew System::Windows::Forms::Button());
 			this->mTabControl = (gcnew System::Windows::Forms::TabControl());
 			this->mLocationTab = (gcnew System::Windows::Forms::TabPage());
+			this->button7 = (gcnew System::Windows::Forms::Button());
 			this->groupBox11 = (gcnew System::Windows::Forms::GroupBox());
 			this->mSceneNameTextBox = (gcnew System::Windows::Forms::TextBox());
 			this->groupBox10 = (gcnew System::Windows::Forms::GroupBox());
@@ -126,7 +129,6 @@ namespace ConverterUI {
 			this->mSettingsTab = (gcnew System::Windows::Forms::TabPage());
 			this->textBox1 = (gcnew System::Windows::Forms::TextBox());
 			this->button1 = (gcnew System::Windows::Forms::Button());
-			this->button7 = (gcnew System::Windows::Forms::Button());
 			this->mMainTab->SuspendLayout();
 			this->groupBox12->SuspendLayout();
 			this->groupBox5->SuspendLayout();
@@ -174,7 +176,7 @@ namespace ConverterUI {
 			// 
 			// groupBox12
 			// 
-			this->groupBox12->Controls->Add(this->mObjectInfoLabel);
+			this->groupBox12->Controls->Add(this->mObjectInfoListBox);
 			this->groupBox12->Location = System::Drawing::Point(0, 46);
 			this->groupBox12->Name = L"groupBox12";
 			this->groupBox12->Size = System::Drawing::Size(421, 112);
@@ -182,14 +184,16 @@ namespace ConverterUI {
 			this->groupBox12->TabStop = false;
 			this->groupBox12->Text = L"Информация об объекте";
 			// 
-			// mObjectInfoLabel
+			// mObjectInfoListBox
 			// 
-			this->mObjectInfoLabel->AutoSize = true;
-			this->mObjectInfoLabel->Location = System::Drawing::Point(6, 20);
-			this->mObjectInfoLabel->Name = L"mObjectInfoLabel";
-			this->mObjectInfoLabel->Size = System::Drawing::Size(35, 13);
-			this->mObjectInfoLabel->TabIndex = 0;
-			this->mObjectInfoLabel->Text = L"label1";
+			this->mObjectInfoListBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left) 
+				| System::Windows::Forms::AnchorStyles::Right));
+			this->mObjectInfoListBox->FormattingEnabled = true;
+			this->mObjectInfoListBox->ImeMode = System::Windows::Forms::ImeMode::NoControl;
+			this->mObjectInfoListBox->Location = System::Drawing::Point(6, 19);
+			this->mObjectInfoListBox->Name = L"mObjectInfoListBox";
+			this->mObjectInfoListBox->Size = System::Drawing::Size(409, 82);
+			this->mObjectInfoListBox->TabIndex = 0;
 			// 
 			// mStartButton
 			// 
@@ -329,6 +333,16 @@ namespace ConverterUI {
 			this->mLocationTab->Size = System::Drawing::Size(424, 254);
 			this->mLocationTab->TabIndex = 1;
 			this->mLocationTab->Text = L"Локации";
+			// 
+			// button7
+			// 
+			this->button7->Location = System::Drawing::Point(345, 93);
+			this->button7->Name = L"button7";
+			this->button7->Size = System::Drawing::Size(75, 23);
+			this->button7->TabIndex = 14;
+			this->button7->Text = L"button7";
+			this->button7->UseVisualStyleBackColor = true;
+			this->button7->Click += gcnew System::EventHandler(this, &MainWindow::OnStartDecompileLevelClick);
 			// 
 			// groupBox11
 			// 
@@ -560,16 +574,6 @@ namespace ConverterUI {
 			this->button1->Text = L"...";
 			this->button1->UseVisualStyleBackColor = true;
 			// 
-			// button7
-			// 
-			this->button7->Location = System::Drawing::Point(345, 93);
-			this->button7->Name = L"button7";
-			this->button7->Size = System::Drawing::Size(75, 23);
-			this->button7->TabIndex = 14;
-			this->button7->Text = L"button7";
-			this->button7->UseVisualStyleBackColor = true;
-			this->button7->Click += gcnew System::EventHandler(this, &MainWindow::OnStartDecompileLevelClick);
-			// 
 			// MainWindow
 			// 
 			this->AllowDrop = true;
@@ -587,7 +591,6 @@ namespace ConverterUI {
 			this->DragEnter += gcnew System::Windows::Forms::DragEventHandler(this, &MainWindow::OnDragEnter);
 			this->mMainTab->ResumeLayout(false);
 			this->groupBox12->ResumeLayout(false);
-			this->groupBox12->PerformLayout();
 			this->groupBox5->ResumeLayout(false);
 			this->groupBox4->ResumeLayout(false);
 			this->groupBox3->ResumeLayout(false);
@@ -620,7 +623,7 @@ namespace ConverterUI {
 
 		static array<String^>^ mOGFFormats = {"object", "bones"};
 		static array<String^>^ mOMFFormats = {"skls",   "skl"};
-		static array<String^>^ mDMFormats  = {"object", "info"};
+		static array<String^>^ mDMFormats  = {"object"/*, "info"*/};
 		static array<String^>^ mXRDemoFormats = {"anm"};
 
 		void OnBrowseFileButton_Click(Object^ sender, EventArgs^ e);

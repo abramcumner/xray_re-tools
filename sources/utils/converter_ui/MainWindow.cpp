@@ -7,13 +7,14 @@
 #include "tools_base.h"
 #include "dm_tools.h"
 #include "ogf_tools.h"
-#include "level_tools.h"
+//#include "level_tools.h"
 #include "xrdemo_tools.h"
+#include "xr_dm.h"
 #include "xr_ogf_v4.h"
-#include "xr_ini_file.h"
 #pragma managed
 
 #include "xr_file_system.h"
+//#include "xr_ini_file.h"
 #include "xr_log.h"
 
 using namespace xray_re;
@@ -83,7 +84,7 @@ MainWindow::MainWindow(array<String^>^ aArgs) {
 	}
 	xr_log::instance().init("converter");
 
-	mIni = new xr_ini_file(CONVERTER_INI);
+	/*mIni = new xr_ini_file(CONVERTER_INI);
 	if (!mIni->empty()) {
 		u32 lcount = mIni->line_count("profiles");
 		for (u32 i = 0; i < lcount; i++) {
@@ -94,10 +95,10 @@ MainWindow::MainWindow(array<String^>^ aArgs) {
 
 		mProfilePicker->Enabled = true;
 		mProfilePicker->SelectedIndex = 0;
-	}
+	}*/
 
 	mModePicker->SelectedIndex = 0;
-	
+
 	if (aArgs->Length > 0) {
 		Prepare(aArgs[0]);
 	}
@@ -163,7 +164,7 @@ void MainWindow::OnStartDecompileLevelClick(Object^ sender, EventArgs^ e) {
 	std::string sLevelsPath = mIni->r_string(sConfig, PA_GAME_LEVELS);
 */
 
-//	level_tools* tools = new level_tools;
+	//level_tools* tools = new level_tools;
 	//tools->process(sConfig, to_string(mModePicker->SelectedItem->ToString()), to_string(mSceneNameTextBox->Text), to_string(mLevelPicker->SelectedItem->ToString()), mIni);
 }
 
@@ -254,52 +255,81 @@ void MainWindow::PrepareObjectTools(char* sFilePath) {
 	mMotionPicker->Enabled = false;
 	mMotionPicker->Items->Clear();
 	mFormatPicker->Items->Clear();
+	mObjectInfoListBox->Items->Clear();
 
-	mStartButton->Enabled = true;
 	mFilePathTextBox->Text = to_string(sFilePath);
+	mStartButton->Enabled = true;
 
 	switch (mTools) {
 		case tools_base::TOOLS_OGF:
 			{
-				msg("load ogf");
-
 				xr_ogf* ogf = xr_ogf::load_ogf(sFilePath);
 				if (ogf) {
-					msg("file loaded");
-
 					mFormatPicker->Items->AddRange(mOGFFormats);
 
 					if (!ogf->motions().empty()) {
-						msg("file has motions");
 						mFormatPicker->Items->AddRange(mOMFFormats);
 						FillMotionComboBox(ogf->motions());
+
+						mObjectInfoListBox->Items->Add("Motions count: " + ogf->motions().size());
+						mObjectInfoListBox->Items->Add("");
+					}
+
+					const xr_ogf_vec& childrens = ogf->children();
+					mObjectInfoListBox->Items->Add("Textures:");
+					for (u32 i = 0; i < childrens.size(); i++) {
+						String^ sValue = to_string(childrens[i]->texture().c_str());
+						if (!mObjectInfoListBox->Items->Contains(sValue)) {
+							mObjectInfoListBox->Items->Add(sValue);
+						}
+					}
+					
+					mObjectInfoListBox->Items->Add("");
+					mObjectInfoListBox->Items->Add("Shaders:");
+					for (u32 i = 0; i < childrens.size(); i++) {
+						String^ sValue = to_string(childrens[i]->shader().c_str());
+						if (!mObjectInfoListBox->Items->Contains(sValue)) {
+							mObjectInfoListBox->Items->Add(sValue);
+						}
 					}
 				} else {
 					// TODO Message about can`t open ogf file
-					msg("can`t load file");
+					msg("can`t load ogf");
+					//return;
 				}
 				delete ogf;
 			} break;
 		case tools_base::TOOLS_OMF:
 			{
-				msg("load omf");
-
 				xr_ogf_v4* omf = new xr_ogf_v4;
 				if (omf->load_omf(sFilePath)) {
-					msg("file loaded");
-
 					mFormatPicker->Items->AddRange(mOMFFormats);
 					FillMotionComboBox(omf->motions());
 
-					msg("path %s", omf->path().c_str());
+					mObjectInfoListBox->Items->Add("Motions count: " + omf->motions().size());
 				} else {
 					// TODO Message about can`t open omf file				
-					msg("can`t load file");
+					msg("can`t load omf");
+					//return;
 				}
 				delete omf;
 			} break;
 		case tools_base::TOOLS_DM:
-			mFormatPicker->Items->AddRange(mDMFormats);
+			{
+				xr_dm* dm = new xr_dm;
+				if (dm->load_dm(sFilePath)) {
+					mFormatPicker->Items->AddRange(mDMFormats);
+
+					mObjectInfoListBox->Items->Add("Texture: " + to_string(dm->texture().c_str()));
+					mObjectInfoListBox->Items->Add("Shader: " + to_string(dm->shader().c_str()));
+					mObjectInfoListBox->Items->Add("Scale (min/max): " + dm->min_scale() + "/" + dm->max_scale());
+					mObjectInfoListBox->Items->Add("Flags: " + dm->flags());
+				} else {
+					// TODO Message about can`t open dm file				
+					msg("can`t load dm");
+					//return;
+				}
+			} break;
 		case tools_base::TOOLS_XRDEMO:
 			mFormatPicker->Items->AddRange(mXRDemoFormats);
 			break;
