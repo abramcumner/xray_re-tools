@@ -1,6 +1,7 @@
+#include <locale.h>
+
 #include "pch.h"
 #include "MainWindow.h"
-#include <locale.h>
 
 using namespace ConverterUI;
 

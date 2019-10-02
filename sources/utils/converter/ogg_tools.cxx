@@ -303,4 +303,14 @@ void ogg_tools::process(const cl_parser& cl)
 
 	process_folder();
 }
+#else
+void ogg_tools::process(const char* path) {
+	if (!check_paths())
+		return;
+
+	xr_file_system& fs = xr_file_system::instance();
+	m_sounds = fs.resolve_path(PA_GAME_SOUNDS);
+
+	process_folder();
+}
 #endif // _CONSOLE

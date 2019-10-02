@@ -38,6 +38,8 @@ public:
 
 #ifdef _CONSOLE
 	virtual void process(const cl_parser& cl);
+#else
+	void process(const char* config, const char* mode,/* const char* flag,*/ const char* scene_name, const char* level_name, xray_re::xr_ini_file* ini);
 #endif // _CONSOLE
 
 	virtual xray_re::xr_surface* create_surface(const xray_re::xr_raw_surface& raw_surface) const;

@@ -15,14 +15,10 @@
 #pragma unmanaged
 typedef unsigned int u32;
 
-typedef char*		LPSTR;
-typedef char const* LPCSTR;
-
 #include <malloc.h>
 #include "debug_macros.h"
 
-const char BUILD_DATE[] = __DATE__;
-const char DEFAULT_FS_SPEC[] = "fsconverter.ltx";
+const char CONVERTER_INI[] = "converter.ini";
 #pragma managed
 
 #pragma warning(disable:4127)
@@ -31,14 +27,14 @@ const char DEFAULT_FS_SPEC[] = "fsconverter.ltx";
 // do not forget to call
 // 'cs_free'
 // on the block of memory being returned
-inline LPSTR to_string(System::String ^string) {
+inline char* to_string(System::String ^string) {
 	// Pin memory so GC can't move it while native function is called
 	pin_ptr<const wchar_t> wch = PtrToStringChars(string);
 
 	size_t	convertedChars = 0;
 	size_t	sizeInBytes = (string->Length + 1) * 2;
 	errno_t	err = 0;
-	LPSTR	result = (LPSTR) malloc(sizeInBytes);
+	char*	result = (char*) malloc(sizeInBytes);
 
 	err = wcstombs_s(&convertedChars, result, sizeInBytes, wch, sizeInBytes);
 
@@ -48,7 +44,7 @@ inline LPSTR to_string(System::String ^string) {
 	return result;
 }
 
-inline System::String^ to_string(LPCSTR string) {
+inline System::String^ to_string(const char* string) {
 	return gcnew System::String(string);
 }
 

@@ -12,8 +12,10 @@ public:
 #ifdef _CONSOLE
 	virtual void process(const cl_parser& cl);
 #else
-	virtual void process(const char* source, const char* target, const char* format);
+	void process(const char* source, const char* target, const char* format);
 #endif
+
+
 };
 
 #endif

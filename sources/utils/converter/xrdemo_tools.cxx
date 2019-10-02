@@ -71,4 +71,18 @@ void xrdemo_tools::process(const cl_parser& cl)
 		}
 	}
 }
+#else
+void xrdemo_tools::process(const char* source, const char* target_path) {
+	prepare_target_name(target_path);
+
+	std::string target;
+	make_target_name(target, source, ".anm");
+	xr_obj_motion omotion;
+	if (load_xrdemo(omotion, source)) {
+		if (!omotion.save_anm(target.c_str()))
+			msg("can't save %s", target.c_str());
+	} else {
+		msg("can't load %s", source);
+	}
+}
 #endif // _CONSOLE

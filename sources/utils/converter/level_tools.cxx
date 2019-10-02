@@ -15,8 +15,9 @@
 #include "xr_entity_factory.h"
 
 using namespace xray_re;
-
+#ifdef _CONSOLE
 const char CONVERTER_INI[] = "converter.ini";
+#endif
 
 level_tools::level_tools():
 	m_ini(0),
@@ -159,6 +160,91 @@ void level_tools::process(const cl_parser& cl)
 			msg("can't load %s", name);
 		delete m_level;
 	}
+	m_level = 0;
+}
+#else
+void level_tools::process(const char* config, const char* mode,/* const char* flag,*/ const char* scene_name, const char* level_name, xr_ini_file* ini)
+{
+	if (!check_paths())
+		return;
+
+	m_ini = ini;
+	m_sect_profile = config;
+
+	m_rmode = RM_MAYA;
+	if (std::strcmp(mode, "le") == 0) {
+		m_rmode = RM_LE;
+	} else if (std::strcmp(mode, "le2") == 0) {
+		m_rmode = RM_LE2;
+	} else if (std::strcmp(mode, "raw") == 0) {
+		m_rmode = RM_RAW;
+	}
+
+	// TODO flags
+	/*m_rflags = 0;
+	if (cl.get_bool("-with_lods"))
+		m_rflags |= RF_WITH_LODS;
+	if (cl.get_bool("-use_mt"))
+		m_rflags |= RF_USE_MT;
+	if (cl.get_bool("-dbgcfrm"))
+		m_rflags |= RF_DEBUG_CFORM;
+	if (cl.get_bool("-dbgmrg"))
+		m_rflags |= RF_DEBUG_MERGE;*/
+
+	/*const char* scene_name = 0;
+	if (cl.get_string("-out", scene_name)) {
+		if (cl.num_params() > 1) {
+			msg("can't set scene name explicitly for multiple input levels");
+			return;
+		}
+		if (!check_scene_name(scene_name)) {
+			msg("invalid scene name");
+			return;
+		}
+	}*/
+
+	m_ini = ini;
+/*	if (m_ini->empty() && !m_ini->load(PA_SDK_ROOT, CONVERTER_INI)) { // TODO check it
+		msg("can't load %s", CONVERTER_INI);
+		return;
+	}*/
+
+	// cache profile-independent settings
+	m_debug_texture = m_ini->r_string("settings", "debug_texture");
+	m_fake_gamemtl = m_ini->r_string("settings", "fake_gamemtl");
+	m_ladders_gamemtl = m_ini->r_string("settings", "ladders_gamemtl");
+	m_ghost_eshader = m_ini->r_string("settings", "ghost_eshader");
+
+	m_shaders_xrlc_lib = new xr_shaders_xrlc_lib;
+	if (!m_shaders_xrlc_lib->load(PA_GAME_DATA, "shaders_xrlc.xr")) {
+		msg("can't load %s", "shaders_xrlc.xr");
+		return;
+	}
+
+	msg("level name: %s", level_name);
+
+	xr_file_system& fs = xr_file_system::instance();
+	if (m_ini->line_exist(m_sect_profile, PA_GAME_DATA))
+		fs.update_path("$temp_game_data$", m_ini->r_string(m_sect_profile, PA_GAME_DATA), "");
+
+	fs.update_path("$temp_level$", m_ini->r_string(m_sect_profile, PA_GAME_LEVELS), level_name);
+
+	//substitute settings from profile
+	if (m_ini->line_exist(m_sect_profile, "settings")) {
+		const char* section = m_ini->r_string(m_sect_profile, "settings");
+		const char* s = m_ini->r_string(section, "ladders_gamemtl");
+		if (s)
+			m_ladders_gamemtl = s;
+	}
+
+	m_level = new xr_level;
+	if (m_level->load("$temp_game_data$", "$temp_level$"))
+		reconstruct_scene(level_name, scene_name);
+	else
+		msg("can't load %s", level_name);
+
+	delete m_level;
+	
 	m_level = 0;
 }
 #endif // _CONSOLE

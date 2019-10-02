@@ -2,9 +2,15 @@
 #include "MainWindow.h"
 
 #pragma unmanaged
+#include "windows.h"
+#include "converter.h"
+#include "tools_base.h"
 #include "dm_tools.h"
 #include "ogf_tools.h"
+#include "level_tools.h"
+#include "xrdemo_tools.h"
 #include "xr_ogf_v4.h"
+#include "xr_ini_file.h"
 #pragma managed
 
 #include "xr_file_system.h"
@@ -14,20 +20,20 @@ using namespace xray_re;
 using namespace ConverterUI;
 
 /* Help for understanding
-Ogf options:
+Ogf options: +
 	object
 	skls
 	skl
 	bones
 
-Omf options:
+Omf options: +
 	skls
 	skl
 
-Xrdemo options:
+Xrdemo options: +
 	anm - one target
 
-DM options:
+DM options: +
 	object
 	info -- not a format
 
@@ -56,17 +62,42 @@ DB options:
 		xdb_ud    - attach user data from file
 		flt		  - extract only files, filtered by mask
 		strip_thm - COMMENTED!!!!! - remove attached image in texture descriptors
+
+OGG options:
+	wav
+
+DDS options:
+	tga:
+		with_solid
+		with_bump
 */
 
 MainWindow::MainWindow(array<String^>^ aArgs) {
+	InitializeComponent();
+
 	xr_file_system& fs = xr_file_system::instance();
 	if (!fs.initialize(DEFAULT_FS_SPEC)) {
-		msg("can't initialize the file system");
+		// TODO
+	} else { // initialize controls
+		//mSoundsPathTextBox->Text = to_string(fs.resolve_path(PA_GAME_SOUNDS));		
 	}
 	xr_log::instance().init("converter");
 
-	InitializeComponent();
+	mIni = new xr_ini_file(CONVERTER_INI);
+	if (!mIni->empty()) {
+		u32 lcount = mIni->line_count("profiles");
+		for (u32 i = 0; i < lcount; i++) {
+			const char* lname;
+			mIni->r_line("profiles", i, &lname, NULL);
+			mProfilePicker->Items->Add(to_string(lname));
+		}
 
+		mProfilePicker->Enabled = true;
+		mProfilePicker->SelectedIndex = 0;
+	}
+
+	mModePicker->SelectedIndex = 0;
+	
 	if (aArgs->Length > 0) {
 		Prepare(aArgs[0]);
 	}
@@ -92,31 +123,48 @@ void MainWindow::OnBrowseFolderButton_Click(Object^ sender, EventArgs^ e) {
 }
 
 void MainWindow::OnStartButton_Click(Object^ sender, EventArgs^ e) {
-	LPSTR sFilePath   = to_string(mFilePathTextBox->Text);
-	LPSTR sTargetPath = to_string(mOutputFolderTextBox->Text);
-	LPSTR sFormat	  = to_string(mFormatPicker->SelectedItem->ToString());
+	char* sFilePath   = to_string(mFilePathTextBox->Text);
+	char* sTargetPath = to_string(mOutputFolderTextBox->Text);
+	char* sFormat	  = to_string(mFormatPicker->SelectedItem->ToString());
 
 	switch (mTools) {
-		case object_tools::TOOLS_OGF: // OGF
+		case tools_base::TOOLS_OGF:
 			{
-				LPCSTR sMotionName = mMotionPicker->SelectedItem ? to_string(mMotionPicker->SelectedItem->ToString()) : "";
+				const char* sMotionName = mMotionPicker->SelectedItem ? to_string(mMotionPicker->SelectedItem->ToString()) : "";
 				ogf_tools* tools = new ogf_tools;
 				tools->process(sFilePath, sTargetPath, sFormat, sMotionName);
+				delete tools;
 			} break;
-		case object_tools::TOOLS_OMF: // OMF
+		case tools_base::TOOLS_OMF:
 			{
-				LPCSTR sMotionName = mMotionPicker->SelectedItem ? to_string(mMotionPicker->SelectedItem->ToString()) : "";
+				const char* sMotionName = mMotionPicker->SelectedItem ? to_string(mMotionPicker->SelectedItem->ToString()) : "";
 				omf_tools* tools = new omf_tools;
 				tools->process(sFilePath, sTargetPath, sFormat, sMotionName);
 				delete tools;
 			} break;
-		case object_tools::TOOLS_DM: // DM
+		case tools_base::TOOLS_DM:
 			{
 				dm_tools* tools = new dm_tools;
 				tools->process(sFilePath, sTargetPath, sFormat);
 				delete tools;
 			} break;
+		case tools_base::TOOLS_XRDEMO:
+			{
+				xrdemo_tools* tools = new xrdemo_tools;
+				tools->process(sFilePath, sTargetPath);
+				delete tools;
+			} break;
 	}
+}
+
+void MainWindow::OnStartDecompileLevelClick(Object^ sender, EventArgs^ e) {
+	/*char* sProfile = to_string(mProfilePicker->SelectedItem->ToString());
+	const char* sConfig = mIni->r_string("profiles", sProfile);
+	std::string sLevelsPath = mIni->r_string(sConfig, PA_GAME_LEVELS);
+*/
+
+//	level_tools* tools = new level_tools;
+	//tools->process(sConfig, to_string(mModePicker->SelectedItem->ToString()), to_string(mSceneNameTextBox->Text), to_string(mLevelPicker->SelectedItem->ToString()), mIni);
 }
 
 void MainWindow::OnFilePickerOk(Object^ sender, CancelEventArgs^ e) {
@@ -124,8 +172,7 @@ void MainWindow::OnFilePickerOk(Object^ sender, CancelEventArgs^ e) {
 }
 
 void MainWindow::OnDragDrop(Object^ sender, DragEventArgs^ e) {
-	array<String^>^ objs = (array<String^>^) e->Data->GetData(DataFormats::FileDrop);
-	Prepare(objs[0]);
+	Prepare(((array<String^>^) e->Data->GetData(DataFormats::FileDrop))[0]);
 }
 
 void MainWindow::OnDragEnter(Object^ sender, DragEventArgs^ e) {
@@ -136,40 +183,73 @@ void MainWindow::OnDragEnter(Object^ sender, DragEventArgs^ e) {
 	}
 }
 
+void MainWindow::OnSelectedProfileChanged(Object^ sender, EventArgs^ e) {
+	mLevelPicker->Items->Clear();
+
+	char* sProfile = to_string(mProfilePicker->SelectedItem->ToString());
+	const char* sConfig = mIni->r_string("profiles", sProfile);
+	std::string sLevelsPath = mIni->r_string(sConfig, PA_GAME_LEVELS);
+
+	WIN32_FIND_DATAA info;
+	HANDLE h = FindFirstFile((sLevelsPath + '*').c_str(), &info);
+
+	if (h != INVALID_HANDLE_VALUE) {
+		do {
+			if (info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+				if (std::strcmp(info.cFileName, ".") != 0 && std::strcmp(info.cFileName, "..") != 0)
+					mLevelPicker->Items->Add(to_string(info.cFileName));
+			}
+		} while (FindNextFile(h, &info));
+		FindClose(h);
+	}
+
+	if (mLevelPicker->Items->Count > 0) {
+		mLevelPicker->Enabled = true;
+		mLevelPicker->SelectedIndex = 0;
+	} else {
+		mLevelPicker->Text = nullptr;
+		mLevelPicker->Enabled = false;
+	}
+}
+
+void MainWindow::OnSelectedLevelChanged(Object^ sender, EventArgs^ e) {
+	mSceneNameTextBox->Text = mLevelPicker->SelectedItem->ToString();
+}
+
 void MainWindow::Prepare(String^ sPath) {
-	LPSTR sFilePath = to_string(sPath);
+	char* sFilePath = to_string(sPath);
 
 	msg("starting prepare...");
 
 	std::string extension;
 	xr_file_system::split_path(sFilePath, 0, 0, &extension);
 
-	mTools = object_tools::TOOLS_NULL;
+	mTools = tools_base::TOOLS_NULL;
 
 	if (extension == ".ogf")
-		mTools = object_tools::TOOLS_OGF;
+		mTools |= tools_base::TOOLS_OGF;
 	else if (extension == ".omf")
-		mTools = object_tools::TOOLS_OMF;
+		mTools |= tools_base::TOOLS_OMF;
 	else if (extension == ".dm")
-		mTools = object_tools::TOOLS_DM;
-	/*else if (extension == ".xrdemo")
-		mTools |= object_tools::TOOLS_XRDEMO;
-	else if (db_tools::is_known(extension))
-		format |= object_tools::TOOLS_DB;*/
+		mTools |= tools_base::TOOLS_DM;
+	else if (extension == ".xrdemo")
+		mTools |= tools_base::TOOLS_XRDEMO;
+	/*else if (db_tools::is_known(extension))
+		format |= tools_base::TOOLS_DB;*/
 
 	msg("tools %u", mTools);
 
 	switch (mTools) {
-		case object_tools::TOOLS_OGF:
-		case object_tools::TOOLS_OMF:
-		case object_tools::TOOLS_DM:
-		//case object_tools::TOOLS_XRDEMO:
+		case tools_base::TOOLS_OGF:
+		case tools_base::TOOLS_OMF:
+		case tools_base::TOOLS_DM:
+		case tools_base::TOOLS_XRDEMO:
 			PrepareObjectTools(sFilePath);
 			break;
 	}
 }
 
-void MainWindow::PrepareObjectTools(LPSTR sFilePath) {
+void MainWindow::PrepareObjectTools(char* sFilePath) {
 	mMotionPicker->Text = nullptr;
 	mMotionPicker->Enabled = false;
 	mMotionPicker->Items->Clear();
@@ -179,7 +259,7 @@ void MainWindow::PrepareObjectTools(LPSTR sFilePath) {
 	mFilePathTextBox->Text = to_string(sFilePath);
 
 	switch (mTools) {
-		case object_tools::TOOLS_OGF:
+		case tools_base::TOOLS_OGF:
 			{
 				msg("load ogf");
 
@@ -200,7 +280,7 @@ void MainWindow::PrepareObjectTools(LPSTR sFilePath) {
 				}
 				delete ogf;
 			} break;
-		case object_tools::TOOLS_OMF:
+		case tools_base::TOOLS_OMF:
 			{
 				msg("load omf");
 
@@ -210,14 +290,18 @@ void MainWindow::PrepareObjectTools(LPSTR sFilePath) {
 
 					mFormatPicker->Items->AddRange(mOMFFormats);
 					FillMotionComboBox(omf->motions());
+
+					msg("path %s", omf->path().c_str());
 				} else {
 					// TODO Message about can`t open omf file				
 					msg("can`t load file");
 				}
 				delete omf;
 			} break;
-		case object_tools::TOOLS_DM:
+		case tools_base::TOOLS_DM:
 			mFormatPicker->Items->AddRange(mDMFormats);
+		case tools_base::TOOLS_XRDEMO:
+			mFormatPicker->Items->AddRange(mXRDemoFormats);
 			break;
 	}
 

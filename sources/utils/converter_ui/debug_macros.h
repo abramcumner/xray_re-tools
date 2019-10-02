@@ -1,3 +1,5 @@
+// позаимствовано из движка ЗП
+
 #ifndef Debug_macrosH
 #define Debug_macrosH
 #pragma once
