@@ -168,13 +168,14 @@ void xr_skl_motion::save(xr_writer& w) const
 	w.w_float(m_accrue);
 	w.w_float(m_falloff);
 	w.w_float(m_power);
+
+	// save bones
 	w.w_size_u16(m_bone_motions.size());
 	w.w_seq(m_bone_motions, xr_writer::f_w_const<xr_bone_motion>(&xr_bone_motion::save));
-
+	
+	// save marks
 	w.w_size_u32(m_marks.size());
-	for (xr_motion_marks_vec_cit it = m_marks.begin(), end = m_marks.end(); it != end; ++it) {
-		(*it)->save(w);
-	}
+	w.w_seq(m_marks, xr_writer::f_w_const<xr_motion_marks>(&xr_motion_marks::save));
 }
 
 bool xr_skl_motion::load_skl(const char* path)
