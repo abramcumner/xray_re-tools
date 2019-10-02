@@ -8,13 +8,13 @@
 #include "dm_tools.h"
 #include "ogf_tools.h"
 //#include "level_tools.h"
+#include "db_tools.h"
 #include "xrdemo_tools.h"
 #include "xr_dm.h"
 #include "xr_ogf_v4.h"
 #pragma managed
 
 #include "xr_file_system.h"
-//#include "xr_ini_file.h"
 #include "xr_log.h"
 
 using namespace xray_re;
@@ -84,9 +84,16 @@ MainWindow::MainWindow(array<String^>^ aArgs) {
 	}
 	xr_log::instance().init("converter");
 
-	/*mIni = new xr_ini_file(CONVERTER_INI);
+	mIni = new xr_ini_file(CONVERTER_INI, false);
 	if (!mIni->empty()) {
-		u32 lcount = mIni->line_count("profiles");
+		if (mIni->line_exist("settings", "output_directory")) {
+			String^ sOutputPath = to_string(mIni->r_string("settings", "output_directory"));
+
+			mOutputFolderTextBox->Text = sOutputPath;
+			mFolderPicker->SelectedPath = sOutputPath;
+		}
+
+		/*u32 lcount = mIni->line_count("profiles");
 		for (u32 i = 0; i < lcount; i++) {
 			const char* lname;
 			mIni->r_line("profiles", i, &lname, NULL);
@@ -94,8 +101,8 @@ MainWindow::MainWindow(array<String^>^ aArgs) {
 		}
 
 		mProfilePicker->Enabled = true;
-		mProfilePicker->SelectedIndex = 0;
-	}*/
+		mProfilePicker->SelectedIndex = 0;*/
+	}
 
 	mModePicker->SelectedIndex = 0;
 
@@ -105,17 +112,19 @@ MainWindow::MainWindow(array<String^>^ aArgs) {
 }
 
 MainWindow::~MainWindow() {
+	delete mIni;
+
 	if (components) {
 		delete components;
 	}
 }
 
-void MainWindow::OnBrowseFileButton_Click(Object^ sender, EventArgs^ e) {
+void MainWindow::OnBrowseFileButtonClick(Object^ sender, EventArgs^ e) {
 	mFilePicker->FileName = "";  
 	mFilePicker->ShowDialog();
 }
 
-void MainWindow::OnBrowseFolderButton_Click(Object^ sender, EventArgs^ e) {
+void MainWindow::OnBrowseFolderButtonClick(Object^ sender, EventArgs^ e) {
 	mFolderPicker->ShowDialog();
 	
 	if (mFolderPicker->SelectedPath->Length > 0) {
@@ -123,7 +132,7 @@ void MainWindow::OnBrowseFolderButton_Click(Object^ sender, EventArgs^ e) {
 	}
 }
 
-void MainWindow::OnStartButton_Click(Object^ sender, EventArgs^ e) {
+void MainWindow::OnStartButtonClick(Object^ sender, EventArgs^ e) {
 	char* sFilePath   = to_string(mFilePathTextBox->Text);
 	char* sTargetPath = to_string(mOutputFolderTextBox->Text);
 	char* sFormat	  = to_string(mFormatPicker->SelectedItem->ToString());
@@ -185,7 +194,7 @@ void MainWindow::OnDragEnter(Object^ sender, DragEventArgs^ e) {
 }
 
 void MainWindow::OnSelectedProfileChanged(Object^ sender, EventArgs^ e) {
-	mLevelPicker->Items->Clear();
+	/*mLevelPicker->Items->Clear();
 
 	char* sProfile = to_string(mProfilePicker->SelectedItem->ToString());
 	const char* sConfig = mIni->r_string("profiles", sProfile);
@@ -210,11 +219,15 @@ void MainWindow::OnSelectedProfileChanged(Object^ sender, EventArgs^ e) {
 	} else {
 		mLevelPicker->Text = nullptr;
 		mLevelPicker->Enabled = false;
-	}
+	}*/
 }
 
 void MainWindow::OnSelectedLevelChanged(Object^ sender, EventArgs^ e) {
 	mSceneNameTextBox->Text = mLevelPicker->SelectedItem->ToString();
+}
+
+void MainWindow::OnOutputFolderChanged(Object^ sender, EventArgs^ e) {
+	mIni->w_string("settings", "output_directory", to_string(mOutputFolderTextBox->Text));
 }
 
 void MainWindow::Prepare(String^ sPath) {
@@ -236,7 +249,7 @@ void MainWindow::Prepare(String^ sPath) {
 	else if (extension == ".xrdemo")
 		mTools |= tools_base::TOOLS_XRDEMO;
 	/*else if (db_tools::is_known(extension))
-		format |= tools_base::TOOLS_DB;*/
+		mTools |= tools_base::TOOLS_DB;*/
 
 	msg("tools %u", mTools);
 

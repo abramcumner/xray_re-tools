@@ -36,9 +36,10 @@ namespace ConverterUI {
 		System::Windows::Forms::Button^		mBrowseFileButton;
 
 		System::Windows::Forms::GroupBox^	groupBox3;
-		System::Windows::Forms::TextBox^	mOutputFolderTextBox;
+	private: System::Windows::Forms::TextBox^  mOutputFolderTextBox;
 
-		System::Windows::Forms::Button^		mBrowseDirectoryButton;
+		System::Windows::Forms::Button^		mBrowseOutFolderButton;
+
 		System::Windows::Forms::ComboBox^	mMotionPicker;
 
 		System::Windows::Forms::TabControl^ mTabControl;
@@ -76,6 +77,11 @@ namespace ConverterUI {
 		System::Windows::Forms::GroupBox^   groupBox12;
 		System::Windows::Forms::ListBox^	mObjectInfoListBox;
 
+
+
+		System::Windows::Forms::TextBox^	textBox4;
+		System::Windows::Forms::Button^		button9;
+
 		System::Windows::Forms::Button^		button7; // TODO
 
 #pragma region Windows Form Designer generated code
@@ -98,7 +104,7 @@ namespace ConverterUI {
 			this->mFormatPicker = (gcnew System::Windows::Forms::ComboBox());
 			this->groupBox3 = (gcnew System::Windows::Forms::GroupBox());
 			this->mOutputFolderTextBox = (gcnew System::Windows::Forms::TextBox());
-			this->mBrowseDirectoryButton = (gcnew System::Windows::Forms::Button());
+			this->mBrowseOutFolderButton = (gcnew System::Windows::Forms::Button());
 			this->groupBox2 = (gcnew System::Windows::Forms::GroupBox());
 			this->mFilePathTextBox = (gcnew System::Windows::Forms::TextBox());
 			this->mBrowseFileButton = (gcnew System::Windows::Forms::Button());
@@ -129,6 +135,8 @@ namespace ConverterUI {
 			this->mSettingsTab = (gcnew System::Windows::Forms::TabPage());
 			this->textBox1 = (gcnew System::Windows::Forms::TextBox());
 			this->button1 = (gcnew System::Windows::Forms::Button());
+			this->textBox4 = (gcnew System::Windows::Forms::TextBox());
+			this->button9 = (gcnew System::Windows::Forms::Button());
 			this->mMainTab->SuspendLayout();
 			this->groupBox12->SuspendLayout();
 			this->groupBox5->SuspendLayout();
@@ -203,7 +211,7 @@ namespace ConverterUI {
 			this->mStartButton->Size = System::Drawing::Size(36, 43);
 			this->mStartButton->TabIndex = 10;
 			this->mStartButton->UseVisualStyleBackColor = true;
-			this->mStartButton->Click += gcnew System::EventHandler(this, &MainWindow::OnStartButton_Click);
+			this->mStartButton->Click += gcnew System::EventHandler(this, &MainWindow::OnStartButtonClick);
 			// 
 			// groupBox5
 			// 
@@ -249,7 +257,7 @@ namespace ConverterUI {
 			// groupBox3
 			// 
 			this->groupBox3->Controls->Add(this->mOutputFolderTextBox);
-			this->groupBox3->Controls->Add(this->mBrowseDirectoryButton);
+			this->groupBox3->Controls->Add(this->mBrowseOutFolderButton);
 			this->groupBox3->Location = System::Drawing::Point(0, 158);
 			this->groupBox3->Name = L"groupBox3";
 			this->groupBox3->Size = System::Drawing::Size(421, 46);
@@ -263,16 +271,17 @@ namespace ConverterUI {
 			this->mOutputFolderTextBox->Name = L"mOutputFolderTextBox";
 			this->mOutputFolderTextBox->Size = System::Drawing::Size(376, 20);
 			this->mOutputFolderTextBox->TabIndex = 5;
+			this->mOutputFolderTextBox->TextChanged += gcnew System::EventHandler(this, &MainWindow::OnOutputFolderChanged);
 			// 
-			// mBrowseDirectoryButton
+			// mBrowseOutFolderButton
 			// 
-			this->mBrowseDirectoryButton->Location = System::Drawing::Point(388, 16);
-			this->mBrowseDirectoryButton->Name = L"mBrowseDirectoryButton";
-			this->mBrowseDirectoryButton->Size = System::Drawing::Size(27, 23);
-			this->mBrowseDirectoryButton->TabIndex = 6;
-			this->mBrowseDirectoryButton->Text = L"...";
-			this->mBrowseDirectoryButton->UseVisualStyleBackColor = true;
-			this->mBrowseDirectoryButton->Click += gcnew System::EventHandler(this, &MainWindow::OnBrowseFolderButton_Click);
+			this->mBrowseOutFolderButton->Location = System::Drawing::Point(388, 16);
+			this->mBrowseOutFolderButton->Name = L"mBrowseOutFolderButton";
+			this->mBrowseOutFolderButton->Size = System::Drawing::Size(27, 23);
+			this->mBrowseOutFolderButton->TabIndex = 6;
+			this->mBrowseOutFolderButton->Text = L"...";
+			this->mBrowseOutFolderButton->UseVisualStyleBackColor = true;
+			this->mBrowseOutFolderButton->Click += gcnew System::EventHandler(this, &MainWindow::OnBrowseFolderButtonClick);
 			// 
 			// groupBox2
 			// 
@@ -283,7 +292,7 @@ namespace ConverterUI {
 			this->groupBox2->Size = System::Drawing::Size(421, 46);
 			this->groupBox2->TabIndex = 11;
 			this->groupBox2->TabStop = false;
-			this->groupBox2->Text = L"Путь к файлу/файлам";
+			this->groupBox2->Text = L"Путь к файлу";
 			// 
 			// mFilePathTextBox
 			// 
@@ -301,7 +310,7 @@ namespace ConverterUI {
 			this->mBrowseFileButton->TabIndex = 4;
 			this->mBrowseFileButton->Text = L"...";
 			this->mBrowseFileButton->UseVisualStyleBackColor = true;
-			this->mBrowseFileButton->Click += gcnew System::EventHandler(this, &MainWindow::OnBrowseFileButton_Click);
+			this->mBrowseFileButton->Click += gcnew System::EventHandler(this, &MainWindow::OnBrowseFileButtonClick);
 			// 
 			// mTabControl
 			// 
@@ -336,7 +345,7 @@ namespace ConverterUI {
 			// 
 			// button7
 			// 
-			this->button7->Location = System::Drawing::Point(345, 93);
+			this->button7->Location = System::Drawing::Point(346, 98);
 			this->button7->Name = L"button7";
 			this->button7->Size = System::Drawing::Size(75, 23);
 			this->button7->TabIndex = 14;
@@ -574,6 +583,22 @@ namespace ConverterUI {
 			this->button1->Text = L"...";
 			this->button1->UseVisualStyleBackColor = true;
 			// 
+			// textBox4
+			// 
+			this->textBox4->Location = System::Drawing::Point(6, 19);
+			this->textBox4->Name = L"textBox4";
+			this->textBox4->Size = System::Drawing::Size(376, 20);
+			this->textBox4->TabIndex = 5;
+			// 
+			// button9
+			// 
+			this->button9->Location = System::Drawing::Point(388, 16);
+			this->button9->Name = L"button9";
+			this->button9->Size = System::Drawing::Size(27, 23);
+			this->button9->TabIndex = 6;
+			this->button9->Text = L"...";
+			this->button9->UseVisualStyleBackColor = true;
+			// 
 			// MainWindow
 			// 
 			this->AllowDrop = true;
@@ -626,11 +651,11 @@ namespace ConverterUI {
 		static array<String^>^ mDMFormats  = {"object"/*, "info"*/};
 		static array<String^>^ mXRDemoFormats = {"anm"};
 
-		void OnBrowseFileButton_Click(Object^ sender, EventArgs^ e);
+		void OnBrowseFileButtonClick(Object^ sender, EventArgs^ e);
 
-		void OnBrowseFolderButton_Click(Object^ sender, EventArgs^ e);
+		void OnBrowseFolderButtonClick(Object^ sender, EventArgs^ e);
 
-		void OnStartButton_Click(Object^ sender, EventArgs^ e);
+		void OnStartButtonClick(Object^ sender, EventArgs^ e);
 
 		void OnStartDecompileLevelClick(Object^ sender, EventArgs^ e);
 
@@ -643,6 +668,8 @@ namespace ConverterUI {
 		void OnSelectedProfileChanged(Object^ sender, EventArgs^ e);
 
 		void OnSelectedLevelChanged(Object^ sender, EventArgs^ e);
+
+		void OnOutputFolderChanged(Object^ sender, EventArgs^ e);
 
 		void Prepare(String^ sPath);
 

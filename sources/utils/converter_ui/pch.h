@@ -15,10 +15,11 @@
 #pragma unmanaged
 typedef unsigned int u32;
 
+const char CONVERTER_INI[] = "converter.ini";
+
 #include <malloc.h>
 #include "debug_macros.h"
 
-const char CONVERTER_INI[] = "converter.ini";
 #pragma managed
 
 #pragma warning(disable:4127)

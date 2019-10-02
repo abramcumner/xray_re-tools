@@ -11,18 +11,22 @@
 namespace xray_re {
 
 class xr_reader;
+class xr_writer;
 
 class xr_ini_file {
 public:
-			xr_ini_file();
-			xr_ini_file(const char* path);
-			xr_ini_file(const char* path, const char* name);
-			~xr_ini_file();
+				xr_ini_file();
+				xr_ini_file(const char* path, bool isReadOnly = true);
+				xr_ini_file(const char* path, const char* name);
+				~xr_ini_file();
 
 	bool		load(xr_reader& r);
 	bool		load(const char* path);
 	bool		load(const std::string& path);
 	bool		load(const char* path, const char* name);
+
+	bool		save_as(const char* new_fname = NULL);
+	void		save_as(xr_writer& writer) const;
 
 	void		clear();
 
@@ -36,6 +40,8 @@ public:
 	bool		r_bool(const char* sname, const char* lname) const;
 	float		r_float(const char* sname, const char* lname) const;
 	bool		r_line(const char* sname, size_t lindex, const char** lname, const char** lvalue) const;
+	
+	void		w_string(const char* sname, const char* lname, const char* value = NULL/*, const char* comment = NULL*/);
 
 	bool		empty() const;
 
@@ -46,6 +52,7 @@ private:
 
 		std::string		name;
 		std::string		value;
+/*		std::string		comment;*/
 	};
 	TYPEDEF_STD_VECTOR_PTR(ini_item)
 
@@ -53,32 +60,46 @@ private:
 					ini_section(const char* _name);
 					~ini_section();
 
-		bool			line_exist(const char* lname, const char** lvalue) const;
-		void			merge(const ini_section* section);
-		size_t			size() const;
+		bool				line_exist(const char* lname, const char** lvalue) const;
+		void				merge(const ini_section* section);
+		size_t				size() const;
 		ini_item_vec_it		begin();
 		ini_item_vec_cit	begin() const;
 		ini_item_vec_it		end();
 		ini_item_vec_cit	end() const;
 
-		std::string		name;
+		std::string			name;
 		ini_item_vec		items;
 	};
 	TYPEDEF_STD_VECTOR_PTR(ini_section)
 
+/*
+	struct ini_comment {
+		ini_comment(const char* _comment);
+
+		std::string		comment;
+	};
+	TYPEDEF_STD_VECTOR_PTR(ini_comment)*/
+
 	struct ini_item_pred;
 	struct ini_section_pred;
+/*	struct ini_comment_pred;*/
 
-	const ini_section*	r_section(const char* sname) const;
+	ini_section*	r_section(const char* sname) const;
 	bool			parse(const char* p, const char* end, const char* path);
 	bool			load_include(const char* path);
 
 private:
-	ini_section_vec		m_sections;
+	char* m_file_name;
+
+	bool mIsReadOnly;
+
+	ini_section_vec	m_sections;
+/*	ini_comment_vec m_comments;*/
 };
 
-inline xr_ini_file::xr_ini_file() {}
-inline xr_ini_file::xr_ini_file(const char* path) { load(path); }
+inline xr_ini_file::xr_ini_file() { mIsReadOnly = true; }
+/*inline xr_ini_file::xr_ini_file(const char* path) { load(path); }*/
 inline xr_ini_file::xr_ini_file(const char* path, const char* name) { load(path, name); }
 
 inline bool xr_ini_file::empty() const { return m_sections.empty(); }
@@ -88,6 +109,8 @@ inline bool xr_ini_file::load(const std::string& path) { return load(path.c_str(
 inline xr_ini_file::ini_item::ini_item(std::string& _name) { name.swap(_name); }
 
 inline xr_ini_file::ini_section::ini_section(const char* _name): name(_name) {}
+/*inline xr_ini_file::ini_comment::ini_comment(const char* _comment): comment(_comment) {}*/
+
 inline size_t xr_ini_file::ini_section::size() const { return items.size(); }
 inline xr_ini_file::ini_item_vec_it xr_ini_file::ini_section::begin() { return items.begin(); }
 inline xr_ini_file::ini_item_vec_cit xr_ini_file::ini_section::begin() const { return items.begin(); }
