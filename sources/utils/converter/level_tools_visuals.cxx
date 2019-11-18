@@ -35,7 +35,7 @@ void level_tools::save_scene_object(const xr_object* object, const char* name)
 	new_visual->co_name() = reference;
 	new_visual->reference() = reference;
 	m_scene_visuals->push_back(new_visual);
-	object->save_object(PA_OBJECTS, reference.append(".object").c_str());
+	object->save_object(PA_OBJECTS, reference.append(".object"));
 	new_visual->file_version() = xr_file_system::instance().file_age(PA_OBJECTS, reference);
 }
 

@@ -340,5 +340,5 @@ void level_tools::save_object(const xr_object* object, const char* name) const
 {
 	std::string reference;
 	make_object_ref(reference, name);
-	object->save_object(PA_OBJECTS, reference.append(".object").c_str());
+	object->save_object(PA_OBJECTS, reference.append(".object"));
 }
