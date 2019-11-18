@@ -12,6 +12,11 @@
 #include "xr_utils.h"
 #include "xr_name_gen.h"
 
+namespace xray_re {
+	compress_t compress_true{ true };
+	compress_t compress_false{ false };
+}
+
 using namespace xray_re;
 
 xr_object::xr_object(): m_flags(EOF_STATIC),
@@ -276,25 +281,25 @@ void xr_object::save_object(xr_writer& w) const
 	w.close_chunk();
 }
 
-bool xr_object::save_object(const char* path, bool compress) const
+bool xr_object::save_object(const char* path, compress_t compress) const
 {
 	xr_memory_writer w;
 	save_object(w);
 
 	xr_memory_writer file;
-	file.w_raw_chunk(EOBJ_CHUNK_MAIN, w.data(), w.tell(), compress);
+	file.w_raw_chunk(EOBJ_CHUNK_MAIN, w.data(), w.tell(), compress.value);
 
 	bool status = file.save_to(path);
 	return status;
 }
 
-bool xr_object::save_object(const char* path, const std::string& name, bool compress) const
+bool xr_object::save_object(const char* path, const std::string& name, compress_t compress) const
 {
 	xr_memory_writer w;
 	save_object(w);
 
 	xr_memory_writer file;
-	file.w_raw_chunk(EOBJ_CHUNK_MAIN, w.data(), w.tell(), compress);
+	file.w_raw_chunk(EOBJ_CHUNK_MAIN, w.data(), w.tell(), compress.value);
 
 	bool status = file.save_to(path, name);
 	return status;
