@@ -785,7 +785,7 @@ MStatus maya_export_tools::export_object(const char* path, bool selection_only)
 
 	MStatus status = MS::kFailure;
 	if (xr_object* object = create_object(mesh_objs)) {
-		if (object->save_object(path, m_compressed))
+		if (object->save_object(path, m_compressed ? compress_options::compress : compress_options::none))
 			status = MS::kSuccess;
 		delete object;
 	}
@@ -858,7 +858,7 @@ MStatus maya_export_tools::export_skl_object(const char* path, bool selection_on
 
 	status = MS::kFailure;
 	if (xr_object* object = create_skl_object(mesh_obj, skin_obj)) {
-		if (object->save_object(path, m_compressed))
+		if (object->save_object(path, m_compressed ? compress_options::compress : compress_options::none))
 			status = MS::kSuccess;
 		delete object;
 	}
