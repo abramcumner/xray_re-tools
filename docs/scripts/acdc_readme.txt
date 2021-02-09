@@ -1,16 +1,16 @@
-S.T.A.L.K.E.R. all.spawn компилер/декомпилер for S.T.A.L.K.E.R. Clear Sky and Call of Pripyat
+п»їS.T.A.L.K.E.R. all.spawn РєРѕРјРїРёР»РµСЂ/РґРµРєРѕРјРїРёР»РµСЂ for S.T.A.L.K.E.R. Clear Sky and Call of Pripyat
 
-Декомпиляция all.spawn:
+Р”РµРєРѕРјРїРёР»СЏС†РёСЏ all.spawn:
 
 acdc.pl -d all.spawn [-o outdir]
 
 
-Компиляция all.spawn:
+РљРѕРјРїРёР»СЏС†РёСЏ all.spawn:
 
 acdc.pl -c all.ltx [-f flag1[,...]] [-a level:point] [-o outfile]
 
 
 
-автор: bardak
-подправлено для Clear Sky: Kolmogor
-подправлено для Call of Pripyat: bardak, Xiani
+Р°РІС‚РѕСЂ: bardak
+РїРѕРґРїСЂР°РІР»РµРЅРѕ РґР»СЏ Clear Sky: Kolmogor
+РїРѕРґРїСЂР°РІР»РµРЅРѕ РґР»СЏ Call of Pripyat: bardak, Xiani
