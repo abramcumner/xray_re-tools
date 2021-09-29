@@ -448,7 +448,7 @@ void xr_ogf_v4::load_s_smparams(xr_reader& r)
 inline void xr_ogf_v4::bone_io::import_ikdata(xr_reader& r)
 {
 	uint32_t version = r.r_u32();
-	xr_assert(version == OGF4_S_JOINT_IK_DATA_VERSION);
+//	xr_assert(version == OGF4_S_JOINT_IK_DATA_VERSION);
 	r.r_sz(m_gamemtl);
 	r.r(m_shape);
 	r.r(m_joint_ik_data);
