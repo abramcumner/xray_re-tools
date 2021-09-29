@@ -108,7 +108,7 @@ void dbg(const char* format, ...);
 } // end of namespace xray_re
 
 #ifdef NDEBUG
-#define xr_assert(expr)		while (!(expr)) { xray_re::die("assertion failed", __FILE__, __LINE__); break; }
+#define xr_assert(expr)		while (!(expr)) { xray_re::die("assertion [" #expr "] failed", __FILE__, __LINE__); break; }
 #define xr_not_implemented()	xray_re::die("unimplemented code path", __FILE__, __LINE__)
 #define xr_not_expected()	xray_re::die("unexpected code path", __FILE__, __LINE__)
 #else
