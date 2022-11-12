@@ -1,4 +1,4 @@
-version: $(APPVEYOR_REPO_TAG_NAME).{build}
+version: $(appveyor_repo_tag_name).{build}
 image: Visual Studio 2019
 configuration: Release
 platform:
@@ -25,7 +25,7 @@ artifacts:
 deploy:
 - provider: GitHub
   auth_token:
-    secure: pXJeBrB1oq+/lPsy2jphy4dRQ542dkJRbAEOD3y/YgSVsoRTSgIt01EI92q9whrl
+    secure: xjiHaJEbgtHZ9AplJeGwGzPwrLxbYrv+6knxrOBTVevgiI9KWc4pkEAaI/14wJg6
   artifact: release
   on:
     appveyor_repo_tag: true
