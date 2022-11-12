@@ -3,6 +3,7 @@
 #include "xr_object_format.h"
 #include "xr_file_system.h"
 #include <regex>
+#include <functional>
 
 using namespace xray_re;
 

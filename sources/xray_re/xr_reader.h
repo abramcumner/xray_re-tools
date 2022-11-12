@@ -6,7 +6,6 @@
 
 #include <string>
 #include <vector>
-#include <functional>
 #include "xr_vector2.h"
 #include "xr_vector3.h"
 #include "xr_color.h"
