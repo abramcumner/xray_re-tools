@@ -26,9 +26,9 @@ bool batch_helper::prepare_target_name(const cl_parser& cl)
 void batch_helper::make_target_name(std::string& target, const char* source, const char* extension) const
 {
 	if (m_output_file.empty()) {
-		std::string name;
-		xr_file_system::split_path(source, 0, &name);
-		target = m_output_folder;
+		std::string name, folder;
+		xr_file_system::split_path(source, &folder, &name);
+		target = m_output_folder.empty() ? folder : m_output_folder;
 		target += name;
 		target += extension;
 	} else {
