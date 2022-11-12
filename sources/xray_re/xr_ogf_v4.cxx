@@ -350,12 +350,12 @@ void xr_ogf_v4::load_s_motions(xr_reader& r)
 		xr_not_expected();
 	size_t num_motions = r.r_u32();
 	xr_assert(m_motions.size() == num_motions);
-	for (uint32_t id = 1; id <= num_motions; ++id) {
-		if (!r.find_chunk(id))
+	for (size_t id = 0; id < num_motions; ++id) {
+		if (!r.find_chunk(id + 1))
 			xr_not_expected();
 
 		const char* name = r.skip_sz();
-		motion_io* smotion = static_cast<motion_io*>(find_motion(name));
+		motion_io* smotion = static_cast<motion_io*>(m_motions.at(id));
 		if (smotion == 0) {
 			msg("unknown motion %s", name);
 			throw xr_error();
@@ -436,9 +436,10 @@ void xr_ogf_v4::load_s_smparams(xr_reader& r)
 	assert(m_motions.empty());
 	size_t num_motions = r.r_u16();
 	m_motions.resize(num_motions);
-	for (; num_motions; --num_motions) {
+	for (size_t i = 0;i != num_motions; i++) {
 		motion_io* smotion = new xr_ogf_v4::motion_io;
-		m_motions.at(smotion->import_params(r, version)) = smotion;
+		smotion->import_params(r, version);
+		m_motions.at(i) = smotion;
 	}
 	assert(std::find(m_motions.begin(), m_motions.end(), static_cast<xr_skl_motion*>(0)) == m_motions.end());
 
