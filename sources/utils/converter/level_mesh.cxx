@@ -329,6 +329,8 @@ void level_mesh::setup_collision_models(b_submesh_vec& submeshes) const
 		b_submesh* sm = *it;
 		if (sm->opc_mesh.GetTris() != null)
 			continue;
+		if (sm->num_faces == 0)
+			continue;
 		if (sm->num_faces > 1) {
 			sm->opc_mesh.SetNbTriangles(udword(sm->num_faces & UINT32_MAX));
 			sm->opc_mesh.SetStrides(sizeof(b_face), sizeof(fvector3));
