@@ -3,7 +3,6 @@ image: Visual Studio 2019
 configuration: Release
 platform:
 - Win32
-- x64
 shallow_clone: true
 
 before_build:
