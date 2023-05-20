@@ -82,7 +82,11 @@
 // @@ NV_CC_MSVC7
 // @@ NV_CC_MSVC8
 
-#if defined POSH_COMPILER_GCC
+#if defined POSH_COMPILER_CLANG
+#   define NV_CC_CLANG  1
+#   define NV_CC_MSVC   1
+#   define NV_CC_STRING "clang-msvc"
+#elif defined POSH_COMPILER_GCC
 #	define NV_CC_GNUC	1
 #	define NV_CC_STRING "gcc"
 #elif defined POSH_COMPILER_MSVC

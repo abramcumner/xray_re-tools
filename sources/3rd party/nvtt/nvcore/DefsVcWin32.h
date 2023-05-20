@@ -37,7 +37,9 @@
 #endif
 
 // Ignore gcc attributes.
+#if !NV_CC_CLANG
 #define __attribute__(X)
+#endif
 
 #if !defined __FUNC__
 #define __FUNC__ __FUNCTION__ 
