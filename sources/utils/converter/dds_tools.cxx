@@ -1,5 +1,9 @@
 #define NOMINMAX
+#ifdef _WIN32
 #include <windows.h>
+#else
+#include <dirent.h>
+#endif
 #include <cstring>
 #include "dds_tools.h"
 #include "xr_image.h"
@@ -82,6 +86,7 @@ void dds_tools::process_file(const std::string& path)
 
 void dds_tools::process_folder(const std::string& path)
 {
+#ifdef _WIN32
 	WIN32_FIND_DATAA info;
 	HANDLE h = FindFirstFileA((m_textures + path + '*').c_str(), &info);
 	if (h == INVALID_HANDLE_VALUE)
@@ -95,6 +100,22 @@ void dds_tools::process_folder(const std::string& path)
 		}
 	} while (FindNextFileA(h, &info));
 	FindClose(h);
+#else
+    DIR *dir;
+    struct dirent *dp;
+
+    dir = opendir((m_textures + path + '*').c_str());
+
+    while ((dp = readdir(dir)) != NULL) {
+        if (dp->d_type == DT_DIR) {
+            if (std::strcmp(dp->d_name, ".") != 0 && std::strcmp(dp->d_name, "..") != 0)
+                process_folder((path + dp->d_name) + '\\');
+        } else {
+            process_file(path + dp->d_name);
+        }
+    }
+    closedir(dir);
+#endif
 }
 
 void dds_tools::process(const cl_parser& cl)

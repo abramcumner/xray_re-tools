@@ -270,7 +270,7 @@ template<typename T, typename F> inline void xr_ini_writer::w_ini_seq(const T& c
 template<typename T, typename F> inline void xr_ini_writer::w_ini_seq(const T& container, F write, const char* prefix)
 {
 	char buf[1024];
-
+#ifdef _WIN32
 	for (uint32_t id = 0, typename T::const_iterator it = container.begin(),
 			end = container.end(); it != end; ++it, ++id) {
 #if defined(_MSC_VER) && _MSC_VER >= 1400
@@ -281,6 +281,15 @@ template<typename T, typename F> inline void xr_ini_writer::w_ini_seq(const T& c
 		if (n > 0)
 			write(*it, *this, buf);
 	}
+#else
+    uint32_t id = 0;
+    for (typename T::const_iterator it = container.begin(),
+            end = container.end(); it != end; ++it, ++id) {
+        int n = snprintf(buf, sizeof(buf), "%s_%04d", prefix, id);
+        if (n > 0)
+            write(*it, *this, buf);
+    }
+#endif
 }
 
 template<typename T, typename F> inline void xr_ini_writer::w_sections(const T& container, F write, const char* prefix)

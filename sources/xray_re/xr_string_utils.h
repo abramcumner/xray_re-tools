@@ -26,17 +26,21 @@ static inline void xr_strlwr(char* s, size_t n)
 #endif
 }
 
-static inline int xr_stricmp(const char* s1, const char* s2)
-{
-	return _stricmp(s1, s2);
-}
-
 #if defined(_MSC_VER) && _MSC_VER >= 1400
 #define xr_snprintf	sprintf_s
 #else
 // FIXME: snprintf has different semantics really!!!
 #define xr_snprintf	snprintf
+#define _stricmp stricmp
+#define strcmpi stricmp
+#define lstrcpy strcpy
+#define stricmp strcasecmp
 #endif
+
+static inline int xr_stricmp(const char* s1, const char* s2)
+{
+	return _stricmp(s1, s2);
+}
 
 /*
 static char* xr_strdup(const char* string)

@@ -66,8 +66,11 @@ const uint32_t UINT_FAST32_MAX = UINT32_MAX;
 
 #else
 
-#warning unexpected build environment
+//#warning unexpected build environment
+#include <stdint.h>
 #include <inttypes.h>
+
+#define PRIuSIZET	"Iu"
 
 #endif
 
