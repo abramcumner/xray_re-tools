@@ -11,6 +11,11 @@
 #include "xr_file_system.h"
 #include "xr_utils.h"
 #include "xr_string_utils.h"
+
+#ifdef __linux__
+#define LZO_OS_POSIX 1
+#endif
+
 #include "lzo/minilzo.h"
 #include "crc32/crc32.h"
 

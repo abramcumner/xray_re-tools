@@ -282,7 +282,11 @@ void level_tools::reconstruct_scene(const char* level_name, const char* scene_na
 			m_spawn_version = CSE_VERSION_SOC;
 		else
 		{
+#ifdef _WIN32
 			std::string& version = std::string(m_ini->r_string(m_sect_profile, "spawn_version"));
+#else
+            std::string version = std::string(m_ini->r_string(m_sect_profile, "spawn_version"));
+#endif
 			xr_strlwr(version);
 			if (version == "soc")
 				m_spawn_version = CSE_VERSION_SOC;

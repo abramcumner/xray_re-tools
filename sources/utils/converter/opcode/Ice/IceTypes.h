@@ -49,8 +49,13 @@
 	typedef unsigned short		uword;		//!< sizeof(uword)	must be 2
 	typedef signed int			sdword;		//!< sizeof(sdword)	must be 4
 	typedef unsigned int		udword;		//!< sizeof(udword)	must be 4
+#ifdef _WIN32
 	typedef signed __int64		sqword;		//!< sizeof(sqword)	must be 8
 	typedef unsigned __int64	uqword;		//!< sizeof(uqword)	must be 8
+#else
+    typedef uint64_t 		    sqword;		//!< sizeof(sqword)	must be 8
+    typedef int64_t 	        uqword;		//!< sizeof(uqword)	must be 8
+#endif
 	typedef float				float32;	//!< sizeof(float32)	must be 4
 	typedef double				float64;	//!< sizeof(float64)	must be 4
 
