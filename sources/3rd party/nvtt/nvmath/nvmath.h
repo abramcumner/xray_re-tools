@@ -48,13 +48,16 @@
 #define IS_NEGATIVE_FLOAT(x)	(IR(x)&SIGN_BITMASK)
 */
 
-#if _MSC_VER < 1800
+namespace std
+{
+
 inline double sqrt_assert(const double f)
 {
 	nvDebugCheck(f >= 0.0f);
 	return sqrt(f);
 }
-#endif
+
+}
 
 inline float sqrtf_assert(const float f)
 {
