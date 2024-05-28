@@ -451,7 +451,7 @@ bool xr_scene::save_v12(const char* name)
 			it != end; ++it) {
 		xr_scene_part* part = *it;
 
-		const type_info& type = typeid(*part);
+		const std::type_info& type = typeid(*part);
 
 		w = new xr_ini_writer();
 		if (type == typeid(xr_scene_ai_map) ||

@@ -192,7 +192,7 @@ void xr_ini_writer::open_section(std::string format, ...)
 #if defined(_MSC_VER) && _MSC_VER >= 1400
 	int n = vsprintf_s(buf, sizeof(buf), format.c_str(), ap);
 #else
-	int n = vsnprintf(buf, sizeof(buf), format, ap);
+	int n = vsnprintf(buf, sizeof(buf), format.c_str(), ap);
 #endif
 	va_end(ap);
 	if (n == 0)
