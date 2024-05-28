@@ -1,3 +1,5 @@
+#ifdef _MSC_VER
+
 #include <string>
 #include <cstdlib>
 #include <sys/types.h>
@@ -285,3 +287,5 @@ size_t xr_file_writer_win32::tell()
 {
 	return SetFilePointer(m_h, 0, NULL, FILE_CURRENT);
 }
+
+#endif // _MSC_VER
