@@ -62,6 +62,7 @@ target_link_libraries(nvimage PRIVATE Nvtt::Core)
 add_library(Nvtt::Image ALIAS nvimage)
 
 add_library(nvtt STATIC)
+target_link_libraries(nvtt PRIVATE nvimage)
 target_include_directories(nvtt PUBLIC nvtt)
 target_sources(nvtt PRIVATE
 	nvtt/nvtt/CompressDXT.cpp
