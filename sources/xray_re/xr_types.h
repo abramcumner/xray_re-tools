@@ -57,7 +57,7 @@ const uint32_t UINT_FAST32_MAX = UINT32_MAX;
 #define PRIx32		"I32x"
 #define PRIuSIZET	"Iu"
 
-#elif defined(__MINGW32__)
+#elif defined(__MINGW32__) || defined(__linux__)
 
 #include <stdint.h>
 #include <inttypes.h>
