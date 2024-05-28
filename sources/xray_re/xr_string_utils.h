@@ -28,7 +28,11 @@ static inline void xr_strlwr(char* s, size_t n)
 
 static inline int xr_stricmp(const char* s1, const char* s2)
 {
+#ifdef _MSC_VER
 	return _stricmp(s1, s2);
+#else
+	return strcasecmp(s1, s2);
+#endif
 }
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400
