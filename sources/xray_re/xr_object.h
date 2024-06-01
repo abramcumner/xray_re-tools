@@ -4,21 +4,26 @@
 #ifndef __XR_OBJECT_H__
 #define __XR_OBJECT_H__
 
-#include <string>
-#include <vector>
-#ifdef _MSC_VER
-#if _MSC_VER >= 1900
-#define _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
-#endif
-#include <hash_map>
-#else
-#include <map>
-#endif
 #include "xr_bone.h"
 #include "xr_skl_motion.h"
 #include "xr_surface.h"
 #include "xr_surface_factory.h"
 #include "xr_mesh.h"
+#include <string>
+#include <vector>
+#include <unordered_map>
+
+template<>
+struct std::hash<xray_re::xr_raw_surface>
+{
+	size_t operator()(const xray_re::xr_raw_surface& surface) const noexcept
+	{
+		if constexpr (sizeof(size_t) == 8)
+			return surface.blob64;
+		else
+			return surface.blob32[0] ^ surface.blob32[1];
+	}
+};
 
 namespace xray_re {
 
@@ -35,17 +40,6 @@ enum {
 
 class xr_reader;
 class xr_writer;
-
-#ifdef _MSC_VER
-inline size_t hash_value(const xr_raw_surface& surface)
-{
-#if SIZE_MAX == _UI64_MAX
-	return surface.blob64;
-#else
-	return surface.blob32[0] ^ surface.blob32[1];
-#endif
-}
-#endif
 
 enum class compress_options
 {
@@ -129,14 +123,8 @@ protected:
 	std::string		m_modif_name;
 	uint32_t		m_modified_time;
 
-	const xr_surface_factory*
-				m_surface_factory;
-#ifdef _MSC_VER
-	stdext::hash_map<xr_raw_surface, xr_surface*>
-#else
-	std::map<xr_raw_surface, xr_surface*>
-#endif
-				m_raw_surfaces;
+	const xr_surface_factory* m_surface_factory;
+	std::unordered_map<xr_raw_surface, xr_surface*>	m_raw_surfaces;
 };
 
 TYPEDEF_STD_VECTOR_PTR(xr_object)
