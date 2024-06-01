@@ -129,12 +129,7 @@ target_sources(nvtt PRIVATE
 #target_link_libraries(nvtt PRIVATE Nvtt::Core)
 add_library(Nvtt::Nvtt ALIAS nvtt)
 
-add_library(libogg STATIC)
-target_include_directories(libogg PUBLIC libogg/include)
-target_sources(libogg PRIVATE
-	libogg/src/bitwise.c
-	libogg/src/framing.c)
-add_library(Xiph::libogg ALIAS libogg)
+add_subdirectory(libogg)
 
 add_library(libvorbis_static STATIC)
 target_include_directories(libvorbis_static
@@ -166,8 +161,8 @@ target_sources(libvorbis_static PRIVATE
 	libvorbis/lib/lpc.h
 	libvorbis/lib/lsp.c
 	libvorbis/lib/lsp.h
-	libvorbis/lib/Makefile.am
-	libvorbis/lib/Makefile.in
+#	libvorbis/lib/Makefile.am
+#	libvorbis/lib/Makefile.in
 	libvorbis/lib/mapping0.c
 	libvorbis/lib/masking.h
 	libvorbis/lib/mdct.c
@@ -189,12 +184,12 @@ target_sources(libvorbis_static PRIVATE
 	libvorbis/lib/vorbisenc.c
 	libvorbis/lib/window.c
 	libvorbis/lib/window.h)
-target_link_libraries(libvorbis_static PRIVATE Xiph::libogg)
+target_link_libraries(libvorbis_static PRIVATE Ogg::ogg)
 add_library(Xiph::libvorbis_static ALIAS libvorbis_static)
 
 add_library(libvorbisfile STATIC)
 target_include_directories(libvorbisfile PUBLIC libvorbis/include)
 target_sources(libvorbisfile PRIVATE
 	libvorbis/lib/vorbisfile.c)
-target_link_libraries(libvorbisfile PRIVATE Xiph::libogg Xiph::libvorbis_static)
+target_link_libraries(libvorbisfile PRIVATE Ogg::ogg Xiph::libvorbis_static)
 add_library(Xiph::libvorbisfile ALIAS libvorbisfile)

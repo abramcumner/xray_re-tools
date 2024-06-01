@@ -11,7 +11,6 @@
  ********************************************************************
 
  function: toplevel libogg include
- last mod: $Id: ogg.h 17571 2010-10-27 13:28:20Z xiphmont $
 
  ********************************************************************/
 #ifndef _OGG_H
@@ -161,6 +160,7 @@ extern int      ogg_stream_iovecin(ogg_stream_state *os, ogg_iovec_t *iov,
 extern int      ogg_stream_pageout(ogg_stream_state *os, ogg_page *og);
 extern int      ogg_stream_pageout_fill(ogg_stream_state *os, ogg_page *og, int nfill);
 extern int      ogg_stream_flush(ogg_stream_state *os, ogg_page *og);
+extern int      ogg_stream_flush_fill(ogg_stream_state *os, ogg_page *og, int nfill);
 
 /* Ogg BITSTREAM PRIMITIVES: decoding **************************/
 
