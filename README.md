@@ -8,7 +8,7 @@ X-Ray unofficial toolset for complex use with official S.T.A.L.K.E.R. MOD SDK. T
 
 ## Build
 
-1. Open solution(bld-vs2015\EngineToolset_vs2015.sln) in Visual Studio 2019.
+1. Open solution(bld-vs2015\EngineToolset_vs2015.sln) in Visual Studio 2022.
 2. Select active **Solution Configuration** and **Solution Platform**.
 3. From the Build menu, click Build Solution (Ctrl+Shift+B).
 
@@ -18,5 +18,5 @@ X-Ray unofficial toolset for complex use with official S.T.A.L.K.E.R. MOD SDK. T
 
 And see [Release](https://github.com/abramcumner/xray_re-tools/releases) section.
 
-[Visual C++ Redistributable for Visual Studio 2019](https://support.microsoft.com/ru-ru/help/2977003/the-latest-supported-visual-c-downloads) is required to run programs.
+[Visual C++ Redistributable for Visual Studio 2022](https://support.microsoft.com/ru-ru/help/2977003/the-latest-supported-visual-c-downloads) is required to run programs.
 

@@ -1,5 +1,5 @@
 version: $(APPVEYOR_REPO_TAG_NAME).{build}
-image: Visual Studio 2019
+image: Visual Studio 2022
 configuration: Release
 platform:
 - Win32
