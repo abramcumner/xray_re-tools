@@ -6,12 +6,11 @@
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
  * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2010             *
- * by the Xiph.Org Foundation http://www.xiph.org/                  *
+ * by the Xiph.Org Foundation https://xiph.org/                     *
  *                                                                  *
  ********************************************************************
 
  function: psychoacoustics not including preecho
- last mod: $Id: psy.c 17569 2010-10-26 17:09:47Z xiphmont $
 
  ********************************************************************/
 
@@ -600,11 +599,12 @@ static void bark_noise_hybridmp(int n,const long *b,
     XY[i] = tXY;
   }
 
-  for (i = 0, x = 0.f;; i++, x += 1.f) {
+  for (i = 0, x = 0.f; i < n; i++, x += 1.f) {
 
     lo = b[i] >> 16;
-    if( lo>=0 ) break;
     hi = b[i] & 0xffff;
+    if( lo>=0 || -lo>=n ) break;
+    if( hi>=n ) break;
 
     tN = N[hi] + N[-lo];
     tX = X[hi] - X[-lo];
@@ -616,17 +616,17 @@ static void bark_noise_hybridmp(int n,const long *b,
     B = tN * tXY - tX * tY;
     D = tN * tXX - tX * tX;
     R = (A + x * B) / D;
-    if (R < 0.f)
-      R = 0.f;
+    if (R < 0.f) R = 0.f;
 
     noise[i] = R - offset;
   }
 
-  for ( ;; i++, x += 1.f) {
+  for ( ; i < n; i++, x += 1.f) {
 
     lo = b[i] >> 16;
     hi = b[i] & 0xffff;
-    if(hi>=n)break;
+    if( lo<0 || lo>=n ) break;
+    if( hi>=n ) break;
 
     tN = N[hi] - N[lo];
     tX = X[hi] - X[lo];
@@ -642,6 +642,7 @@ static void bark_noise_hybridmp(int n,const long *b,
 
     noise[i] = R - offset;
   }
+
   for ( ; i < n; i++, x += 1.f) {
 
     R = (A + x * B) / D;
@@ -652,10 +653,11 @@ static void bark_noise_hybridmp(int n,const long *b,
 
   if (fixed <= 0) return;
 
-  for (i = 0, x = 0.f;; i++, x += 1.f) {
+  for (i = 0, x = 0.f; i < n; i++, x += 1.f) {
     hi = i + fixed / 2;
     lo = hi - fixed;
-    if(lo>=0)break;
+    if ( hi>=n ) break;
+    if ( lo>=0 ) break;
 
     tN = N[hi] + N[-lo];
     tX = X[hi] - X[-lo];
@@ -671,11 +673,12 @@ static void bark_noise_hybridmp(int n,const long *b,
 
     if (R - offset < noise[i]) noise[i] = R - offset;
   }
-  for ( ;; i++, x += 1.f) {
+  for ( ; i < n; i++, x += 1.f) {
 
     hi = i + fixed / 2;
     lo = hi - fixed;
-    if(hi>=n)break;
+    if ( hi>=n ) break;
+    if ( lo<0 ) break;
 
     tN = N[hi] - N[lo];
     tX = X[hi] - X[lo];
@@ -1020,7 +1023,9 @@ void _vp_couple_quantize_normalize(int blobno,
   int limit = g->coupling_pointlimit[p->vi->blockflag][blobno];
   float prepoint=stereo_threshholds[g->coupling_prepointamp[blobno]];
   float postpoint=stereo_threshholds[g->coupling_postpointamp[blobno]];
+#if 0
   float de=0.1*p->m_val; /* a blend of the AoTuV M2 and M3 code here and below */
+#endif
 
   /* mdct is our raw mdct output, floor not removed. */
   /* inout passes in the ifloor, passes back quantized result */
@@ -1154,27 +1159,28 @@ void _vp_couple_quantize_normalize(int blobno,
                 reM[j] += reA[j];
                 qeM[j] = fabs(reM[j]);
               }else{
+#if 0
                 /* AoTuV */
                 /** @ M2 **
                     The boost problem by the combination of noise normalization and point stereo is eased.
                     However, this is a temporary patch.
                     by Aoyumi @ 2004/04/18
                 */
-                /*float derate = (1.0 - de*((float)(j-limit+i) / (float)(n-limit)));
-                /* elliptical 
+                float derate = (1.0 - de*((float)(j-limit+i) / (float)(n-limit)));
+                /* elliptical */
                 if(reM[j]+reA[j]<0){
                   reM[j] = - (qeM[j] = (fabs(reM[j])+fabs(reA[j]))*derate*derate);
                 }else{
                   reM[j] =   (qeM[j] = (fabs(reM[j])+fabs(reA[j]))*derate*derate);
-                  }*/
-
+                }
+#else
                 /* elliptical */
                 if(reM[j]+reA[j]<0){
                   reM[j] = - (qeM[j] = fabs(reM[j])+fabs(reA[j]));
                 }else{
                   reM[j] =   (qeM[j] = fabs(reM[j])+fabs(reA[j]));
                 }
-
+#endif
 
               }
               reA[j]=qeA[j]=0.f;

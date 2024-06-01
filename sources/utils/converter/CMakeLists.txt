@@ -169,7 +169,7 @@ target_sources(converter PRIVATE
 target_link_libraries(converter PRIVATE
 	XrayRe::XrayRe
 	Ogg::ogg
-	Xiph::libvorbisfile
+	vorbisfile
 	Opcode::Opcode
 	Nvtt::Image Nvtt::Nvtt
 )
