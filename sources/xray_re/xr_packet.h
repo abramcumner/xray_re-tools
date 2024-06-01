@@ -127,32 +127,32 @@ public:
 			
 	size_t		tell() const;
 
-	virtual void		w_raw(const void* data, size_t size);
-	virtual void		w_sz(const std::string& value);
-	virtual void		w_u64(uint64_t value);
-	virtual void		w_u32(uint32_t value);
-	virtual void		w_s32(int32_t value);
-	virtual void		w_u16(uint16_t value);
-	virtual void		w_s16(int16_t value);
-	virtual void		w_u8(uint8_t value);
-	virtual void		w_s8(int8_t value);
-	virtual void		w_bool(bool value);
-	virtual void		w_float(float value);
-	virtual void		w_float_q8(float value, float min = 0, float max = 1.f);
-	virtual void		w_vec3(const fvector3& value);
+			void		w_raw(const void* data, size_t size)					override;
+			void		w_sz(const std::string& value)							override;
+			void		w_u64(uint64_t value)									override;
+			void		w_u32(uint32_t value)									override;
+			void		w_s32(int32_t value)									override;
+			void		w_u16(uint16_t value)									override;
+			void		w_s16(int16_t value)									override;
+			void		w_u8(uint8_t value)										override;
+			void		w_s8(int8_t value)										override;
+			void		w_bool(bool value)										override;
+			void		w_float(float value)									override;
+			void		w_float_q8(float value, float min = 0, float max = 1.f)	override;
+			void		w_vec3(const fvector3& value)							override;
 	//virtual void		w_matrix(const fmatrix& value);
-	virtual void		w_size_u32(size_t size);
-	virtual void		w_size_u16(size_t size);
-	virtual void		w_size_u8(size_t size);
+			void		w_size_u32(size_t size)									override;
+			void		w_size_u16(size_t size)									override;
+			void		w_size_u8(size_t size)									override;
 
-	virtual void		w_cseq(size_t n, const uint8_t values[]);
-	virtual void		w_seq(std::vector<uint8_t> container);
-	virtual void		w_seq(std::vector<uint16_t> container);
+			void		w_cseq(size_t n, const uint8_t values[])				override;
+			void		w_seq(std::vector<uint8_t> container)					override;
+			void		w_seq(std::vector<uint16_t> container)					override;
 
 	template<typename T> void write(const T& value);
 	template<typename T> void write_number(const T& value);
 
-	virtual const uint8_t*	buf() const;
+	const uint8_t*		buf() const override;
 
 	bool				is_ini() const override { return true; }
 private:
