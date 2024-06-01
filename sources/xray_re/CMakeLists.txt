@@ -239,6 +239,11 @@ target_sources(xray_re PRIVATE
 	xr_writer.cxx
 	xr_writer.h
 )
+
+if(NOT WIN32)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-multichar -std=c++17")
+endif()
+
 target_link_libraries(xray_re PRIVATE Nvtt::Image Nvtt::Nvtt)
 add_library(XrayRe::XrayRe ALIAS xray_re)
   

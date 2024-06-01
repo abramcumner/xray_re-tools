@@ -1,5 +1,12 @@
 #define NOMINMAX
-#include <windows.h>
+#ifdef WIN32
+#	include <windows.h>
+#else
+#	include <string.h>
+#	include <filesystem>
+namespace fs = std::filesystem;
+#endif
+
 #include "ogg_tools.h"
 #include "xr_types.h"
 #include "xr_file_system.h"
@@ -277,6 +284,7 @@ void ogg_tools::process_file(const std::string& path)
 
 void ogg_tools::process_folder(const std::string& path)
 {
+#ifdef WIN32
 	WIN32_FIND_DATAA info;
 	HANDLE h = FindFirstFileA((m_sounds + path + '*').c_str(), &info);
 	if (h == INVALID_HANDLE_VALUE)
@@ -290,6 +298,18 @@ void ogg_tools::process_folder(const std::string& path)
 		}
 	} while (FindNextFileA(h, &info));
 	FindClose(h);
+#else
+	fs::path fullpath(m_sounds + path);
+
+	if(!fs::exists(fullpath) || !fs::is_directory(fullpath))
+		return;
+
+	for(auto const& de: fs::recursive_directory_iterator(fullpath))
+	{
+		if(de.is_regular_file())
+			process_file(de.path());
+	}
+#endif
 }
 
 void ogg_tools::process(const cl_parser& cl)

@@ -23,6 +23,7 @@ typedef _bone_weight<uint32_t, float> fbone_weight;
 
 // up to 2 influences in SoC, and up to 4 in CS.
 template<typename Tb, typename Tw> struct _influence: public _svector<_bone_weight<Tb, Tw>, 4> {
+	using _svector<_bone_weight<Tb, Tw>, 4>::push_back;
 	void		set(uint32_t bone0);
 	void		set(uint16_t bone0, uint16_t bone1, float weight0);
 	void		set_wo_reorder(uint16_t bone0, uint16_t bone1, float weight0);

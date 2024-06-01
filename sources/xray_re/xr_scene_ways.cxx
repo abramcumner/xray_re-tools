@@ -83,7 +83,7 @@ struct write_point_ini { void operator()(const way_point_le& point, xr_ini_write
 	if (n > 0)
 		w->write(buf, point.position);
 
-	n = sprintf_s(buf, sizeof(buffer), "wp_%d_selected", id);
+	n = xr_snprintf(buf, sizeof(buffer), "wp_%d_selected", id);
 	if (n > 0)
 		w->write(buf, "off", false);
 }};

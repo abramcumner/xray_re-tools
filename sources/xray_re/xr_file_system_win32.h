@@ -1,8 +1,6 @@
-#ifndef __GNUC__
+#ifdef _MSC_VER
+
 #pragma once
-#endif
-#ifndef __XR_FILE_SYSTEM_WIN32_H__
-#define __XR_FILE_SYSTEM_WIN32_H__
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -38,4 +36,4 @@ private:
 
 } // end of namespace xray_re
 
-#endif
+#endif // _MSC_VER

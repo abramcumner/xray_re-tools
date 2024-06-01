@@ -235,7 +235,7 @@ xr_reader* xr_file_system::r_open(const char* path, const char* name) const
 xr_writer* xr_file_system::w_open(const char* path, const char* name) const
 {
 	const path_alias* pa = find_path_alias(path);
-	return pa ? w_open(pa->root + name) : false;
+	return pa ? w_open(pa->root + name) : nullptr;
 }
 
 bool xr_file_system::folder_exist(const char* path, const char* name) const

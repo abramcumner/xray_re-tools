@@ -162,10 +162,16 @@ target_sources(converter PRIVATE
 	crc32/crc32.c
 	crc32/crc32.h
 )
+
+if(NOT WIN32)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+endif()
+
 target_link_libraries(converter PRIVATE
 	XrayRe::XrayRe
 	Xiph::libogg
 	Xiph::libvorbisfile
 	Opcode::Opcode
+	Nvtt::Image Nvtt::Nvtt
 )
   

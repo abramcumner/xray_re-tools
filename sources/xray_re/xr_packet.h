@@ -160,6 +160,8 @@ private:
 	uint32_t		m_counter;
 	char			m_key_buffer[128];
 	char			m_temp_buffer[256];
+
+	template<typename T> void write_number_totemp(const T& value);
 };
 
 inline void xr_ini_packet::w_cseq(size_t n, const uint8_t values[])
@@ -187,9 +189,17 @@ template<typename T> inline void xr_ini_packet::write(const T& value){
 
 template<typename T> inline void xr_ini_packet::write_number(const T& value){
 	int n = xr_snprintf(m_key_buffer, sizeof(m_key_buffer), "%06d", ++m_counter);
-	n = xr_snprintf(m_temp_buffer, sizeof(m_temp_buffer), "%d", value);
+	write_number_totemp(value);
 	w->write(m_key_buffer, m_temp_buffer, false);
 	w_seek(w_tell() + sizeof(T));
+}
+
+template<typename T> inline void xr_ini_packet::write_number_totemp(const T& value){
+	xr_snprintf(m_temp_buffer, sizeof(m_temp_buffer), "%d", value);
+}
+
+template<> inline void xr_ini_packet::write_number_totemp<uint64_t>(const uint64_t& value){
+	xr_snprintf(m_temp_buffer, sizeof(m_temp_buffer), "%ld", value);
 }
 
 inline const uint8_t* xr_ini_packet::buf() const { return w->data(); }

@@ -1,5 +1,11 @@
 #define NOMINMAX
-#include <windows.h>
+#ifdef WIN32
+#	include <windows.h>
+#else
+#	include <filesystem>
+namespace fs = std::filesystem;
+#endif
+
 #include <cstring>
 #include "db_tools.h"
 #include "xr_scrambler.h"
@@ -421,6 +427,7 @@ void db_packer::process(const cl_parser& cl)
 
 void db_packer::process_folder(const std::string& path)
 {
+#ifdef WIN32
 	if (!path.empty()) {
 		for (std::vector<std::string>::iterator it = m_folders.begin(),
 				end = m_folders.end(); it != end; ++it) {
@@ -446,6 +453,18 @@ found:
 		}
 	} while (FindNextFileA(h, &info));
 	FindClose(h);
+#else
+	fs::path fullpath(m_root + path);
+
+	if(!fs::exists(fullpath) || !fs::is_directory(fullpath))
+		return;
+
+	for(auto const& de: fs::recursive_directory_iterator(fullpath))
+	{
+		if(de.is_regular_file())
+			process_file(de.path());
+	}
+#endif
 }
 
 void db_packer::process_file(const std::string& path)
