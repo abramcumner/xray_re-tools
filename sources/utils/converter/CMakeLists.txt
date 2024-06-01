@@ -105,6 +105,9 @@ target_sources(opcode PRIVATE
 add_library(Opcode::Opcode ALIAS opcode)
 
 add_executable(converter)
+set_target_properties(converter PROPERTIES
+	CXX_STANDARD 17
+	CXX_STANDARD_REQUIRED ON)
 target_include_directories(converter PRIVATE opcode)
 target_sources(converter PRIVATE
 	batch_helper.cxx
@@ -162,10 +165,6 @@ target_sources(converter PRIVATE
 	crc32/crc32.c
 	crc32/crc32.h
 )
-
-if(NOT WIN32)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-endif()
 
 target_link_libraries(converter PRIVATE
 	XrayRe::XrayRe

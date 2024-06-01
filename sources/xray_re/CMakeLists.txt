@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.15)
 project(xray_re LANGUAGES CXX)
 
 add_library(xray_re STATIC)
+set_target_properties(xray_re PROPERTIES
+	CXX_STANDARD 17
+	CXX_STANDARD_REQUIRED ON)
+if(NOT WIN32)
+	target_compile_options(xray_re PRIVATE -Wno-multichar)
+endif()
 target_include_directories(xray_re PUBLIC .)
 target_sources(xray_re PRIVATE
 	xr_aabb.h
@@ -50,10 +56,6 @@ target_sources(xray_re PRIVATE
 	xr_envelope_eval.cxx
 	xr_file_system.cxx
 	xr_file_system.h
-	xr_file_system_posix.cxx
-	xr_file_system_posix.h
-	xr_file_system_win32.cxx
-	xr_file_system_win32.h
 	xr_fixed_vector.h
 	xr_game_graph.cxx
 	xr_game_graph.h
@@ -239,11 +241,15 @@ target_sources(xray_re PRIVATE
 	xr_writer.cxx
 	xr_writer.h
 )
-
-if(NOT WIN32)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-multichar -std=c++17")
+if (WIN32)
+target_sources(xray_re PRIVATE
+	xr_file_system_win32.cxx
+	xr_file_system_win32.h)
+else()
+target_sources(xray_re PRIVATE
+	xr_file_system_posix.cxx
+	xr_file_system_posix.h)
 endif()
 
 target_link_libraries(xray_re PRIVATE Nvtt::Image Nvtt::Nvtt)
 add_library(XrayRe::XrayRe ALIAS xray_re)
-  
