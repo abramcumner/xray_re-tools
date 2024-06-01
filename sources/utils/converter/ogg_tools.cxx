@@ -2,6 +2,7 @@
 #ifdef WIN32
 #	include <windows.h>
 #else
+#	include <string.h>
 #	include <filesystem>
 namespace fs = std::filesystem;
 #endif

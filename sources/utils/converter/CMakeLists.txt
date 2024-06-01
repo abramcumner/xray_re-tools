@@ -172,5 +172,6 @@ target_link_libraries(converter PRIVATE
 	Xiph::libogg
 	Xiph::libvorbisfile
 	Opcode::Opcode
+	Nvtt::Image Nvtt::Nvtt
 )
   
