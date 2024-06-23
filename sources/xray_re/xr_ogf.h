@@ -25,7 +25,7 @@ public:
 	virtual void	clear();
 	virtual bool	load_ogf(const char* path, const std::string& name);
 	virtual void	load_ogf(xr_reader& r) = 0;
-	virtual void	to_object();
+	void			to_object(xr_sg_type sg_type) override;
 
 	class ogf_error: public xr_error {};
 

@@ -15,6 +15,8 @@ namespace xray_re {
 
 class level_aux_mesh: public xray_re::xr_mesh_builder {
 public:
+	level_aux_mesh();
+
 	void		build(const xray_re::xr_level_hom& hom);
 	void		build(const xray_re::xr_level_som& som, const xray_re::xr_gamemtls_lib& gamemtls_lib);
 	void		build(const xray_re::xr_cform& cform);

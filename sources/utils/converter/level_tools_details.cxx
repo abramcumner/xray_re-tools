@@ -44,7 +44,7 @@ void level_tools::reconstruct_details()
 
 		if (!texture.empty())
 			dm->texture() = texture;
-		dm->to_object();
+		dm->to_object(xr_sg_type::SOC);
 		save_object(dm, name.get());
 	}
 

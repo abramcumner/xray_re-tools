@@ -114,45 +114,65 @@ void level_mesh::create_smoothing_groups()
 
 	create_edges(true);
 
-	uint32_t* next_sgroup = new uint32_t[m_instances.size()];
-	xr_uninitialized_fill_n(next_sgroup, m_instances.size(), 0);
-
-	std::vector<uint32_t> adjacents;
-	adjacents.reserve(512);
-	for (b_face_vec_it it = m_faces.begin(), end = m_faces.end(); it != end; ++it) {
-		if (it->sgroup != EMESH_NO_SG)
-			continue;
-		uint32_t tag = it->tag, sgroup = next_sgroup[tag];
-		xr_assert(m_instances[tag]->tag == tag);
-		bool new_sgroup = false;
-		for (uint32_t face_idx = uint32_t((it - m_faces.begin()) & UINT32_MAX);;) {
-			b_face& face = m_faces[face_idx];
-			for (uint_fast32_t i = 3, v0, v1 = face.v0; i != 0; v1 = v0) {
-				b_edge* edge = find_edge(v0 = face.v[--i], v1);
-				xr_assert(edge);
-				if (!edge->smooth)
-					continue;
-				if (!new_sgroup) {
-					new_sgroup = true;
-					face.sgroup = sgroup;
+	if (m_sg_type == xr_sg_type::SOC) {
+		uint32_t* next_sgroup = new uint32_t[m_instances.size()];
+		xr_uninitialized_fill_n(next_sgroup, m_instances.size(), 0);
+		std::vector<uint32_t> adjacents;
+		adjacents.reserve(512);
+		for (b_face_vec_it it = m_faces.begin(), end = m_faces.end(); it != end; ++it) {
+			if (it->sgroup != EMESH_NO_SG)
+				continue;
+			uint32_t tag = it->tag, sgroup = next_sgroup[tag];
+			xr_assert(m_instances[tag]->tag == tag);
+			bool new_sgroup = false;
+			for (uint32_t face_idx = uint32_t((it - m_faces.begin()) & UINT32_MAX);;) {
+				b_face& face = m_faces[face_idx];
+				for (uint_fast32_t i = 3, v0, v1 = face.v0; i != 0; v1 = v0) {
+					b_edge* edge = find_edge(v0 = face.v[--i], v1);
+					xr_assert(edge);
+					if (!edge->smooth)
+						continue;
+					if (!new_sgroup) {
+						new_sgroup = true;
+						face.sgroup = sgroup;
+					}
+					uint32_t adjacent_idx = (edge->face0 == face_idx) ?
+							face.link[i] : edge->face0;
+					b_face& adjacent = m_faces[adjacent_idx];
+					if (adjacent.sgroup == EMESH_NO_SG && adjacent.tag == tag) {
+						adjacents.push_back(adjacent_idx);
+						adjacent.sgroup = sgroup;
+					}
 				}
-				uint32_t adjacent_idx = (edge->face0 == face_idx) ?
-						face.link[i] : edge->face0;
-				b_face& adjacent = m_faces[adjacent_idx];
-				if (adjacent.sgroup == EMESH_NO_SG && adjacent.tag == tag) {
-					adjacents.push_back(adjacent_idx);
-					adjacent.sgroup = sgroup;
+				if (adjacents.empty())
+					break;
+				face_idx = adjacents.back();
+				adjacents.pop_back();
+			}
+			if (new_sgroup)
+				++next_sgroup[tag];
+		}
+		delete[] next_sgroup;
+	} else if (m_sg_type == xr_sg_type::CSCOP) {
+		for (b_face_vec_it it = m_faces.begin(), end = m_faces.end(); it != end; ++it) {
+			uint32_t face_idx = uint32_t((it - m_faces.begin()) & UINT32_MAX);
+			b_face& face = *it;
+			uint32_t smoothing_data = 0;
+			for (uint_fast32_t i = 0; i < 3; ++i) {
+				uint32_t v0 = face.v[i];
+				uint32_t v1 = face.v[(i + 1) % 3];
+				b_edge* edge = find_edge(v0, v1);
+				xr_assert(edge);
+				if (!edge->smooth) {
+					smoothing_data |= (1 << i);
 				}
 			}
-			if (adjacents.empty())
-				break;
-			face_idx = adjacents.back();
-			adjacents.pop_back();
+			face.sgroup = smoothing_data;
 		}
-		if (new_sgroup)
-			++next_sgroup[tag];
 	}
-	delete[] next_sgroup;
+	else {
+		xr_not_implemented();
+	}
 }
 
 void level_mesh::pre_commit()

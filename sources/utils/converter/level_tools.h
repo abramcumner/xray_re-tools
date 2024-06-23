@@ -9,6 +9,7 @@
 #include "xr_types.h"
 #include "xr_surface_factory.h"
 #include "tools_base.h"
+#include "xr_sg_type.h"
 
 namespace xray_re {
 	class xr_scene;
@@ -24,7 +25,6 @@ namespace xray_re {
 	struct sector_data;
 	template<typename T> struct _vector3;
 	template<typename T> struct _matrix;
-
 	typedef _vector3<float> fvector3;
 	typedef _matrix<float> fmatrix;
 }
@@ -159,6 +159,9 @@ private:
 	uint16_t		m_default_sector_idx;
 
 	std::string		m_objects_ref;
+
+	const char* m_sg_val = 0;
+	xray_re::xr_sg_type m_sg_type = xray_re::xr_sg_type::SOC;
 };
 
 #endif

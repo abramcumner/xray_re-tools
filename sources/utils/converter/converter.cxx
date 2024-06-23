@@ -14,59 +14,77 @@
 
 using namespace xray_re;
 
+void usage_sg_param()
+{
+	printf(" -sg <TYPE>     smoothing group type according to <TYPE>\n");
+	printf("   soc          smoothing group like SOC SDK (default)\n");
+	printf("   cscop        smoothing group like CS/COP SDK\n");
+}
+
 void usage()
 {
 	printf("X-Ray game asset converter (A.0.2.0 %s)\n", BUILD_DATE);
 	printf("Vendor: ZENOBIAN mod team\n");
-	printf("Usage: converter <common-options> <format-specific-options> <input-objects>\n\n");
-	printf("Common options:\n");
-	printf(" -ro		perform all the steps but do not write anything on disk\n");
-	printf(" -fs <SPEC>	use this file system specification file (default is %s)\n", DEFAULT_FS_SPEC);
-	printf(" -out <PATH>	output file name (OGF, OMF, DM, XRDEMO and DB pack)\n");
-	printf(" -dir <PATH>	output folder name (OGF, OMF, DM, XRDEMO and DB unpack)\n\n");
-	printf("OGF options:\n");
-	printf(" -ogf		assume OGF format for input file(s)\n");
-	printf(" -object	save as .object file (default)\n");
-	printf(" -skls		save all motions as .skls file\n");
-	printf(" -skl <NAME>	save motion <NAME> as .skl file\n");
-	printf(" -bones		save all bones as .bones file\n\n");
-	printf("OMF options:\n");
-	printf(" -omf		assume OMF format for input file(s)\n");
-	printf(" -skls		save as .skls file (default)\n");
-	printf(" -skl <NAME>	save motion <NAME> as .skl file\n\n");
-	printf("DM options:\n");
-	printf(" -dm		assume DM format for input file(s)\n");
-	printf(" -object	save as .object file (default)\n");
-	printf(" -info		display shader, texture, min/max scale and flags\n\n");
+	printf("Usage: converter <common-options> <format-specific-options> <input-objects>\n");
+
+	printf("\nCommon options:\n");
+	printf(" -ro            perform all the steps but do not write anything on disk\n");
+	printf(" -fs <SPEC>     use this file system specification file (default is %s)\n", DEFAULT_FS_SPEC);
+	printf(" -out <PATH>    output file name (OGF, OMF, DM, XRDEMO and DB pack)\n");
+	printf(" -dir <PATH>    output folder name (OGF, OMF, DM, XRDEMO and DB unpack)\n");
+
+	printf("\nOGF options:\n");
+	printf(" -ogf           assume OGF format for input file(s)\n");
+	printf(" -object        save as .object file (default)\n");
+	printf(" -skls          save all motions as .skls file\n");
+	printf(" -skl <NAME>    save motion <NAME> as .skl file\n");
+	printf(" -bones         save all bones as .bones file\n");
+	usage_sg_param();
+
+	printf("\nOMF options:\n");
+	printf(" -omf           assume OMF format for input file(s)\n");
+	printf(" -skls          save as .skls file (default)\n");
+	printf(" -skl <NAME>    save motion <NAME> as .skl file\n");
+
+	printf("\nDM options:\n");
+	printf(" -dm            assume DM format for input file(s)\n");
+	printf(" -object        save as .object file (default)\n");
+	printf(" -info          display shader, texture, min/max scale and flags\n");
+
 //	printf("XRDEMO options:\n");
 //	printf(" -xrdemo	assume XRDEMO format for input file(s)\n\n");
-	printf("Level options:\n");
-	printf(" -level		assume game level format\n");
-	printf(" -mode <MODE>	assume output format according to <MODE>:\n");
-	printf("	maya	make single object for importing into Maya/3ds Max (default)\n");
-	printf("	le	split into terrain, merged edge-linked groups, MU models\n");
-	printf("	le2	split into terrain, raw edge-linked groups, MU models\n");
-	printf(" -terrain	make terrain object only from faces with terrain texture\n");
-	printf(" -with_lods	produce LOD textures for MU models\n");
-	printf(" -fancy <SPEC>	scale detail models and fix fences according to <SPEC>\n\n");
-	printf("OGG/WAV options:\n");
-	printf(" -ogg2wav	restore *.wav/*.thm in $sounds$ using *.ogg from $game_sounds$\n\n");
-	printf("DDS/TGA options:\n");
-	printf(" -dds2tga	restore *.tga in $textures$ using *.dds from $game_textures$\n");
-	printf(" -with_solid	don't ignore non-transparent textures (for xrLC -gi)\n");
-	printf(" -with_bump	don't ignore bump textures\n\n");
-	printf("DB options:\n");
-	printf(" -unpack	unpack game archive (expects list of file names)\n");
-	printf(" -pack		pack game archive (expects folder name)\n");
+
+	printf("\nLevel options:\n");
+	printf(" -level         assume game level format\n");
+	printf(" -mode <MODE>   assume output format according to <MODE>:\n");
+	printf("   maya         make single object for importing into Maya/3ds Max (default)\n");
+	printf("   le           split into terrain, merged edge-linked groups, MU models\n");
+	printf("   le2          split into terrain, raw edge-linked groups, MU models\n");
+	printf(" -terrain       make terrain object only from faces with terrain texture\n");
+	printf(" -with_lods     produce LOD textures for MU models\n");
+	printf(" -fancy <SPEC>  scale detail models and fix fences according to <SPEC>\n");
+	usage_sg_param();
+
+	printf("\nOGG/WAV options:\n");
+	printf(" -ogg2wav       restore *.wav/*.thm in $sounds$ using *.ogg from $game_sounds$\n");
+
+	printf("\nDDS/TGA options:\n");
+	printf(" -dds2tga       restore *.tga in $textures$ using *.dds from $game_textures$\n");
+	printf(" -with_solid    don't ignore non-transparent textures (for xrLC -gi)\n");
+	printf(" -with_bump     don't ignore bump textures\n");
+
+	printf("\nDB options:\n");
+	printf(" -unpack        unpack game archive (expects list of file names)\n");
+	printf(" -pack          pack game archive (expects folder name)\n");
 //	printf(" -strip_thm	remove attached image in texture descriptors\n");
-	printf(" -11xx		assume 1114/1154 archive format (unpack only)\n");
-	printf(" -2215		assume 2215 archive format (unpack only)\n");
-	printf(" -2945		assume 2945/2939 archive format (unpack only)\n");
-	printf(" -2947ru	assume release version format\n");
-	printf(" -2947ww	assume world-wide release version and 3120 format\n");
-	printf(" -xdb		assume .xdb or .db archive format\n");
-	printf(" -xdb_ud <FILE>	attach user data from <FILE>\n");
-	printf(" -flt <MASK> 	extract only files, filtered by mask\n");
+	printf(" -11xx          assume 1114/1154 archive format (unpack only)\n");
+	printf(" -2215          assume 2215 archive format (unpack only)\n");
+	printf(" -2945          assume 2945/2939 archive format (unpack only)\n");
+	printf(" -2947ru        assume release version format\n");
+	printf(" -2947ww        assume world-wide release version and 3120 format\n");
+	printf(" -xdb           assume .xdb or .db archive format\n");
+	printf(" -xdb_ud <FILE> attach user data from <FILE>\n");
+	printf(" -flt <MASK>    extract only files, filtered by mask\n");
 }
 
 int main(int argc, char* argv[])
@@ -96,6 +114,7 @@ int main(int argc, char* argv[])
 		{"-bones",	cl_parser::OT_BOOL},
 		{"-comment",	cl_parser::OT_BOOL},
 		{"-object",	cl_parser::OT_BOOL},
+		{"-sg",		cl_parser::OT_STRING},
 
 		{"-fs",		cl_parser::OT_STRING},
 		{"-out",	cl_parser::OT_STRING},

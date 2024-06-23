@@ -130,9 +130,9 @@ xr_surface* xr_ogf::create_surface(const xr_raw_surface& raw_surface) const
 	return surface;
 }
 
-void xr_ogf::to_object()
+void xr_ogf::to_object(xr_sg_type sg_type)
 {
-	xr_mesh_builder* mesh = new xr_mesh_builder;
+	xr_mesh_builder* mesh = new xr_mesh_builder(sg_type);
 	if (hierarchical()) {
 		size_t vb_reserve = 0, ib_reserve = 0;
 		unsigned vb_signature = 0;

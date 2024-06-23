@@ -23,7 +23,7 @@ class xr_bone;
 
 class xr_mesh_builder: public xr_mesh {
 public:
-			xr_mesh_builder();
+			xr_mesh_builder(xr_sg_type sg_type);
 	virtual		~xr_mesh_builder();
 
 	void		set_tc_fix(bool tc_fix);

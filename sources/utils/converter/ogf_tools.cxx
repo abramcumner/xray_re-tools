@@ -2,6 +2,8 @@
 #include "xr_ogf_v4.h"
 #include "xr_file_system.h"
 
+#include <cstring>
+
 using namespace xray_re;
 
 void ogf_tools::process(const cl_parser& cl)
@@ -16,6 +18,22 @@ void ogf_tools::process(const cl_parser& cl)
 		break;
 	}
 
+	xr_sg_type sg_type = xr_sg_type::SOC;
+	const char* sg_val = 0;
+	if (!cl.get_string("-sg", sg_val)) {
+		sg_type = xr_sg_type::SOC;
+	}
+	else if (std::strcmp(sg_val, "soc") == 0) {
+		sg_type = xr_sg_type::SOC;
+	}
+	else if (std::strcmp(sg_val, "cscop") == 0) {
+		sg_type = xr_sg_type::CSCOP;
+	}
+	else {
+		msg("invalid `-sg` param");
+		return;
+	}
+
 	if (!prepare_target_name(cl))
 		return;
 
@@ -26,7 +44,7 @@ void ogf_tools::process(const cl_parser& cl)
 			switch (format) {
 			case TARGET_DEFAULT:
 			case TARGET_OBJECT:
-				save_object(*ogf, source);
+				save_object(*ogf, source, sg_type);
 				break;
 			case TARGET_SKLS:
 				if (ogf->motions().empty()) {

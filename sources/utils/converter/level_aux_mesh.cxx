@@ -27,6 +27,10 @@ template<typename T> struct vertex_equal {
 template<typename T> inline
 const fvector3& face_vertex(const T* faces, uint32_t idx) { return faces[idx >> 2].v[idx & 3]; }
 
+level_aux_mesh::level_aux_mesh() : xr_mesh_builder(xr_sg_type::SOC)
+{
+}
+
 template<typename T> void level_aux_mesh::compact_vertices(std::vector<uint32_t>& refs, const T* faces)
 {
 	std::sort(refs.begin(), refs.end(), vertex_less<T>(faces));
