@@ -23,8 +23,8 @@ void usage_sg_param()
 
 void usage()
 {
-	printf("X-Ray game asset converter (A.0.2.0 %s)\n", BUILD_DATE);
-	printf("Vendor: ZENOBIAN mod team\n");
+	printf("X-Ray game asset converter (0.3.0.288 %s)\n", BUILD_DATE);
+	printf("Vendor: abramcumner\n");
 	printf("Usage: converter <common-options> <format-specific-options> <input-objects>\n");
 
 	printf("\nCommon options:\n");
