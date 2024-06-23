@@ -451,7 +451,7 @@ void level_tools::reconstruct_visuals()
 		calculate_ext_meshes(vb_size, ib_size);
 	}
 
-	level_mesh* mesh = new level_mesh(vb_size, ib_size);
+	level_mesh* mesh = new level_mesh(vb_size, ib_size, m_sg_type);
 	msg("collecting %s", "subdivisions");
 	if (xrlc_version >= XRLC_VERSION_9 && xrlc_version <= XRLC_VERSION_12 && version == OGF3_VERSION) {
 		uint16_t sector_idx = 0;

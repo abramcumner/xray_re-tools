@@ -57,9 +57,9 @@ xr_surface* xr_dm::create_surface(const xr_raw_surface& raw_surface) const
 	return surface;
 }
 
-void xr_dm::to_object()
+void xr_dm::to_object(xr_sg_type sg_type)
 {
-	xr_mesh_builder* mesh = new xr_mesh_builder;
+	xr_mesh_builder* mesh = new xr_mesh_builder(sg_type);
 	mesh->prepare(xr_vbuf::S_POINTS|xr_vbuf::S_TEXCOORDS, m_vb.size(), m_ib.size());
 	mesh->push(m_vb, m_ib, 0, 0);
 	mesh->compact_geometry();

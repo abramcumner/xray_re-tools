@@ -10,6 +10,7 @@
 
 namespace xray_re {
 	class xr_object;
+	enum class xr_sg_type;
 };
 
 class object_tools: public tools_base, public batch_helper {
@@ -29,7 +30,7 @@ public:
 	};
 
 protected:
-	void		save_object(xray_re::xr_object& object, const char* source) const;
+	void		save_object(xray_re::xr_object& object, const char* source, xray_re::xr_sg_type sg_type) const;
 	void		save_skl(xray_re::xr_object& object, const char* source, const cl_parser& cl) const;
 	void		save_skls(xray_re::xr_object& object, const char* source) const;
 	void		save_bones(xray_re::xr_object& object, const char* source) const;

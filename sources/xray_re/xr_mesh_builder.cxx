@@ -76,7 +76,10 @@ bool xr_mesh_builder::b_face::is_edge_smooth(const b_face& face, uint_fast32_t v
 
 ////////////////////////////////////////////////////////////////////////////////
 
-xr_mesh_builder::xr_mesh_builder() {}
+xr_mesh_builder::xr_mesh_builder(xr_sg_type sg_type)
+{
+	m_sg_type = sg_type;
+}
 
 xr_mesh_builder::~xr_mesh_builder() {}
 
@@ -466,7 +469,7 @@ void xr_mesh_builder::create_smoothing_groups()
 
 	create_edges(true);
 
-	if (0) {		// soc format
+	if (m_sg_type == xr_sg_type::SOC) {
 		m_sgroups.assign(m_faces.size(), EMESH_NO_SG);
 		std::vector<uint32_t> adjacents;
 		adjacents.reserve(512);
@@ -504,8 +507,7 @@ void xr_mesh_builder::create_smoothing_groups()
 				++sgroup;
 		}
 	}
-
-	else {		// cs/cop format
+	else if (m_sg_type == xr_sg_type::CSCOP) {
 		m_sgroups.assign(m_faces.size(), EMESH_NO_SG);
 		for (uint_fast32_t face_idx = 0; face_idx < m_faces.size(); ++face_idx) {
 			const b_face& face = m_faces[face_idx];
@@ -521,6 +523,9 @@ void xr_mesh_builder::create_smoothing_groups()
 			}
 			m_sgroups[face_idx] = smoothing_data;
 		}
+	}
+	else {
+		xr_not_implemented();
 	}
 }
 

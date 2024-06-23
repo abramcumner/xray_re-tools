@@ -18,11 +18,11 @@ void object_tools::process(const cl_parser& cl)
 }
 #endif
 
-void object_tools::save_object(xray_re::xr_object& object, const char* source) const
+void object_tools::save_object(xray_re::xr_object& object, const char* source, xr_sg_type sg_type) const
 {
 	std::string target;
 	make_target_name(target, source, ".object");
-	object.to_object();
+	object.to_object(sg_type);
 	if (!object.save_object(target.c_str()))
 		msg("can't save object in %s", target.c_str());
 }

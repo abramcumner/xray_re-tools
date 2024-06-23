@@ -114,7 +114,7 @@ void level_mesh::create_smoothing_groups()
 
 	create_edges(true);
 
-	if (0) {	// soc format
+	if (m_sg_type == xr_sg_type::SOC) {
 		uint32_t* next_sgroup = new uint32_t[m_instances.size()];
 		xr_uninitialized_fill_n(next_sgroup, m_instances.size(), 0);
 		std::vector<uint32_t> adjacents;
@@ -153,8 +153,7 @@ void level_mesh::create_smoothing_groups()
 				++next_sgroup[tag];
 		}
 		delete[] next_sgroup;
-
-	} else {	// cs/cop format
+	} else if (m_sg_type == xr_sg_type::CSCOP) {
 		for (b_face_vec_it it = m_faces.begin(), end = m_faces.end(); it != end; ++it) {
 			uint32_t face_idx = uint32_t((it - m_faces.begin()) & UINT32_MAX);
 			b_face& face = *it;
@@ -171,7 +170,9 @@ void level_mesh::create_smoothing_groups()
 			face.sgroup = smoothing_data;
 		}
 	}
-
+	else {
+		xr_not_implemented();
+	}
 }
 
 void level_mesh::pre_commit()

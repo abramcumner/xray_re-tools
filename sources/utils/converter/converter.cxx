@@ -14,6 +14,13 @@
 
 using namespace xray_re;
 
+void usage_sg_param()
+{
+	printf(" -sg <TYPE>     smoothing group type according to <TYPE>\n");
+	printf("   soc          smoothing group like SOC SDK (default)\n");
+	printf("   cscop        smoothing group like CS/COP SDK\n");
+}
+
 void usage()
 {
 	printf("X-Ray game asset converter (A.0.2.0 %s)\n", BUILD_DATE);
@@ -32,6 +39,7 @@ void usage()
 	printf(" -skls          save all motions as .skls file\n");
 	printf(" -skl <NAME>    save motion <NAME> as .skl file\n");
 	printf(" -bones         save all bones as .bones file\n");
+	usage_sg_param();
 
 	printf("\nOMF options:\n");
 	printf(" -omf           assume OMF format for input file(s)\n");
@@ -49,12 +57,13 @@ void usage()
 	printf("\nLevel options:\n");
 	printf(" -level         assume game level format\n");
 	printf(" -mode <MODE>   assume output format according to <MODE>:\n");
-	printf("    maya        make single object for importing into Maya/3ds Max (default)\n");
-	printf("    le          split into terrain, merged edge-linked groups, MU models\n");
-	printf("    le2         split into terrain, raw edge-linked groups, MU models\n");
+	printf("   maya         make single object for importing into Maya/3ds Max (default)\n");
+	printf("   le           split into terrain, merged edge-linked groups, MU models\n");
+	printf("   le2          split into terrain, raw edge-linked groups, MU models\n");
 	printf(" -terrain       make terrain object only from faces with terrain texture\n");
 	printf(" -with_lods     produce LOD textures for MU models\n");
 	printf(" -fancy <SPEC>  scale detail models and fix fences according to <SPEC>\n");
+	usage_sg_param();
 
 	printf("\nOGG/WAV options:\n");
 	printf(" -ogg2wav       restore *.wav/*.thm in $sounds$ using *.ogg from $game_sounds$\n");
@@ -105,6 +114,7 @@ int main(int argc, char* argv[])
 		{"-bones",	cl_parser::OT_BOOL},
 		{"-comment",	cl_parser::OT_BOOL},
 		{"-object",	cl_parser::OT_BOOL},
+		{"-sg",		cl_parser::OT_STRING},
 
 		{"-fs",		cl_parser::OT_STRING},
 		{"-out",	cl_parser::OT_STRING},

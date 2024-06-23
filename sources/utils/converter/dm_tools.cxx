@@ -27,7 +27,7 @@ void dm_tools::process(const cl_parser& cl)
 			switch (format) {
 			case TARGET_DEFAULT:
 			case TARGET_OBJECT:
-				save_object(*dm, source);
+				save_object(*dm, source, xr_sg_type::SOC);
 				break;
 			case TARGET_INFO:
 				msg("shader: %s", dm->shader().c_str());

@@ -29,7 +29,7 @@ class xr_dm: public xr_object {
 public:
 				xr_dm();
 	virtual			~xr_dm();
-	virtual void		to_object();
+	void			to_object(xr_sg_type sg_type) override;
 
 	bool			load_dm(const char* path);
 	void			load_dm(xr_reader& r);

@@ -109,6 +109,8 @@ void level_tools::process(const cl_parser& cl)
 		}
 	}
 
+	cl.get_string("-sg", m_sg_val);
+
 	m_ini = new xr_ini_file(CONVERTER_INI);
 	if (m_ini->empty() && !m_ini->load(PA_SDK_ROOT, CONVERTER_INI)) {
 		msg("can't load %s", CONVERTER_INI);
@@ -290,6 +292,21 @@ void level_tools::reconstruct_scene(const char* level_name, const char* scene_na
 				m_spawn_version = CSE_VERSION_CS;
 			else if (version == "cop")
 				m_spawn_version = CSE_VERSION_COP;
+		}
+
+		m_sg_type = xr_sg_type::SOC;
+		if (!m_sg_val) {
+			m_sg_type = m_spawn_version == CSE_VERSION_SOC ? xr_sg_type::SOC : xr_sg_type::CSCOP;
+		}
+		else if (std::strcmp(m_sg_val, "soc") == 0) {
+			m_sg_type = xr_sg_type::SOC;
+		}
+		else if (std::strcmp(m_sg_val, "cscop") == 0) {
+			m_sg_type = xr_sg_type::CSCOP;
+		}
+		else {
+			msg("invalid `-sg` param");
+			return;
 		}
 
 		reconstruct_details();

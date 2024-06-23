@@ -106,7 +106,7 @@ namespace xray_re {
 
 class level_mesh: public xray_re::xr_mesh_builder {
 public:
-			level_mesh(size_t vb_size, size_t ib_size);
+			level_mesh(size_t vb_size, size_t ib_size, xray_re::xr_sg_type);
 	virtual		~level_mesh();
 
 	void		build(float normal_tolerance);

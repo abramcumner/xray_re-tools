@@ -423,7 +423,7 @@ void xr_object::denominate()
 		(*it)->name().assign(name.get()).append("Shape");
 }
 
-void xr_object::to_object() {}
+void xr_object::to_object(xr_sg_type sg_type) {}
 
 xr_surface* xr_object::attach(const xr_raw_surface& raw_surface)
 {

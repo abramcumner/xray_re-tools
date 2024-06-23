@@ -59,7 +59,7 @@ uint16_t b_model::model_id() const
 
 ////////////////////////////////////////////////////////////////////////////////
 
-level_mesh::level_mesh(size_t vb_size, size_t ib_size):
+level_mesh::level_mesh(size_t vb_size, size_t ib_size, xr_sg_type sg_type) : xr_mesh_builder(sg_type),
 	m_debug_cform(false), m_debug_merge(false),
 	m_restricted_merge(false), m_aggressive_merge(false),
 	m_use_mt(false),

@@ -54,7 +54,7 @@ public:
 	virtual		~xr_object();
 
 	virtual void	clear();
-	virtual void	to_object();
+	virtual void	to_object(xr_sg_type sg_type);
 	virtual void	denominate();
 	virtual void	denominate_surfaces();
 
